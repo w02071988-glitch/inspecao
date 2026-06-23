@@ -2,14 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Inspeção">
-<meta name="theme-color" content="#1F3864">
-<link rel="manifest" href="./manifest.json">
-<link rel="apple-touch-icon" href="./icon-192.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inspeção de Correia</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
@@ -2140,72 +2133,9 @@ function voltar(){
 }
 
 renderLista();
-
-// ════════════════════════════════
-// SERVICE WORKER (PWA)
-// ════════════════════════════════
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
-  });
-}
-
-// ════════════════════════════════
-// LOCALSTORAGE — PERSISTÊNCIA AUTOMÁTICA
-// ════════════════════════════════
-const LS_KEY='inspecao_db_v2';
-
-function salvarLS(){
-  try{
-    const data={
-      ativos: ATIVOS,
-      registros: DB.registros,
-      fichas: DB.fichas,
-      raspAtivos: DB.raspAtivos,
-      anotacoesGerais: DB.anotacoesGerais,
-      favoritos: [...DB.favoritos],
-      regCounter
-    };
-    localStorage.setItem(LS_KEY, JSON.stringify(data));
-  }catch(e){
-    if(e.name==='QuotaExceededError')
-      mostrarToast('⚠ Armazenamento cheio! Exporte backup.','#C62828');
-  }
-}
-
-function carregarLS(){
-  try{
-    const raw=localStorage.getItem(LS_KEY);
-    if(!raw)return false;
-    const data=JSON.parse(raw);
-    if(Array.isArray(data.ativos)&&data.ativos.length){
-      ATIVOS.length=0;
-      data.ativos.forEach(a=>{ATIVOS.push(a);_initAtivo(a.id);});
-    }
-    ATIVOS.forEach(a=>{
-      if(data.registros?.[a.id])  DB.registros[a.id] =data.registros[a.id];
-      if(data.fichas?.[a.id])     DB.fichas[a.id]    =data.fichas[a.id];
-      if(data.raspAtivos?.[a.id]) DB.raspAtivos[a.id]=data.raspAtivos[a.id];
-    });
-    if(Array.isArray(data.anotacoesGerais)) DB.anotacoesGerais=data.anotacoesGerais;
-    if(Array.isArray(data.favoritos)) DB.favoritos=new Set(data.favoritos);
-    if(data.regCounter) regCounter=data.regCounter+1;
-    return true;
-  }catch(e){return false;}
-}
-
-const _origMarcarMudanca2=marcarMudanca;
-function marcarMudanca(){
-  _origMarcarMudanca2();
-  salvarLS();
-}
-
-const _carregouLS=carregarLS();
-if(_carregouLS) mostrarToast('✓ Dados restaurados!','#2E7D32');
 marcarSalvo();
 
-
 </script>
-
 </body>
 </html>
+<!-- placeholder para verificar tamanho -->
