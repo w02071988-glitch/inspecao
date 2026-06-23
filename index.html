@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Inspeção">
+<meta name="theme-color" content="#1F3864">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>Inspeção de Correia</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F0F2F5;min-height:100vh;}
+.topbar{background:#1F3864;color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;}
+.topbar-back{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:2px 6px 2px 0;display:none;}
+.topbar-back.vis{display:block;}
+.topbar-info{flex:1;}
+.topbar h1{font-size:15px;font-weight:600;}
+.topbar p{font-size:11px;opacity:.65;margin-top:1px;}
+.step-bar{display:flex;align-items:center;padding:12px 16px;background:#fff;border-bottom:1px solid #E5E8ED;}
+.step-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;}
+.step-dot.ativo{background:#1F3864;color:#fff;}
+.step-dot.feito{background:#D4EDDA;color:#2E7D32;}
+.step-dot.inativo{background:#EEF0F3;color:#9CA3AF;}
+.step-line{flex:1;height:2px;background:#EEF0F3;}
+.step-line.feito{background:#D4EDDA;}
+.step-labels{display:flex;justify-content:space-between;padding:2px 10px 10px;background:#fff;border-bottom:1px solid #E5E8ED;}
+.step-lbl{font-size:10px;color:#9CA3AF;text-align:center;width:70px;}
+.step-lbl.ativo{color:#1F3864;font-weight:600;}
+.content{padding:12px;}
+
+/* LISTA DE ATIVOS — GRID */
+.ativo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.ativo-card{background:#fff;border:1px solid #E5E8ED;border-radius:12px;padding:12px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;transition:border-color .15s;}
+.ativo-card:active{background:#F5F7FA;border-color:#2E75B6;}
+.ativo-card .ac-icon{font-size:24px;color:#2E75B6;margin-bottom:2px;}
+.ativo-card .ac-id{font-size:13px;font-weight:700;color:#1F3864;}
+.ativo-card .ac-tipo{font-size:10px;color:#9CA3AF;}
+/* Card Anotações Gerais — ocupa linha inteira */
+.anotacoes-gerais-card{background:#1F3864;border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.anotacoes-gerais-card:active{opacity:.88;}
+.anotacoes-gerais-card i{font-size:26px;color:#BDD9F8;}
+.anotacoes-gerais-card .ag-titulo{font-size:14px;font-weight:700;color:#fff;}
+.anotacoes-gerais-card .ag-sub{font-size:11px;color:#BDD9F8;margin-top:1px;}
+
+.pill{font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;display:inline-block;}
+.pill-ok{background:#E8F5E9;color:#2E7D32;}
+.pill-at{background:#FFF3E0;color:#E65100;}
+.pill-vn{background:#FFEBEE;color:#C62828;}
+.pill-neu{background:#EEF0F3;color:#6B7280;}
+.pill-blue{background:#E3F2FD;color:#1565C0;}
+
+/* MENU DO ATIVO */
+.ativo-banner{background:#fff;border:1px solid #E5E8ED;border-radius:12px;padding:12px 14px;margin-bottom:13px;display:flex;align-items:center;gap:12px;}
+.ativo-banner i{font-size:22px;color:#2E75B6;}
+.ab-id{font-size:15px;font-weight:700;color:#1F3864;}
+.ab-nome{font-size:12px;color:#6B7280;margin-top:1px;}
+.card-btn{background:#fff;border:1px solid #E5E8ED;border-radius:12px;padding:13px 8px;text-align:center;cursor:pointer;}
+.card-btn:active{background:#F5F7FA;}
+.card-btn.destaque{border:1.5px solid #1F3864;background:#EBF3FF;padding:14px;}
+.card-btn i{font-size:22px;color:#2E75B6;display:block;margin-bottom:5px;}
+.card-btn.destaque i{color:#1F3864;}
+.card-btn .cb-nome{font-size:11px;font-weight:700;color:#1F2937;line-height:1.3;}
+.card-btn .cb-sub{font-size:10px;color:#6B7280;margin-top:2px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+
+/* FORM */
+.bloco-titulo{font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.form-grupo{margin-bottom:12px;}
+.form-grupo label{font-size:13px;color:#374151;font-weight:500;display:block;margin-bottom:3px;}
+.lbl-hint{font-size:11px;color:#9CA3AF;font-weight:400;}
+.form-grupo input,.form-grupo select,.form-grupo textarea{width:100%;font-size:14px;padding:10px 12px;border:1px solid #D1D5DB;border-radius:8px;background:#fff;color:#111827;-webkit-appearance:none;}
+.form-grupo textarea{min-height:75px;resize:vertical;}
+.form-grupo input:focus,.form-grupo select:focus,.form-grupo textarea:focus{outline:none;border-color:#2E75B6;box-shadow:0 0 0 3px rgba(46,117,182,.12);}
+.desc-opts{display:flex;gap:6px;margin-bottom:7px;flex-wrap:wrap;}
+.desc-opt-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #D1D5DB;background:#fff;color:#374151;}
+.desc-opt-btn.blue{border-color:#2E75B6;background:#EBF3FF;color:#1F3864;}
+.rasp-bloco{background:#F8F9FB;border:1px solid #E5E8ED;border-radius:10px;padding:11px;margin-bottom:8px;}
+.rasp-bloco-titulo{font-size:12px;font-weight:700;color:#374151;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;}
+.toggle-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.toggle-btn{padding:6px 11px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:1px dashed #D1D5DB;background:#fff;color:#6B7280;display:flex;align-items:center;gap:4px;}
+.toggle-btn.ativo{border:1px solid #1F3864;background:#EBF3FF;color:#1F3864;border-style:solid;}
+.defeito-card{background:#fff;border:1px solid #E5E8ED;border-radius:10px;padding:11px;margin-bottom:10px;}
+.defeito-card-header{font-size:12px;font-weight:700;color:#1F3864;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.check-row{display:flex;align-items:center;gap:10px;padding:8px 0;}
+.check-row input[type=checkbox]{width:18px;height:18px;flex-shrink:0;cursor:pointer;accent-color:#1F3864;}
+.check-row label{font-size:13px;color:#1F2937;cursor:pointer;}
+.foto-area{border:2px dashed #D1D5DB;border-radius:8px;padding:14px;text-align:center;cursor:pointer;color:#6B7280;font-size:12px;background:#F9FAFB;}
+.foto-area i{font-size:26px;display:block;margin-bottom:4px;color:#9CA3AF;}
+.foto-prev-img{width:100%;border-radius:8px;margin-top:7px;display:none;}
+/* GALERIA */
+.galeria-wrap{margin-top:6px;}
+.galeria-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.galeria-thumb{position:relative;width:105px;height:105px;border-radius:8px;overflow:hidden;cursor:pointer;background:#EEF0F3;flex-shrink:0;}
+.galeria-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.galeria-thumb .g-rem{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.galeria-add-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:8px;border:1px solid #D1D5DB;background:#F9FAFB;color:#6B7280;font-size:12px;font-weight:600;cursor:pointer;margin-top:4px;}
+.galeria-add-btn i{font-size:15px;}
+.galeria-add-btn:active{background:#EEF0F3;}
+/* LIGHTBOX */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;align-items:center;justify-content:center;flex-direction:column;}
+.lightbox.vis{display:flex;}
+.lightbox img{max-width:96vw;max-height:80vh;border-radius:8px;object-fit:contain;}
+.lightbox-nav{display:flex;align-items:center;gap:16px;margin-top:14px;}
+.lb-btn{background:rgba(255,255,255,.15);border:none;color:#fff;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.lb-btn:disabled{opacity:.3;cursor:default;}
+.lb-counter{color:#fff;font-size:13px;min-width:50px;text-align:center;}
+.lb-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+.btn-prim{width:100%;padding:13px;background:#1F3864;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px;}
+.btn-prim:active{opacity:.85;}
+.btn-sec{width:100%;padding:11px;background:#fff;color:#374151;border:1px solid #D1D5DB;border-radius:10px;font-size:13px;cursor:pointer;margin-top:8px;}
+.btn-danger{width:100%;padding:11px;background:#fff;color:#C62828;border:1px solid #FFCDD2;border-radius:10px;font-size:13px;cursor:pointer;margin-top:8px;}
+.btn-sm{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;}
+.btn-sm-sec{background:#EEF0F3;color:#374151;}
+.btn-sm-danger{background:#FFEBEE;color:#C62828;}
+.btn-sm-green{background:#E8F5E9;color:#2E7D32;}
+.btn-sm-orange{background:#FFF3E0;color:#E65100;}
+
+/* SUCESSO */
+.sucesso{text-align:center;padding:24px 14px;}
+.sucesso .sico{font-size:48px;color:#2E7D32;display:block;margin-bottom:10px;}
+.sucesso h2{font-size:17px;font-weight:600;color:#1F2937;margin-bottom:5px;}
+.sucesso p{font-size:13px;color:#6B7280;line-height:1.5;}
+.sucesso-detalhes{background:#F8F9FB;border-radius:10px;padding:12px;margin:14px 0;text-align:left;}
+.sucesso-row{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid #F0F2F5;}
+.sucesso-row:last-child{border-bottom:none;}
+.sucesso-row span:first-child{color:#6B7280;}
+.sucesso-row span:last-child{font-weight:600;color:#1F2937;max-width:55%;text-align:right;}
+
+/* RELATÓRIO */
+.rel-section{background:#fff;border-radius:12px;border:1px solid #E5E8ED;margin-bottom:12px;overflow:hidden;}
+.rel-section-header{background:#1F3864;color:#fff;padding:9px 13px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;gap:7px;}
+.rel-ficha-row{display:flex;border-bottom:1px solid #F0F2F5;font-size:12px;}
+.rel-ficha-row:last-child{border-bottom:none;}
+.rel-ficha-label{background:#F8F9FB;padding:8px 10px;color:#6B7280;font-weight:500;min-width:95px;flex-shrink:0;}
+.rel-ficha-val{padding:8px 10px;color:#1F2937;font-weight:500;flex:1;}
+.reg-card{background:#F8F9FB;border:1px solid #E5E8ED;border-radius:8px;padding:11px;margin-bottom:8px;}
+.reg-card-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.rc-data{font-size:11px;color:#6B7280;}
+.reg-card-body{font-size:13px;color:#374151;line-height:1.5;}
+.reg-card-footer{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap;}
+.hist-sep{font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.06em;padding:9px 0 3px;border-top:1px solid #E5E8ED;margin-top:4px;}
+.status-em{background:#FFF3E0;color:#E65100;}
+.status-ac{background:#E3F2FD;color:#1565C0;}
+.status-co{background:#E8F5E9;color:#2E7D32;}
+.ficha-table{width:100%;border-collapse:collapse;font-size:12px;}
+.ficha-table th{background:#1F3864;color:#fff;padding:6px 8px;text-align:left;font-weight:600;}
+.ficha-table td{padding:6px 8px;border-bottom:1px solid #F0F2F5;}
+.ficha-table tr:last-child td{border-bottom:none;}
+.ficha-table .lbl{background:#F0F4FA;color:#374151;font-weight:600;}
+.trecho-header{background:#C5D8F0;font-weight:700;color:#1F3864;}
+.uss-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:6px;}
+.uss-cell{text-align:center;}
+.uss-num{font-size:10px;color:#6B7280;font-weight:600;margin-bottom:2px;}
+.uss-cell input{width:100%;font-size:10px;padding:4px 2px;border:1px solid #D1D5DB;border-radius:5px;text-align:center;background:#fff;}
+.uss-cell input:focus{outline:none;border-color:#2E75B6;}
+.uss-prev{font-size:9px;color:#9CA3AF;margin-top:1px;min-height:12px;}
+.empty-state{text-align:center;padding:18px;color:#9CA3AF;font-size:13px;}
+.empty-state i{font-size:30px;display:block;margin-bottom:5px;opacity:.4;}
+
+/* ANOTAÇÕES GERAIS */
+.anotacao-card{background:#fff;border:1px solid #E5E8ED;border-radius:10px;padding:12px;margin-bottom:8px;}
+.anotacao-ativo-badge{display:inline-block;background:#1F3864;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-bottom:7px;}
+.anotacao-data{font-size:11px;color:#9CA3AF;margin-bottom:5px;}
+.anotacao-desc{font-size:13px;color:#374151;line-height:1.5;}
+/* PAGINAÇÃO */
+.pag-bar{display:flex;justify-content:center;align-items:center;gap:8px;padding:12px 0;}
+.pag-btn{width:34px;height:34px;border-radius:8px;border:1px solid #D1D5DB;background:#fff;font-size:13px;font-weight:600;cursor:pointer;color:#374151;display:flex;align-items:center;justify-content:center;}
+.pag-btn.ativo{background:#1F3864;color:#fff;border-color:#1F3864;}
+.pag-btn:disabled{opacity:.4;cursor:default;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;}
+.modal-overlay.vis{display:flex;}
+.modal-box{background:#fff;border-radius:16px 16px 0 0;padding:18px 15px;width:100%;max-height:88vh;overflow-y:auto;}
+.modal-titulo{font-size:15px;font-weight:700;color:#1F2937;margin-bottom:13px;display:flex;justify-content:space-between;align-items:center;}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:#6B7280;}
+/* TOPBAR EXTRA BUTTONS */
+.topbar-actions{display:flex;gap:4px;margin-left:6px;}
+.topbar-icon-btn{background:rgba(255,255,255,.18);border:none;color:#fff;width:32px;height:32px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.topbar-icon-btn:active{background:rgba(255,255,255,.35);}
+/* PRINT */
+@media print{
+  .topbar,.step-bar,.step-labels,.btn-prim,.btn-sec,.btn-danger,.btn-sm,
+  .reg-card-footer,.topbar-actions,#step-bar-wrap,.no-print{display:none!important;}
+  body{background:#fff!important;}
+  .content{padding:5mm!important;}
+  .rel-section{border:1px solid #ccc;border-radius:3px;page-break-inside:avoid;margin-bottom:6px!important;}
+  .rel-section-header{background:#1F3864!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff!important;}
+  @page{size:A4 portrait;margin:10mm;}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <button class="topbar-back" id="btn-voltar" onclick="voltar()"><i class="ti ti-arrow-left"></i></button>
+  <div class="topbar-info">
+    <h1 id="topbar-titulo">Inspeção de Correia</h1>
+    <p id="topbar-sub"></p>
+  </div>
+  <div class="topbar-actions" id="topbar-actions" style="display:none;">
+    <button class="topbar-icon-btn" id="btn-print" title="Imprimir PDF" onclick="imprimirRelatorio()" style="display:none;"><i class="ti ti-printer"></i></button>
+    <button class="topbar-icon-btn" title="Compartilhar backup" onclick="compartilharBackup()"><i class="ti ti-share"></i></button>
+    <button class="topbar-icon-btn" title="Exportar backup" onclick="exportarBackup()"><i class="ti ti-download"></i></button>
+    <button class="topbar-icon-btn" title="Importar backup" onclick="document.getElementById('import-input').click()"><i class="ti ti-upload"></i></button>
+    <input type="file" id="import-input" accept=".json" style="display:none" onchange="importarBackup(this)">
+  </div>
+</div>
+<!-- Indicador de mudanças não salvas -->
+<div id="indicador-mudanca" style="display:none;background:#E65100;color:#fff;font-size:11px;font-weight:600;padding:5px 14px;text-align:center;align-items:center;justify-content:center;gap:8px;">
+  <i class="ti ti-alert-circle" style="font-size:13px;"></i>
+  Alterações não salvas
+  <button onclick="exportarBackup()" style="background:rgba(255,255,255,.25);border:none;color:#fff;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;">Salvar agora</button>
+</div>
+<!-- Modal edição anotação geral -->
+<div class="modal-overlay" id="modal-anotacao">
+  <div class="modal-box">
+    <div class="modal-titulo">
+      <span>Editar anotação</span>
+      <button class="modal-close" onclick="fecharModalAnotacao()"><i class="ti ti-x"></i></button>
+    </div>
+    <div id="modal-anotacao-corpo"></div>
+  </div>
+</div>
+<div id="step-bar-wrap">
+  <div class="step-bar">
+    <div class="step-dot ativo" id="dot1">1</div>
+    <div class="step-line" id="line1"></div>
+    <div class="step-dot inativo" id="dot2">2</div>
+    <div class="step-line" id="line2"></div>
+    <div class="step-dot inativo" id="dot3">3</div>
+  </div>
+  <div class="step-labels">
+    <span class="step-lbl ativo" id="lbl1">Ativo</span>
+    <span class="step-lbl" id="lbl2">Seção</span>
+    <span class="step-lbl" id="lbl3">Registro</span>
+  </div>
+</div>
+<div class="content" id="content"></div>
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal-box">
+    <div class="modal-titulo">
+      <span id="modal-titulo-txt">Editar</span>
+      <button class="modal-close" onclick="fecharModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div id="modal-corpo"></div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="fecharLightbox()">
+  <button class="lb-close" onclick="fecharLightbox()"><i class="ti ti-x"></i></button>
+  <img id="lb-img" src="" alt="" onclick="event.stopPropagation()">
+  <div class="lightbox-nav" onclick="event.stopPropagation()">
+    <button class="lb-btn" id="lb-prev" onclick="navLightbox(-1)"><i class="ti ti-chevron-left"></i></button>
+    <span class="lb-counter" id="lb-counter">1 / 1</span>
+    <button class="lb-btn" id="lb-next" onclick="navLightbox(1)"><i class="ti ti-chevron-right"></i></button>
+  </div>
+</div>
+<script>
+const hoje = new Date(); hoje.setHours(0,0,0,0);
+
+const ATIVOS=[
+  {id:'EP01L',tipo:'Empilhadeira'},{id:'EP01T',tipo:'Empilhadeira'},{id:'EP10',tipo:'Empilhadeira'},
+  {id:'RC01',tipo:'Recuperadora'},{id:'RC02A',tipo:'Recuperadora'},
+  {id:'TRA01',tipo:'Transportador'},{id:'TRA02',tipo:'Transportador'},{id:'TRA02A',tipo:'Transportador'},
+  {id:'TRA02B',tipo:'Transportador'},{id:'TRB03G',tipo:'Transportador'},{id:'TRC06',tipo:'Transportador'},
+  {id:'TRF02',tipo:'Transportador'},{id:'TRF06',tipo:'Transportador'},{id:'TRF07',tipo:'Transportador'},
+  {id:'TRF08',tipo:'Transportador'},{id:'TRH02',tipo:'Transportador'},{id:'TRH07',tipo:'Transportador'},
+  {id:'TRH14',tipo:'Transportador'},{id:'TRH15',tipo:'Transportador'},{id:'TRH16',tipo:'Transportador'},
+  {id:'TRH17',tipo:'Transportador'},{id:'TRH18',tipo:'Transportador'},{id:'TRH19',tipo:'Transportador'},
+  {id:'TRH20',tipo:'Transportador'},{id:'TRH30',tipo:'Transportador'},{id:'TRN01',tipo:'Transportador'},
+  {id:'TRN02',tipo:'Transportador'},{id:'TRN03',tipo:'Transportador'},{id:'TRN04',tipo:'Transportador'},
+  {id:'TRT12',tipo:'Transportador'},
+];
+
+const RASP_CHAVES=['prim','p2','s1','s2','s3','s4','s5'];
+const RASP_LABELS={prim:'Primário (P1)',p2:'Primário (P2)',s1:'Secundário S1',s2:'Secundário S2',s3:'Secundário S3',s4:'Secundário S4',s5:'Secundário S5'};
+const LETRAS=['A','B','C','D','E','F','G','H'];
+const POR_PAGINA=20;
+
+// DB principal
+const DB={registros:{},fichas:{},raspAtivos:{},anotacoesGerais:[]};
+ATIVOS.forEach(a=>{
+  DB.registros[a.id]=[];
+  DB.fichas[a.id]={cod:'',comprimento_total:'',trechos:[{l:'A',de:'',ate:'',comp:'',med:'',op:''}],specs:[{l:'A',spec:'',fab:''}],largura:'',lonas:'',resistencia:'',material:'',ultrassom:Array(21).fill(''),obs:''};
+  DB.raspAtivos[a.id]={prim:true,p2:false,s1:false,s2:false,s3:false,s4:false,s5:false};
+});
+
+let ativoSel=null,fotoB64=null,passo='lista',secaoSel=null,editandoReg=null,regCounter=1,pagAnotacoes=1;
+let _defIdx=0;
+
+const SECAO_LABELS={anotacao:'Anotações',contra:'Contrapeso',defeito:'Defeitos/Reparos',desal:'Desalinhamento',interf:'Interferências',rasp:'Raspadores'};
+const SECAO_ICONS={anotacao:'ti-notes',contra:'ti-adjustments',defeito:'ti-hammer',desal:'ti-arrows-left-right',interf:'ti-alert-triangle',rasp:'ti-tool'};
+// Ordem alfabética para o menu
+const SECOES_MENU=['anotacao','contra','defeito','desal','interf','rasp'];
+
+function fmtData(iso){if(!iso)return'—';const[y,m,d]=iso.split('-');return d+'/'+m+'/'+y;}
+function dataHojeISO(){return hoje.toISOString().split('T')[0];}
+function diasDesde(iso){if(!iso)return null;return Math.round((hoje-new Date(iso+'T00:00:00'))/86400000);}
+function iconeAtivo(t){return t==='Empilhadeira'?'ti-forklift':t==='Recuperadora'?'ti-refresh':'ti-engine';}
+function newId(){return 'r'+(regCounter++);}
+function ultimaAlteracao(id){const r=DB.registros[id];if(!r.length)return null;return r.map(x=>x.data).sort().reverse()[0];}
+function pillUltima(id){
+  const ult=ultimaAlteracao(id);
+  if(!ult)return{cls:'pill-neu',txt:'—'};
+  const d=diasDesde(ult);
+  if(d===0)return{cls:'pill-blue',txt:'Hoje'};
+  if(d<=7)return{cls:'pill-ok',txt:d+'d'};
+  if(d<=30)return{cls:'pill-at',txt:d+'d'};
+  return{cls:'pill-vn',txt:d+'d'};
+}
+function ultimoReg(ativoId,tipo){
+  const r=DB.registros[ativoId].filter(x=>x.tipo===tipo);
+  return r.length?r.sort((a,b)=>b.data.localeCompare(a.data))[0]:null;
+}
+function ultimoRaspChave(ativoId,chave){
+  const r=DB.registros[ativoId].filter(x=>x.tipo==='rasp'&&x.campos&&x.campos[chave]);
+  return r.length?r.sort((a,b)=>b.data.localeCompare(a.data))[0]:null;
+}
+
+function setTopbar(titulo,sub,back,showPrint){
+  document.getElementById('topbar-titulo').textContent=titulo;
+  document.getElementById('topbar-sub').textContent=sub||'';
+  document.getElementById('btn-voltar').classList.toggle('vis',!!back);
+  document.getElementById('topbar-actions').style.display='flex';
+  const btnP=document.getElementById('btn-print');
+  if(btnP)btnP.style.display=showPrint?'flex':'none';
+}
+function setStepBar(show,step){
+  document.getElementById('step-bar-wrap').style.display=show?'block':'none';
+  if(!show)return;
+  [1,2,3].forEach(i=>{
+    document.getElementById('dot'+i).className='step-dot '+(i<step?'feito':i===step?'ativo':'inativo');
+    document.getElementById('dot'+i).textContent=i<step?'✓':String(i);
+    document.getElementById('lbl'+i).className='step-lbl'+(i===step?' ativo':'');
+    const l=document.getElementById('line'+i);if(l)l.className='step-line'+(i<step?' feito':'');
+  });
+}
+
+// ════════════════════════════════
+// LISTA DE ATIVOS
+// ════════════════════════════════
+function renderLista(){
+  passo='lista';
+  setTopbar('Inspeção de Correia',hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}),false,false);
+  setStepBar(true,1);
+
+  let h=`
+    <div class="anotacoes-gerais-card" onclick="renderAnotacoesGerais()">
+      <i class="ti ti-notebook"></i>
+      <div>
+        <div class="ag-titulo">Anotações Gerais</div>
+        <div class="ag-sub">${DB.anotacoesGerais.length} anotação(ões) · toque para ver histórico</div>
+      </div>
+      <i class="ti ti-chevron-right" style="margin-left:auto;color:#BDD9F8;font-size:18px;"></i>
+    </div>
+    <div class="bloco-titulo">Ativos</div>
+    <div class="ativo-grid">`;
+
+  ATIVOS.forEach(a=>{
+    const{cls,txt}=pillUltima(a.id);
+    h+=`<div class="ativo-card" onclick="selAtivo('${a.id}')">
+      <i class="ti ${iconeAtivo(a.tipo)} ac-icon"></i>
+      <div class="ac-id">${a.id}</div>
+      <div class="ac-tipo">${a.tipo}</div>
+      <span class="pill ${cls}" style="margin-top:3px;">${txt}</span>
+    </div>`;
+  });
+
+  h+=`</div>`;
+  document.getElementById('content').innerHTML=h;
+}
+
+// ════════════════════════════════
+// ANOTAÇÕES GERAIS
+// ════════════════════════════════
+function renderAnotacoesGerais(){
+  passo='anotacoes-gerais';
+  setTopbar('Anotações Gerais','',true,false);
+  setStepBar(false);
+  pagAnotacoes=1;
+  document.getElementById('content').innerHTML=buildAnotacoesGeraisHtml();setTimeout(()=>renderGaleriaGrid('gal-ag'),0);
+}
+
+function buildAnotacoesGeraisHtml(){
+  const totalPags=Math.max(1,Math.ceil(DB.anotacoesGerais.length/POR_PAGINA));
+  const inicio=(pagAnotacoes-1)*POR_PAGINA;
+  const pagItems=DB.anotacoesGerais.slice(inicio,inicio+POR_PAGINA);
+
+  let h=`
+    <!-- FORM NOVA ANOTAÇÃO -->
+    <div class="rel-section" style="margin-bottom:12px;">
+      <div class="rel-section-header"><i class="ti ti-plus"></i> NOVA ANOTAÇÃO</div>
+      <div style="padding:12px;">
+        <div class="form-grupo">
+          <label>Ativo <span class="lbl-hint">(digitar)</span></label>
+          <input type="text" id="ag-ativo" placeholder="Ex: TRH22, RC01...">
+        </div>
+        <div class="form-grupo">
+          <label>Data da inspeção</label>
+          <input type="date" id="ag-data" value="${dataHojeISO()}">
+        </div>
+        <div class="form-grupo">
+          <label>Descrição</label>
+          <textarea id="ag-desc" placeholder="Descreva a anotação..."></textarea>
+        </div>
+        ${buildGaleriaField('gal-ag')}
+        <button class="btn-prim" onclick="salvarAnotacaoGeral()"><i class="ti ti-device-floppy"></i> Salvar anotação</button>
+      </div>
+    </div>
+
+    <!-- HISTÓRICO -->
+    <div class="rel-section">
+      <div class="rel-section-header" style="background:#374151;"><i class="ti ti-history"></i> HISTÓRICO DE ANOTAÇÕES</div>
+      <div style="padding:10px;">`;
+
+  if(!pagItems.length){
+    h+=`<div class="empty-state"><i class="ti ti-notes"></i>Nenhuma anotação registrada</div>`;
+  } else {
+    pagItems.forEach((an,i)=>{
+      const idxGlobal=inicio+i;
+      const fotos=an.fotos||[];
+      h+=`<div class="anotacao-card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;">
+          <span class="anotacao-ativo-badge">${an.ativo||'—'}</span>
+          <div style="display:flex;gap:5px;">
+            <button class="btn-sm btn-sm-sec" onclick="abrirEdicaoAnotacao(${idxGlobal})"><i class="ti ti-edit"></i></button>
+            <button class="btn-sm btn-sm-danger" onclick="excluirAnotacaoGeral(${idxGlobal})"><i class="ti ti-trash"></i></button>
+          </div>
+        </div>
+        <div class="anotacao-data"><i class="ti ti-calendar" style="vertical-align:-2px;"></i> ${fmtData(an.data)}</div>
+        <div class="anotacao-desc">${an.desc}</div>
+        ${buildGaleriaDisplay(fotos,'agd-'+idxGlobal)}
+      </div>`;
+    });
+  }
+
+  // Paginação
+  if(totalPags>1){
+    h+=`<div class="pag-bar">
+      <button class="pag-btn" onclick="mudaPagAnotacoes(${pagAnotacoes-1})" ${pagAnotacoes===1?'disabled':''}>‹</button>`;
+    for(let p=1;p<=totalPags;p++){
+      h+=`<button class="pag-btn ${p===pagAnotacoes?'ativo':''}" onclick="mudaPagAnotacoes(${p})">${p}</button>`;
+    }
+    h+=`<button class="pag-btn" onclick="mudaPagAnotacoes(${pagAnotacoes+1})" ${pagAnotacoes===totalPags?'disabled':''}>›</button>
+    </div>`;
+  }
+
+  h+=`</div></div>
+    <button class="btn-sec" onclick="renderLista()"><i class="ti ti-arrow-left"></i> Voltar</button>
+    <div style="height:20px;"></div>`;
+
+  return h;
+}
+
+function salvarAnotacaoGeral(){
+  const ativo=(document.getElementById('ag-ativo')?.value||'').trim();
+  const data=document.getElementById('ag-data')?.value||dataHojeISO();
+  const desc=(document.getElementById('ag-desc')?.value||'').trim();
+  if(!desc){alert('Preencha a descrição.');return;}
+  const fotos=getGalFotos('gal-ag');
+  DB.anotacoesGerais.unshift({ativo,data,desc,fotos});
+  resetGal('gal-ag');
+  marcarMudanca(); autoBackup();
+  agFotoB64='';
+  pagAnotacoes=1;
+  document.getElementById('content').innerHTML=buildAnotacoesGeraisHtml();setTimeout(()=>renderGaleriaGrid('gal-ag'),0);
+  // Feedback
+  const btn=document.querySelector('.btn-prim');
+  if(btn){const o=btn.innerHTML;btn.innerHTML='<i class="ti ti-check"></i> Salvo!';btn.style.background='#2E7D32';setTimeout(()=>{btn.innerHTML=o;btn.style.background='';},1600);}
+}
+
+function excluirAnotacaoGeral(idx){
+  if(!confirm('Excluir esta anotação?'))return;
+  DB.anotacoesGerais.splice(idx,1);
+  if(pagAnotacoes>Math.max(1,Math.ceil(DB.anotacoesGerais.length/POR_PAGINA))) pagAnotacoes=1;
+  document.getElementById('content').innerHTML=buildAnotacoesGeraisHtml();setTimeout(()=>renderGaleriaGrid('gal-ag'),0);
+}
+
+function mudaPagAnotacoes(p){
+  const total=Math.max(1,Math.ceil(DB.anotacoesGerais.length/POR_PAGINA));
+  if(p<1||p>total)return;
+  pagAnotacoes=p;
+  document.getElementById('content').innerHTML=buildAnotacoesGeraisHtml();setTimeout(()=>renderGaleriaGrid('gal-ag'),0);
+}
+
+// ════════════════════════════════
+// MENU DO ATIVO
+// ════════════════════════════════
+function selAtivo(id){ativoSel=id;renderMenu();}
+function renderMenu(){
+  passo='menu';
+  const a=ATIVOS.find(x=>x.id===ativoSel);
+  const{cls,txt}=pillUltima(ativoSel);
+  setTopbar(ativoSel,a.tipo,true,false);
+  setStepBar(true,2);
+
+  // seções em ordem alfabética — 3 por linha exceto rasp que destaca
+  let secoesHtml='<div class="grid-2" style="gap:8px;">';
+  SECOES_MENU.forEach(s=>{
+    secoesHtml+=`<div class="card-btn" onclick="selSecao('${s}')">
+      <i class="ti ${SECAO_ICONS[s]}"></i>
+      <div class="cb-nome">${SECAO_LABELS[s]}</div>
+    </div>`;
+  });
+  secoesHtml+=`</div>`;
+
+  document.getElementById('content').innerHTML=`
+    <div class="ativo-banner">
+      <i class="ti ${iconeAtivo(a.tipo)}"></i>
+      <div><div class="ab-id">${a.id}</div><div class="ab-nome">${a.tipo}</div></div>
+      <span class="pill ${cls}" style="margin-left:auto;">${txt}</span>
+    </div>
+    <div class="grid-2" style="margin-bottom:13px;gap:8px;">
+      <div class="card-btn destaque" onclick="renderRelatorio()">
+        <i class="ti ti-clipboard-data"></i>
+        <div class="cb-nome">Relatório</div><div class="cb-sub">Ficha completa</div>
+      </div>
+      <div class="card-btn destaque" onclick="renderFicha()">
+        <i class="ti ti-table"></i>
+        <div class="cb-nome">Dados do Transportador</div><div class="cb-sub">Ficha técnica</div>
+      </div>
+    </div>
+    <div class="bloco-titulo">Registrar inspeção</div>
+    ${secoesHtml}
+    <button class="btn-sec" style="margin-top:12px;" onclick="renderLista()"><i class="ti ti-arrow-left"></i> Outro ativo</button>`;
+}
+
+// ════════════════════════════════
+// FORMULÁRIO
+// ════════════════════════════════
+function selSecao(key){secaoSel=key;fotoB64=null;_defIdx=0;renderForm();}
+
+function galNs(sec){return 'gal-'+sec;}
+
+function renderForm(){
+  passo='form';
+  setTopbar(ativoSel,SECAO_LABELS[secaoSel],true,false);
+  setStepBar(true,3);
+  const rU=ultimoReg(ativoSel,secaoSel);
+  const hDesc=rU?.desc||'';
+  const hData=rU?'(última: '+fmtData(rU.data)+')':'';
+  const ns=galNs(secaoSel);
+  resetGal(ns);
+
+  let c=`<div class="form-grupo">
+    <label>Data da inspeção <span class="lbl-hint">${hData}</span></label>
+    <input type="date" id="f-data" value="${dataHojeISO()}">
+  </div>`;
+
+  if(secaoSel==='rasp') c+=buildRaspForm();
+  else if(secaoSel==='interf') c+=buildInterfForm(rU);
+  else if(secaoSel==='desal') c+=buildDesalForm(rU);
+  else if(secaoSel==='contra') c+=buildContraForm(rU);
+  else if(secaoSel==='defeito') c+=buildDefeitoForm();
+  else if(secaoSel==='anotacao') c+=buildAnotacaoForm(hDesc);
+
+  // Galeria para seções simples (não rasp, defeito, anotacao — elas têm galeria própria)
+  if(!['defeito','rasp','anotacao'].includes(secaoSel)){
+    c+=buildGaleriaField(ns);
+  }
+  c+=`<button class="btn-prim" onclick="salvar()">Salvar registro</button>
+      <button class="btn-sec" onclick="renderMenu()"><i class="ti ti-arrow-left"></i> Voltar ao menu</button>`;
+
+  document.getElementById('content').innerHTML=`
+    <div class="ativo-banner">
+      <i class="ti ${SECAO_ICONS[secaoSel]}" style="font-size:20px;color:#2E75B6;"></i>
+      <div><div class="ab-id">${SECAO_LABELS[secaoSel]}</div><div class="ab-nome">${ativoSel}</div></div>
+    </div>${c}`;
+
+  // Inicializa grids após DOM render
+  const grids=[ns];
+  if(secaoSel==='anotacao') grids.push('gal-f-foto-an');
+  initGals(...grids);
+}
+
+function buildFotoField(fotoId,inpId,prevId){
+  // fotoId used as namespace key for the gallery
+  return buildGaleriaField(fotoId);
+}
+
+// ── GALERIA (até 6 fotos) ──
+// Armazena fotos por namespace: galFotos['f-foto'] = [b64, b64, ...]
+const galFotos={};
+
+function buildGaleriaField(ns){
+  if(!galFotos[ns]) galFotos[ns]=[];
+  return `<div class="form-grupo">
+    <label>Fotos <span class="lbl-hint">(até 6)</span></label>
+    <div class="galeria-wrap">
+      <div class="galeria-grid" id="gal-grid-${ns}"></div>
+      <div id="gal-btn-${ns}">
+        <div class="galeria-add-btn" onclick="document.getElementById('gal-inp-${ns}').click()">
+          <i class="ti ti-camera"></i> Adicionar foto
+        </div>
+      </div>
+    </div>
+    <input type="file" id="gal-inp-${ns}" accept="image/*" multiple style="display:none" onchange="adicionarFotos('${ns}',this)">
+  </div>`;
+}
+
+function renderGaleriaGrid(ns){
+  const grid=document.getElementById('gal-grid-'+ns);
+  if(!grid)return;
+  if(!galFotos[ns])galFotos[ns]=[];
+  const fotos=galFotos[ns];
+  let h='';
+  fotos.forEach((b64,i)=>{
+    h+=`<div class="galeria-thumb" onclick="abrirLightbox('${ns}',${i})">
+      <img src="${b64}" alt="foto ${i+1}">
+      <button class="g-rem" onclick="event.stopPropagation();removerFotoGal('${ns}',${i})"><i class="ti ti-x" style="font-size:9px;"></i></button>
+    </div>`;
+  });
+  grid.innerHTML=h;
+  // Mostra/oculta botão de adicionar
+  const btn=document.getElementById('gal-btn-'+ns);
+  if(btn) btn.style.display=fotos.length>=6?'none':'block';
+}
+
+function adicionarFotos(ns,input){
+  if(!galFotos[ns])galFotos[ns]=[];
+  const files=Array.from(input.files);
+  const restante=6-galFotos[ns].length;
+  const toAdd=files.slice(0,restante);
+  let loaded=0;
+  toAdd.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      galFotos[ns].push(e.target.result);
+      loaded++;
+      if(loaded===toAdd.length) renderGaleriaGrid(ns);
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value='';
+}
+
+function removerFotoGal(ns,idx){
+  if(galFotos[ns])galFotos[ns].splice(idx,1);
+  renderGaleriaGrid(ns);
+}
+
+function getGalFotos(ns){
+  return galFotos[ns]||[];
+}
+
+function buildGaleriaDisplay(fotos,uid){
+  if(!fotos||!fotos.length)return'';
+  let h='<div class="galeria-grid" style="margin-top:8px;">';
+  fotos.forEach((b64,i)=>{
+    // Store array on window keyed by uid for lightbox
+    const safeUid='lbs_'+uid.replace(/[^a-z0-9]/gi,'_');
+    h+=`<div class="galeria-thumb" onclick="lbOpenSaved('${safeUid}',${i},${JSON.stringify(fotos).replace(/</g,'\\u003c')})">
+      <img src="${b64}" alt="foto ${i+1}">
+    </div>`;
+  });
+  h+='</div>';
+  return h;
+}
+function lbOpenSaved(uid,idx,arr){
+  lbArrCurrent=arr||window['_lb_'+uid]||[];
+  window['_lb_'+uid]=lbArrCurrent;
+  lbIdx=idx;
+  document.getElementById('lb-prev').onclick=()=>{lbIdx--;atualizarLightboxArr();};
+  document.getElementById('lb-next').onclick=()=>{lbIdx++;atualizarLightboxArr();};
+  atualizarLightboxArr();
+  document.getElementById('lightbox').classList.add('vis');
+}
+
+function buildAnotacaoForm(hDesc){
+  resetGal('gal-anotacao');
+  setTimeout(()=>renderGaleriaGrid('gal-anotacao'),0);
+  return buildDescGroup('f-desc',hDesc)+buildGaleriaField('gal-anotacao');
+}
+
+function resetGal(ns){
+  galFotos[ns]=[];
+}
+
+// Inicializa grid após render (chamada logo após innerHTML)
+function initGals(...namespaces){
+  setTimeout(()=>{namespaces.forEach(ns=>renderGaleriaGrid(ns));},0);
+}
+
+// ── LIGHTBOX ──
+let lbNs='',lbIdx=0;
+function abrirLightbox(ns,idx){
+  lbNs=ns;lbIdx=idx;
+  atualizarLightbox();
+  document.getElementById('lightbox').classList.add('vis');
+}
+function atualizarLightbox(){
+  const fotos=galFotos[lbNs]||[];
+  if(!fotos.length)return;
+  lbIdx=Math.max(0,Math.min(lbIdx,fotos.length-1));
+  document.getElementById('lb-img').src=fotos[lbIdx];
+  document.getElementById('lb-counter').textContent=(lbIdx+1)+' / '+fotos.length;
+  document.getElementById('lb-prev').disabled=lbIdx===0;
+  document.getElementById('lb-next').disabled=lbIdx===fotos.length-1;
+}
+function navLightbox(dir){lbIdx+=dir;atualizarLightbox();}
+function fecharLightbox(){document.getElementById('lightbox').classList.remove('vis');}
+
+// Lightbox para fotos já salvas (array de b64)
+let lbArrCurrent=[];
+function abrirLightboxArr(arr,idx){
+  lbArrCurrent=arr;lbIdx=idx;
+  atualizarLightboxArr();
+  document.getElementById('lightbox').classList.add('vis');
+}
+function atualizarLightboxArr(){
+  const fotos=lbArrCurrent;
+  if(!fotos.length)return;
+  lbIdx=Math.max(0,Math.min(lbIdx,fotos.length-1));
+  document.getElementById('lb-img').src=fotos[lbIdx];
+  document.getElementById('lb-counter').textContent=(lbIdx+1)+' / '+fotos.length;
+  document.getElementById('lb-prev').disabled=lbIdx===0;
+  document.getElementById('lb-next').disabled=lbIdx===fotos.length-1;
+  // remap nav buttons
+  document.getElementById('lb-prev').onclick=()=>{lbIdx--;atualizarLightboxArr();};
+  document.getElementById('lb-next').onclick=()=>{lbIdx++;atualizarLightboxArr();};
+}
+
+function carregarFoto(input,prevId){
+  // legacy — não mais usado diretamente
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    fotoB64=e.target.result;
+    const img=document.getElementById(prevId);
+    if(img){img.src=e.target.result;img.style.display='block';}
+    input.dataset.b64=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function buildInterfForm(rU){
+  return buildDescGroup('f-desc',rU?.desc||'')+`
+  <div class="form-grupo"><label>Tipo</label>
+    <select id="f-tipo-interf" onchange="toggleEl('f-tipo-interf','outros','bloco-outros-interf')">
+      <option value="">Selecione</option><option>Interferência</option><option>Interdição</option>
+      <option value="outros">Outros (digitar)</option>
+    </select></div>
+  <div id="bloco-outros-interf" style="display:none;">
+    <div class="form-grupo"><label>Especificar</label><input type="text" id="f-tipo-outros" placeholder="Descreva..."></div>
+  </div>
+  <div class="form-grupo"><label>Baliza / local</label><input type="text" id="f-bal" placeholder="Ex: B3, PE, cabeça..."></div>
+  <div class="check-row"><input type="checkbox" id="f-novo"><label for="f-novo">Novo evento (não existia antes)</label></div>
+  <div class="form-grupo" style="margin-top:8px;"><label>Criticidade</label>
+    <select id="f-crit"><option value="">Selecione</option><option>Baixo</option><option>Médio</option><option>Alto</option></select></div>
+  <div class="form-grupo"><label>Status</label>
+    <select id="f-status"><option value="em">Em andamento</option><option value="ac">Acompanhando</option><option value="co">Concluído</option></select></div>`;
+}
+
+function buildDesalForm(rU){
+  return buildDescGroup('f-desc',rU?.desc||'')+`
+  <div class="form-grupo"><label>Local</label><input type="text" id="f-local" placeholder="Ex: retorno, carga, meio..."></div>
+  <div class="form-grupo"><label>Status</label>
+    <select id="f-status-desal"><option value="ac">Acompanhando</option><option value="em">Em andamento</option><option value="co">Concluído</option></select></div>`;
+}
+
+function buildContraForm(rU){
+  return buildDescGroup('f-desc',rU?.desc||'')+`
+  <div class="form-grupo">
+    <label>Posição / leitura <span class="lbl-hint">${rU?.campos?.pos?'(último: '+rU.campos.pos+')':''}</span></label>
+    <input type="text" id="f-pos" placeholder="Ex: 45cm, limite inferior...">
+  </div>`;
+}
+
+function buildDefeitoForm(){
+  _defIdx=0;
+  return `<div id="defeitos-container">${buildDefeitoBloco(0)}</div>
+  <button type="button" class="btn-sec" onclick="adicionarDefeito()" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px;">
+    <i class="ti ti-plus"></i> Adicionar outro defeito/reparo
+  </button>`;
+}
+
+function buildDefeitoBloco(idx){
+  const id='def-'+idx;
+  return `<div class="defeito-card" id="card-${id}">
+    <div class="defeito-card-header">Defeito${idx>0?' #'+(idx+1):''}
+      ${idx>0?`<button class="btn-sm btn-sm-danger" onclick="removerDefeito('${id}')"><i class="ti ti-trash"></i> Remover</button>`:''}
+    </div>
+    <div class="form-grupo"><label>Tipo</label>
+      <select id="${id}-tipo-loc" onchange="toggleEmenda('${id}')">
+        <option value="">Selecione</option><option value="emenda">Emenda</option><option value="fora_emenda">Fora de emenda</option>
+      </select></div>
+    <div id="${id}-bloco-emenda" style="display:none;">
+      <div class="form-grupo"><label>Data da emenda</label>
+        <input type="text" id="${id}-data-emenda" placeholder="dd/mm/aaaa">
+      </div>
+    </div>
+    <div class="form-grupo"><label>Localização</label>
+      <select id="${id}-loc"><option value="">Selecione</option><option>Carga</option><option>Retorno</option></select></div>
+    <div class="check-row"><input type="checkbox" id="${id}-novo"><label for="${id}-novo">Novo evento (não existia antes)</label></div>
+    <div class="form-grupo" style="margin-top:6px;"><label>Criticidade</label>
+      <select id="${id}-crit"><option value="">Selecione</option><option>Baixo</option><option>Médio</option><option>Alto</option></select></div>
+    <div class="form-grupo"><label>Status</label>
+      <select id="${id}-status"><option value="em">Em andamento</option><option value="ac">Acompanhando</option><option value="co">Concluído</option></select></div>
+    ${buildDescGroup(id+'-desc','')}
+    ${buildGaleriaField('gal-'+id)}
+  </div>`;
+}
+
+function adicionarDefeito(){
+  _defIdx++;
+  const div=document.createElement('div');
+  div.innerHTML=buildDefeitoBloco(_defIdx);
+  document.getElementById('defeitos-container').appendChild(div.firstElementChild);
+  initGals('gal-def-'+_defIdx);
+}
+function removerDefeito(id){document.getElementById('card-'+id)?.remove();}
+function toggleEmenda(id){
+  const v=document.getElementById(id+'-tipo-loc')?.value;
+  const bl=document.getElementById(id+'-bloco-emenda');
+  if(bl)bl.style.display=(v==='emenda'?'block':'none');
+}
+function toggleEl(selId,val,blocoId){
+  const v=document.getElementById(selId)?.value;
+  const bl=document.getElementById(blocoId);
+  if(bl)bl.style.display=(v===val?'block':'none');
+}
+
+function buildRaspForm(){
+  const ativos=DB.raspAtivos[ativoSel];
+  let h=`<div style="margin-bottom:10px;">
+    <div style="font-size:11px;color:#6B7280;font-weight:600;text-transform:uppercase;margin-bottom:6px;">Ativar/desativar raspadores</div>
+    <div class="toggle-row">`;
+  RASP_CHAVES.filter(k=>k!=='prim').forEach(k=>{
+    const at=ativos[k];
+    h+=`<button type="button" class="toggle-btn ${at?'ativo':''}" id="toggle-${k}" onclick="toggleRasp('${k}')">
+      ${at?'<i class="ti ti-x" style="font-size:10px;color:#C62828;"></i>':'<i class="ti ti-plus" style="font-size:10px;"></i>'}
+      ${k==='p2'?'P2':k.toUpperCase()}
+    </button>`;
+  });
+  h+=`</div></div>`;
+  const ativosArr=RASP_CHAVES.filter(k=>ativos[k]);
+  ativosArr.forEach(k=>{h+=buildRaspBloco(k);});
+  // init grids after DOM
+  setTimeout(()=>ativosArr.forEach(k=>renderGaleriaGrid('gal-rasp-'+k)),0);
+  return h;
+}
+
+function buildRaspBloco(chave){
+  const rU=ultimoRaspChave(ativoSel,chave);
+  const ultPct=rU?.campos?.[chave]?.pct||'';
+  const ultCrit=rU?.campos?.[chave]?.crit||'';
+  const ultData=rU?fmtData(rU.data):'';
+  return `<div class="rasp-bloco" id="rasp-bloco-${chave}">
+    <div class="rasp-bloco-titulo">
+      <span><i class="ti ti-tool" style="color:${chave.startsWith('p')?'#2E75B6':'#6B7280'};margin-right:4px;"></i>
+        ${RASP_LABELS[chave]} ${ultData?'<span class="lbl-hint">(última: '+ultData+')</span>':''}
+      </span>
+    </div>
+    ${buildDescGroup('f-desc-'+chave,rU?.desc||'')}
+    <div class="form-grupo">
+      <label>% Desgaste <span class="lbl-hint">${ultPct?'(último: '+ultPct+'%)':''}</span></label>
+      <input type="number" id="f-pct-${chave}" min="0" max="100" placeholder="0 a 100">
+    </div>
+    <div class="form-grupo">
+      <label>Criticidade <span class="lbl-hint">${ultCrit?'(último: '+ultCrit+')':''}</span></label>
+      <select id="f-crit-${chave}">
+        <option value="">Sem alteração</option><option>Baixo</option><option>Médio</option><option>Alto</option>
+      </select>
+    </div>
+    ${buildGaleriaField('gal-rasp-'+chave)}
+  </div>`;
+}
+
+function toggleRasp(chave){
+  DB.raspAtivos[ativoSel][chave]=!DB.raspAtivos[ativoSel][chave];
+  fotoB64=null;renderForm();
+}
+
+function buildDescGroup(id,ultimoRelato){
+  const tem=!!ultimoRelato;
+  return `<div class="form-grupo">
+    <label>Descrição ${tem?'<span class="lbl-hint">(último: '+ultimoRelato.substring(0,25)+(ultimoRelato.length>25?'...':'')+')</span>':''}</label>
+    <div class="desc-opts">
+      <button type="button" class="desc-opt-btn" onclick="usarSemRelato('${id}')">Sem relato</button>
+      ${tem?`<button type="button" class="desc-opt-btn blue" onclick="copiarRelato('${id}','${ultimoRelato.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ')}')">↩ Copiar último</button>`:''}
+    </div>
+    <textarea id="${id}" placeholder="Descreva a condição..."></textarea>
+  </div>`;
+}
+function usarSemRelato(id){const el=document.getElementById(id);if(el){el.value='Sem relato';el.style.color='#9CA3AF';}}
+function copiarRelato(id,txt){const el=document.getElementById(id);if(el){el.value=txt;el.style.color='';}}
+
+function carregarFoto(input,prevId){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    if(prevId==='f-foto-prev') fotoB64=e.target.result;
+    const img=document.getElementById(prevId);
+    if(img){img.src=e.target.result;img.style.display='block';}
+    input.dataset.b64=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ════════════════════════════════
+// SALVAR
+// ════════════════════════════════
+function salvar(){
+  const data=document.getElementById('f-data')?.value||dataHojeISO();
+
+  // ANOTAÇÃO → vai para anotações gerais do ativo
+  if(secaoSel==='anotacao'){
+    const desc=(document.getElementById('f-desc')?.value||'').trim();
+    if(!desc){alert('Preencha a descrição ou use "Sem relato".');return;}
+    const fotos=getGalFotos('gal-anotacao');
+    DB.anotacoesGerais.unshift({ativo:ativoSel,data,desc,fotos});
+    renderSucesso({id:newId(),tipo:'anotacao',data,desc,fotos,campos:{}});
+    return;
+  }
+
+  if(secaoSel==='rasp'){
+    const ativos=DB.raspAtivos[ativoSel];
+    const campos={};
+    RASP_CHAVES.forEach(k=>{
+      if(!ativos[k])return;
+      const desc=(document.getElementById('f-desc-'+k)?.value||'').trim();
+      const pct=document.getElementById('f-pct-'+k)?.value||'';
+      const crit=document.getElementById('f-crit-'+k)?.value||'';
+      const fotos=getGalFotos('gal-rasp-'+k);
+      campos[k]={desc:desc||'Sem relato',pct,crit,fotos};
+    });
+    const reg={id:newId(),tipo:'rasp',data,desc:'Inspeção de raspadores',fotos:[],campos};
+    DB.registros[ativoSel].unshift(reg);
+    renderSucesso(reg);return;
+  }
+
+  if(secaoSel==='defeito'){
+    const cards=document.querySelectorAll('[id^="card-def-"]');
+    const defeitos=[];
+    cards.forEach(card=>{
+      const id=card.id.replace('card-','');
+      let tipo=document.getElementById(id+'-tipo-loc')?.value||'';
+      const dataEmenda=tipo==='emenda'?(document.getElementById(id+'-data-emenda')?.value||''):'';
+      const fotos=getGalFotos('gal-'+id);
+      defeitos.push({tipo,dataEmenda,loc:document.getElementById(id+'-loc')?.value||'',novo:document.getElementById(id+'-novo')?.checked||false,crit:document.getElementById(id+'-crit')?.value||'',status:document.getElementById(id+'-status')?.value||'em',desc:(document.getElementById(id+'-desc')?.value||'').trim()||'Sem relato',fotos});
+    });
+    const reg={id:newId(),tipo:'defeito',data,desc:'Defeitos/Reparos',fotos:[],campos:{defeitos}};
+    DB.registros[ativoSel].unshift(reg);
+    renderSucesso(reg);return;
+  }
+
+  const desc=(document.getElementById('f-desc')?.value||'').trim();
+  if(!desc){alert('Preencha a descrição ou use "Sem relato".');return;}
+  const fotos=getGalFotos(galNs(secaoSel));
+  const reg={id:newId(),tipo:secaoSel,data,desc,fotos,campos:{}};
+
+  if(secaoSel==='interf'){
+    let tipo=document.getElementById('f-tipo-interf')?.value||'';
+    if(tipo==='outros')tipo=document.getElementById('f-tipo-outros')?.value||'Outros';
+    reg.campos={tipo,bal:document.getElementById('f-bal')?.value||'',novo:document.getElementById('f-novo')?.checked||false,crit:document.getElementById('f-crit')?.value||'',status:document.getElementById('f-status')?.value||'em'};
+  }
+  if(secaoSel==='desal')reg.campos={local:document.getElementById('f-local')?.value||'',status:document.getElementById('f-status-desal')?.value||'em'};
+  if(secaoSel==='contra')reg.campos={pos:document.getElementById('f-pos')?.value||''};
+
+  DB.registros[ativoSel].unshift(reg);
+  renderSucesso(reg);
+}
+
+function renderSucesso(reg){
+  marcarMudanca(); autoBackup();
+  passo='sucesso';
+  setTopbar('Registro salvo!',ativoSel,false,false);
+  setStepBar(false);
+  const isAnotacao=reg.tipo==='anotacao';
+  document.getElementById('content').innerHTML=`
+    <div class="sucesso">
+      <i class="ti ti-circle-check sico"></i>
+      <h2>Registro salvo!</h2>
+      <p>${isAnotacao?'Anotação enviada para Anotações Gerais.':'O registro foi incluído no relatório do ativo.'}</p>
+      <div class="sucesso-detalhes">
+        <div class="sucesso-row"><span>Ativo</span><span>${ativoSel}</span></div>
+        <div class="sucesso-row"><span>Seção</span><span>${SECAO_LABELS[reg.tipo]}</span></div>
+        <div class="sucesso-row"><span>Data</span><span>${fmtData(reg.data)}</span></div>
+      </div>
+      ${isAnotacao?`<button class="btn-prim" onclick="renderAnotacoesGerais()"><i class="ti ti-notebook"></i> Ver Anotações Gerais</button>`:`<button class="btn-prim" onclick="selSecao('${secaoSel}')">Registrar outra — ${SECAO_LABELS[secaoSel]}</button>`}
+      <button class="btn-sec" onclick="renderMenu()">Voltar ao menu do ativo</button>
+      ${!isAnotacao?`<button class="btn-sec" onclick="renderRelatorio()"><i class="ti ti-clipboard-data"></i> Ver relatório</button>`:''}
+    </div>`;
+}
+
+// ════════════════════════════════
+// RELATÓRIO
+// ════════════════════════════════
+function renderRelatorio(){
+  passo='relatorio';
+  setTopbar('Relatório',ativoSel,true,true);
+  setStepBar(false);
+  const ficha=DB.fichas[ativoSel];
+  const TIPOS=['anotacao','contra','defeito','desal','interf','rasp'];
+  const ativos={},hist={};
+  TIPOS.forEach(t=>{ativos[t]=[];hist[t]=[];});
+  DB.registros[ativoSel].forEach(r=>{
+    if(!TIPOS.includes(r.tipo))return;
+    const conc=r.campos?.status==='co'||(r.tipo==='defeito'&&r.campos?.defeitos?.every(d=>d.status==='co'));
+    if(conc)hist[r.tipo].push(r);else ativos[r.tipo].push(r);
+  });
+
+  // Ficha
+  const temFicha=ficha.comprimento_total||ficha.cod||ficha.trechos.some(t=>t.comp||t.de);
+  let fichaHtml=`<div class="rel-section">
+    <div class="rel-section-header"><i class="ti ti-table"></i> FICHA TÉCNICA — ${ativoSel}</div>`;
+  if(!temFicha){fichaHtml+=`<div class="empty-state"><i class="ti ti-table"></i>Não preenchida</div>`;}
+  else{
+    if(ficha.comprimento_total||ficha.cod)fichaHtml+=`<div class="rel-ficha-row"><div class="rel-ficha-label">Comprimento</div><div class="rel-ficha-val">${ficha.comprimento_total||'—'} m</div><div class="rel-ficha-label">COD</div><div class="rel-ficha-val">${ficha.cod||'—'}</div></div>`;
+    const tC=ficha.trechos.filter(t=>t.de||t.comp);
+    if(tC.length){fichaHtml+=`<div style="overflow-x:auto;"><table class="ficha-table"><tr><th>Trecho</th><th>De</th><th>Até</th><th>Comp.</th><th>MED</th><th>OP</th></tr>`;tC.forEach(t=>{fichaHtml+=`<tr><td class="lbl trecho-header">${t.l}</td><td>${fmtData(t.de)}</td><td>${fmtData(t.ate)}</td><td>${t.comp||'—'}</td><td>${t.med||'—'}</td><td>${t.op||'—'}</td></tr>`;});fichaHtml+=`</table></div>`;}
+    const sC=ficha.specs.filter(s=>s.spec||s.fab);
+    if(sC.length){fichaHtml+=`<div style="padding:6px 10px;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;background:#F8F9FB;border-top:1px solid #F0F2F5;">Especificação</div><div style="overflow-x:auto;"><table class="ficha-table"><tr><th>Esp.</th><th>Especificação</th><th>Fabricante</th></tr>`;sC.forEach(s=>{fichaHtml+=`<tr><td class="lbl">${s.l}</td><td>${s.spec||'—'}</td><td>${s.fab||'—'}</td></tr>`;});fichaHtml+=`</table></div>`;}
+    if(ficha.largura||ficha.lonas)fichaHtml+=`<div class="rel-ficha-row"><div class="rel-ficha-label">Largura</div><div class="rel-ficha-val">${ficha.largura||'—'} mm · ${ficha.lonas||'—'} lonas</div><div class="rel-ficha-label">Material</div><div class="rel-ficha-val">${ficha.material||'—'} ${ficha.resistencia?'· '+ficha.resistencia:''}</div></div>`;
+    if(ficha.obs)fichaHtml+=`<div class="rel-ficha-row"><div class="rel-ficha-label">Obs.</div><div class="rel-ficha-val" style="white-space:pre-line;">${ficha.obs}</div></div>`;
+  }
+  fichaHtml+=`<div style="padding:9px;"><button class="btn-sec" onclick="renderFicha()"><i class="ti ti-edit"></i> Editar ficha</button></div></div>`;
+
+  // Ultrassom
+  const ussVals=ficha.ultrassom||Array(21).fill('');
+  let ussHtml=`<div class="rel-section"><div class="rel-section-header"><i class="ti ti-wave-sine"></i> MEDIDAS DE ULTRASSOM</div><div style="padding:10px;"><div class="uss-grid">`;
+  for(let i=0;i<21;i++){const n=String(i+1).padStart(2,'0');ussHtml+=`<div class="uss-cell"><div class="uss-num">${n}</div><input type="text" id="uss-${i}" value="${ussVals[i]||''}" placeholder="—" inputmode="decimal" onchange="salvarUss()"></div>`;}
+  ussHtml+=`</div><div style="margin-top:7px;font-size:11px;color:#9CA3AF;text-align:right;" id="uss-saved-msg"></div></div></div>`;
+
+  let regsHtml='';
+  TIPOS.forEach(tipo=>{
+    if(!ativos[tipo].length)return;
+    regsHtml+=`<div class="rel-section"><div class="rel-section-header"><i class="ti ${SECAO_ICONS[tipo]}"></i> ${SECAO_LABELS[tipo].toUpperCase()}</div><div style="padding:10px;">`;
+    ativos[tipo].forEach(r=>{regsHtml+=buildRegCard(r,false);});
+    regsHtml+=`</div></div>`;
+  });
+  if(!regsHtml)regsHtml=`<div class="rel-section"><div class="empty-state" style="padding:18px;"><i class="ti ti-clipboard-x"></i>Nenhum registro ativo</div></div>`;
+
+  let histHtml='';
+  if(TIPOS.some(t=>hist[t].length)){
+    histHtml=`<div class="rel-section"><div class="rel-section-header" style="background:#374151;"><i class="ti ti-history"></i> HISTÓRICO</div><div style="padding:10px;">`;
+    TIPOS.forEach(tipo=>{if(!hist[tipo].length)return;histHtml+=`<div class="hist-sep">${SECAO_LABELS[tipo]}</div>`;hist[tipo].forEach(r=>{histHtml+=buildRegCard(r,true);});});
+    histHtml+=`</div></div>`;
+  }
+
+  document.getElementById('content').innerHTML=`
+    <button class="btn-prim" style="margin-bottom:12px;" onclick="renderMenu()"><i class="ti ti-plus"></i> Novo registro</button>
+    ${fichaHtml}${ussHtml}
+    <div class="bloco-titulo" style="margin-top:4px;">Registros ativos</div>
+    ${regsHtml}${histHtml}
+    <button class="btn-sec" onclick="renderMenu()"><i class="ti ti-arrow-left"></i> Menu do ativo</button>
+    <div style="height:24px;"></div>`;
+}
+
+function salvarUss(){
+  const vals=[];for(let i=0;i<21;i++)vals.push(document.getElementById('uss-'+i)?.value||'');
+  DB.fichas[ativoSel].ultrassom=vals;
+  marcarMudanca(); autoBackup();
+  const msg=document.getElementById('uss-saved-msg');
+  if(msg){msg.textContent='✓ Salvo';setTimeout(()=>{if(msg)msg.textContent='';},1500);}
+}
+
+const stMap={em:'Em andamento',ac:'Acompanhando',co:'Concluído'};
+const stCls={em:'status-em',ac:'status-ac',co:'status-co'};
+
+function buildRegCard(r,isHist){
+  let extras='';
+  if(r.tipo==='rasp'){
+    extras='<div style="margin-top:7px;">';
+    Object.entries(r.campos).forEach(([k,v])=>{
+      extras+=`<div style="background:#fff;border:1px solid #E5E8ED;border-radius:7px;padding:8px;margin-bottom:6px;">
+        <div style="font-size:11px;font-weight:700;color:#1F3864;margin-bottom:4px;">${RASP_LABELS[k]}</div>
+        <div style="font-size:12px;color:#374151;">${v.desc==='Sem relato'?'<span style="color:#9CA3AF;font-style:italic;">Sem relato</span>':v.desc}</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;">
+          ${v.pct?`<span class="pill pill-neu">${v.pct}% desgaste</span>`:''}
+          ${v.crit?`<span class="pill pill-vn">${v.crit}</span>`:''}
+        </div>
+        ${v.fotos&&v.fotos.length?buildGaleriaDisplay(v.fotos,'rv-'+r.id+'-'+k):(v.foto?`<img src="${v.foto}" style="width:100%;border-radius:6px;margin-top:6px;">`:'')}      </div>`;
+    });
+    extras+='</div>';
+  }
+  else if(r.tipo==='interf'){
+    extras=`<div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
+      <span class="pill ${stCls[r.campos.status]||''}">${stMap[r.campos.status]||''}</span>
+      ${r.campos.tipo?`<span class="pill pill-neu">${r.campos.tipo}</span>`:''}
+      ${r.campos.crit?`<span class="pill pill-vn">${r.campos.crit}</span>`:''}
+      ${r.campos.bal?`<span class="pill pill-neu">📍 ${r.campos.bal}</span>`:''}
+      ${r.campos.novo?`<span class="pill pill-at">Novo evento</span>`:''}
+    </div>`+buildStatusBtns(r,isHist);
+  }
+  else if(r.tipo==='desal'){
+    extras=`<div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
+      <span class="pill ${stCls[r.campos.status]||''}">${stMap[r.campos.status]||''}</span>
+      ${r.campos.local?`<span class="pill pill-neu">📍 ${r.campos.local}</span>`:''}
+    </div>`+buildStatusBtns(r,isHist);
+  }
+  else if(r.tipo==='contra'&&r.campos.pos){
+    extras=`<div style="margin-top:5px;font-size:12px;color:#6B7280;">Posição: ${r.campos.pos}</div>`;
+  }
+  else if(r.tipo==='defeito'){
+    extras='<div style="margin-top:7px;">';
+    (r.campos.defeitos||[]).forEach((d,i)=>{
+      extras+=`<div style="background:#fff;border:1px solid #E5E8ED;border-radius:7px;padding:8px;margin-bottom:6px;">
+        <div style="font-size:11px;font-weight:700;color:#1F3864;margin-bottom:4px;">Defeito${i>0?' #'+(i+1):''}</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px;">
+          <span class="pill ${stCls[d.status]||''}">${stMap[d.status]||''}</span>
+          ${d.tipo?`<span class="pill pill-neu">${d.tipo==='emenda'?'Emenda'+(d.dataEmenda?' ('+d.dataEmenda+')':''):'Fora de emenda'}</span>`:''}
+          ${d.loc?`<span class="pill pill-neu">${d.loc}</span>`:''}
+          ${d.crit?`<span class="pill pill-vn">${d.crit}</span>`:''}
+          ${d.novo?`<span class="pill pill-at">Novo evento</span>`:''}
+        </div>
+        <div style="font-size:12px;color:#374151;">${d.desc==='Sem relato'?'<span style="color:#9CA3AF;font-style:italic;">Sem relato</span>':d.desc}</div>
+        ${d.fotos&&d.fotos.length?buildGaleriaDisplay(d.fotos,'rd-'+r.id+'-'+i):(d.foto?`<img src="${d.foto}" style="width:100%;border-radius:6px;margin-top:6px;">`:'')}        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;">
+          ${!isHist?`${d.status!=='em'?`<button class="btn-sm btn-sm-danger" onclick="mudaStatusDefeito('${r.id}',${i},'em')">Em andamento</button>`:''}
+          ${d.status!=='ac'?`<button class="btn-sm btn-sm-orange" onclick="mudaStatusDefeito('${r.id}',${i},'ac')">Acompanhando</button>`:''}
+          ${d.status!=='co'?`<button class="btn-sm btn-sm-green" onclick="mudaStatusDefeito('${r.id}',${i},'co')">✓ Concluído</button>`:''}`:
+          `<button class="btn-sm btn-sm-danger" onclick="mudaStatusDefeito('${r.id}',${i},'em')">↩ Reabrir</button>`}
+        </div>
+      </div>`;
+    });
+    extras+='</div>';
+  }
+  else if(r.tipo==='anotacao'){
+    extras='';// desc já aparece no corpo
+  }
+
+  return `<div class="reg-card" id="card-${r.id}">
+    <div class="reg-card-header">
+      <span class="rc-data"><i class="ti ti-calendar" style="vertical-align:-2px;"></i> ${fmtData(r.data)}</span>
+      <span style="flex:1;"></span>
+      <button class="btn-sm btn-sm-sec" onclick="abrirEdicao('${r.id}')"><i class="ti ti-edit"></i> Editar</button>
+    </div>
+    ${r.tipo!=='rasp'&&r.tipo!=='defeito'?`<div class="reg-card-body">${r.desc==='Sem relato'?'<span style="color:#9CA3AF;font-style:italic;">Sem relato</span>':r.desc}</div>`:''}
+    ${extras}
+    ${r.fotos&&r.fotos.length?buildGaleriaDisplay(r.fotos,'rg-'+r.id):(r.foto?`<img src="${r.foto}" style="width:100%;border-radius:6px;margin-top:8px;">`:'')}  </div>`;
+}
+
+function buildStatusBtns(r,isHist){
+  if(!isHist)return`<div class="reg-card-footer">
+    ${r.campos.status!=='em'?`<button class="btn-sm btn-sm-danger" onclick="mudaStatus('${r.id}','em')">Em andamento</button>`:''}
+    ${r.campos.status!=='ac'?`<button class="btn-sm btn-sm-sec" onclick="mudaStatus('${r.id}','ac')">Acompanhando</button>`:''}
+    ${r.campos.status!=='co'?`<button class="btn-sm btn-sm-green" onclick="mudaStatus('${r.id}','co')">✓ Concluído</button>`:''}
+  </div>`;
+  return`<div class="reg-card-footer">
+    <button class="btn-sm btn-sm-danger" onclick="mudaStatus('${r.id}','em')">↩ Reabrir (Em andamento)</button>
+    <button class="btn-sm btn-sm-sec" onclick="mudaStatus('${r.id}','ac')">↩ Reabrir (Acompanhando)</button>
+  </div>`;
+}
+function mudaStatus(regId,s){const r=DB.registros[ativoSel].find(x=>x.id===regId);if(r)r.campos.status=s;renderRelatorio();}
+function mudaStatusDefeito(regId,idx,s){const r=DB.registros[ativoSel].find(x=>x.id===regId);if(r&&r.campos.defeitos&&r.campos.defeitos[idx])r.campos.defeitos[idx].status=s;renderRelatorio();}
+
+// ════════════════════════════════
+// EDIÇÃO MODAL
+// ════════════════════════════════
+function abrirEdicao(regId){
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  if(!r)return;
+  editandoReg=regId;
+  const ns='edit-'+regId;
+  // Copia fotos atuais para edição
+  galFotos[ns]=[...(r.fotos||[])];
+
+  let c=`<div class="form-grupo"><label>Data</label><input type="date" id="edit-data" value="${r.data}"></div>`;
+
+  // ── RASPADORES ──
+  if(r.tipo==='rasp'){
+    Object.entries(r.campos).forEach(([k,v])=>{
+      const nsK=ns+'-'+k;
+      galFotos[nsK]=[...(v.fotos||[])];
+      c+=`<div class="rasp-bloco">
+        <div class="rasp-bloco-titulo">${RASP_LABELS[k]}</div>
+        <div class="form-grupo"><label>Descrição</label><textarea id="edit-desc-${k}">${v.desc||''}</textarea></div>
+        <div class="form-grupo"><label>% Desgaste</label><input type="number" id="edit-pct-${k}" value="${v.pct||''}"></div>
+        <div class="form-grupo"><label>Criticidade</label><select id="edit-crit-${k}">
+          <option value="" ${!v.crit?'selected':''}>Sem alteração</option>
+          <option ${v.crit==='Baixo'?'selected':''}>Baixo</option>
+          <option ${v.crit==='Médio'?'selected':''}>Médio</option>
+          <option ${v.crit==='Alto'?'selected':''}>Alto</option>
+        </select></div>
+        ${buildGaleriaField(nsK)}
+      </div>`;
+    });
+  }
+
+  // ── INTERFERÊNCIAS ──
+  else if(r.tipo==='interf'){
+    const isOu=r.campos.tipo&&!['Interferência','Interdição'].includes(r.campos.tipo);
+    c+=`<div class="form-grupo"><label>Descrição</label><textarea id="edit-desc">${r.desc||''}</textarea></div>
+    <div class="form-grupo"><label>Tipo</label>
+      <select id="edit-tipo-interf" onchange="toggleEl('edit-tipo-interf','outros','edit-bloco-outros')">
+        <option value="">—</option>
+        <option ${r.campos.tipo==='Interferência'?'selected':''}>Interferência</option>
+        <option ${r.campos.tipo==='Interdição'?'selected':''}>Interdição</option>
+        <option value="outros" ${isOu?'selected':''}>Outros</option>
+      </select></div>
+    <div id="edit-bloco-outros" style="${isOu?'':'display:none'}">
+      <div class="form-grupo"><label>Especificar</label><input type="text" id="edit-tipo-outros" value="${isOu?r.campos.tipo:''}"></div>
+    </div>
+    <div class="form-grupo"><label>Baliza / local</label><input type="text" id="edit-bal" value="${r.campos.bal||''}"></div>
+    <div class="check-row"><input type="checkbox" id="edit-novo" ${r.campos.novo?'checked':''}><label for="edit-novo">Novo evento</label></div>
+    <div class="form-grupo" style="margin-top:8px;"><label>Criticidade</label>
+      <select id="edit-crit-interf">
+        <option value="" ${!r.campos.crit?'selected':''}>—</option>
+        <option ${r.campos.crit==='Baixo'?'selected':''}>Baixo</option>
+        <option ${r.campos.crit==='Médio'?'selected':''}>Médio</option>
+        <option ${r.campos.crit==='Alto'?'selected':''}>Alto</option>
+      </select></div>
+    <div class="form-grupo"><label>Status</label>
+      <select id="edit-status">
+        <option value="em" ${r.campos.status==='em'?'selected':''}>Em andamento</option>
+        <option value="ac" ${r.campos.status==='ac'?'selected':''}>Acompanhando</option>
+        <option value="co" ${r.campos.status==='co'?'selected':''}>Concluído</option>
+      </select></div>
+    ${buildGaleriaField(ns)}`;
+  }
+
+  // ── DESALINHAMENTO ──
+  else if(r.tipo==='desal'){
+    c+=`<div class="form-grupo"><label>Descrição</label><textarea id="edit-desc">${r.desc||''}</textarea></div>
+    <div class="form-grupo"><label>Local</label><input type="text" id="edit-local" value="${r.campos.local||''}"></div>
+    <div class="form-grupo"><label>Status</label>
+      <select id="edit-status-desal">
+        <option value="em" ${r.campos.status==='em'?'selected':''}>Em andamento</option>
+        <option value="ac" ${r.campos.status==='ac'?'selected':''}>Acompanhando</option>
+        <option value="co" ${r.campos.status==='co'?'selected':''}>Concluído</option>
+      </select></div>
+    ${buildGaleriaField(ns)}`;
+  }
+
+  // ── CONTRAPESO ──
+  else if(r.tipo==='contra'){
+    c+=`<div class="form-grupo"><label>Descrição</label><textarea id="edit-desc">${r.desc||''}</textarea></div>
+    <div class="form-grupo"><label>Posição / leitura</label><input type="text" id="edit-pos" value="${r.campos.pos||''}"></div>
+    ${buildGaleriaField(ns)}`;
+  }
+
+  // ── ANOTAÇÃO ──
+  else if(r.tipo==='anotacao'){
+    c+=`<div class="form-grupo"><label>Descrição</label><textarea id="edit-desc">${r.desc||''}</textarea></div>
+    ${buildGaleriaField(ns)}`;
+  }
+
+  // ── DEFEITOS ──
+  else if(r.tipo==='defeito'){
+    const defs=r.campos.defeitos||[];
+    defs.forEach((d,i)=>{
+      const nsD=ns+'-d'+i;
+      galFotos[nsD]=[...(d.fotos||[])];
+      c+=`<div class="defeito-card">
+        <div class="defeito-card-header">Defeito${i>0?' #'+(i+1):''}</div>
+        <div class="form-grupo"><label>Tipo</label>
+          <select id="edit-def-tipo-${i}" onchange="toggleEmendaEdit(${i})">
+            <option value="">—</option>
+            <option value="emenda" ${d.tipo==='emenda'?'selected':''}>Emenda</option>
+            <option value="fora_emenda" ${d.tipo==='fora_emenda'?'selected':''}>Fora de emenda</option>
+          </select></div>
+        <div id="edit-def-emenda-${i}" style="${d.tipo==='emenda'?'':'display:none'}">
+          <div class="form-grupo"><label>Data da emenda</label><input type="text" id="edit-def-data-emenda-${i}" value="${d.dataEmenda||''}" placeholder="dd/mm/aaaa"></div>
+        </div>
+        <div class="form-grupo"><label>Localização</label>
+          <select id="edit-def-loc-${i}">
+            <option value="">—</option>
+            <option ${d.loc==='Carga'?'selected':''}>Carga</option>
+            <option ${d.loc==='Retorno'?'selected':''}>Retorno</option>
+          </select></div>
+        <div class="check-row"><input type="checkbox" id="edit-def-novo-${i}" ${d.novo?'checked':''}><label for="edit-def-novo-${i}">Novo evento</label></div>
+        <div class="form-grupo" style="margin-top:6px;"><label>Criticidade</label>
+          <select id="edit-def-crit-${i}">
+            <option value="" ${!d.crit?'selected':''}>—</option>
+            <option ${d.crit==='Baixo'?'selected':''}>Baixo</option>
+            <option ${d.crit==='Médio'?'selected':''}>Médio</option>
+            <option ${d.crit==='Alto'?'selected':''}>Alto</option>
+          </select></div>
+        <div class="form-grupo"><label>Status</label>
+          <select id="edit-def-status-${i}">
+            <option value="em" ${d.status==='em'?'selected':''}>Em andamento</option>
+            <option value="ac" ${d.status==='ac'?'selected':''}>Acompanhando</option>
+            <option value="co" ${d.status==='co'?'selected':''}>Concluído</option>
+          </select></div>
+        <div class="form-grupo"><label>Descrição</label><textarea id="edit-def-desc-${i}">${d.desc||''}</textarea></div>
+        ${buildGaleriaField(nsD)}
+      </div>`;
+    });
+  }
+
+  c+=`<button class="btn-prim" onclick="salvarEdicao()">Salvar alterações</button>
+      <button class="btn-danger" onclick="excluirRegistro('${regId}')"><i class="ti ti-trash"></i> Excluir registro</button>`;
+
+  document.getElementById('modal-titulo-txt').textContent='Editar — '+SECAO_LABELS[r.tipo];
+  document.getElementById('modal-corpo').innerHTML=c;
+  document.getElementById('modal-edit').classList.add('vis');
+
+  // Inicializa galerias de edição
+  setTimeout(()=>{
+    if(r.tipo==='rasp') Object.keys(r.campos).forEach(k=>renderGaleriaGrid(ns+'-'+k));
+    else if(r.tipo==='defeito') (r.campos.defeitos||[]).forEach((_,i)=>renderGaleriaGrid(ns+'-d'+i));
+    else renderGaleriaGrid(ns);
+  },0);
+}
+
+function toggleEmendaEdit(i){
+  const v=document.getElementById('edit-def-tipo-'+i)?.value;
+  const bl=document.getElementById('edit-def-emenda-'+i);
+  if(bl)bl.style.display=(v==='emenda'?'block':'none');
+}
+
+function fecharModal(){document.getElementById('modal-edit').classList.remove('vis');editandoReg=null;}
+
+function salvarEdicao(){
+  const r=DB.registros[ativoSel].find(x=>x.id===editandoReg);
+  if(!r)return;
+  const ns='edit-'+r.id;
+  r.data=document.getElementById('edit-data')?.value||r.data;
+
+  if(r.tipo==='rasp'){
+    Object.keys(r.campos).forEach(k=>{
+      const nsK=ns+'-'+k;
+      const d=document.getElementById('edit-desc-'+k)?.value;
+      const p=document.getElementById('edit-pct-'+k)?.value;
+      const cr=document.getElementById('edit-crit-'+k)?.value;
+      if(d!==undefined)r.campos[k].desc=d;
+      if(p!==undefined)r.campos[k].pct=p;
+      if(cr!==undefined)r.campos[k].crit=cr;
+      r.campos[k].fotos=getGalFotos(nsK);
+    });
+  }
+  else if(r.tipo==='interf'){
+    r.desc=document.getElementById('edit-desc')?.value||r.desc;
+    let tipo=document.getElementById('edit-tipo-interf')?.value||'';
+    if(tipo==='outros')tipo=document.getElementById('edit-tipo-outros')?.value||'Outros';
+    r.campos.tipo=tipo;
+    r.campos.bal=document.getElementById('edit-bal')?.value||'';
+    r.campos.novo=document.getElementById('edit-novo')?.checked||false;
+    r.campos.crit=document.getElementById('edit-crit-interf')?.value||'';
+    r.campos.status=document.getElementById('edit-status')?.value||'em';
+    r.fotos=getGalFotos(ns);
+  }
+  else if(r.tipo==='desal'){
+    r.desc=document.getElementById('edit-desc')?.value||r.desc;
+    r.campos.local=document.getElementById('edit-local')?.value||'';
+    r.campos.status=document.getElementById('edit-status-desal')?.value||'em';
+    r.fotos=getGalFotos(ns);
+  }
+  else if(r.tipo==='contra'){
+    r.desc=document.getElementById('edit-desc')?.value||r.desc;
+    r.campos.pos=document.getElementById('edit-pos')?.value||'';
+    r.fotos=getGalFotos(ns);
+  }
+  else if(r.tipo==='anotacao'){
+    r.desc=document.getElementById('edit-desc')?.value||r.desc;
+    r.fotos=getGalFotos(ns);
+  }
+  else if(r.tipo==='defeito'){
+    (r.campos.defeitos||[]).forEach((d,i)=>{
+      const nsD=ns+'-d'+i;
+      let tipo=document.getElementById('edit-def-tipo-'+i)?.value||d.tipo;
+      d.tipo=tipo;
+      d.dataEmenda=tipo==='emenda'?(document.getElementById('edit-def-data-emenda-'+i)?.value||''):'';
+      d.loc=document.getElementById('edit-def-loc-'+i)?.value||d.loc;
+      d.novo=document.getElementById('edit-def-novo-'+i)?.checked||false;
+      d.crit=document.getElementById('edit-def-crit-'+i)?.value||d.crit;
+      d.status=document.getElementById('edit-def-status-'+i)?.value||d.status;
+      d.desc=document.getElementById('edit-def-desc-'+i)?.value||d.desc;
+      d.fotos=getGalFotos(nsD);
+    });
+  }
+
+  DB.registros[ativoSel].sort((a,b)=>b.data.localeCompare(a.data));
+  marcarMudanca(); autoBackup();
+  fecharModal();renderRelatorio();
+}
+function excluirRegistro(regId){
+  if(!confirm('Excluir este registro?'))return;
+  DB.registros[ativoSel]=DB.registros[ativoSel].filter(x=>x.id!==regId);
+  marcarMudanca(); autoBackup();
+  fecharModal();renderRelatorio();
+}
+
+// ════════════════════════════════
+// FICHA TÉCNICA
+// ════════════════════════════════
+function renderFicha(){
+  passo='ficha';
+  const ficha=DB.fichas[ativoSel];
+  setTopbar('Dados do Transportador',ativoSel,true,false);
+  setStepBar(false);
+  let tH='';ficha.trechos.forEach((t,i)=>{tH+=buildTrechoForm(t,i);});
+  let sH='';ficha.specs.forEach((s,i)=>{sH+=buildSpecForm(s,i);});
+  const ussVals=ficha.ultrassom||Array(21).fill('');
+  let ussG='<div class="uss-grid">';
+  for(let i=0;i<21;i++){const n=String(i+1).padStart(2,'0');const pv=ussVals[i]||'';ussG+=`<div class="uss-cell"><div class="uss-num">${n}</div><input type="text" id="fc-uss-${i}" value="${pv}" placeholder="—" inputmode="decimal"><div class="uss-prev">${pv}</div></div>`;}
+  ussG+='</div>';
+  let h=`<div class="ativo-banner"><i class="ti ti-table" style="font-size:20px;color:#2E75B6;"></i><div><div class="ab-id">Ficha Técnica</div><div class="ab-nome">${ativoSel}</div></div></div>
+    <div class="rel-section" style="margin-bottom:11px;"><div class="rel-section-header"><i class="ti ti-ruler"></i> IDENTIFICAÇÃO</div><div style="padding:11px;">
+      <div class="grid-2"><div class="form-grupo"><label>COD</label><input type="text" id="fc-cod" value="${ficha.cod||''}" placeholder="Ex: 15430151"></div>
+      <div class="form-grupo"><label>Comprimento total (m)</label><input type="number" id="fc-comp-total" value="${ficha.comprimento_total||''}" placeholder="Ex: 1428.90"></div></div>
+    </div></div>
+    <div class="rel-section" style="margin-bottom:11px;"><div class="rel-section-header"><i class="ti ti-arrows-right-left"></i> TRECHOS</div>
+      <div style="padding:11px;" id="trechos-container">${tH}</div>
+      <div style="padding:0 11px 11px;"><button type="button" class="btn-sec" onclick="adicionarTrecho()" style="display:flex;align-items:center;justify-content:center;gap:6px;"><i class="ti ti-plus"></i> Adicionar trecho</button></div>
+    </div>
+    <div class="rel-section" style="margin-bottom:11px;"><div class="rel-section-header"><i class="ti ti-settings"></i> ESPECIFICAÇÃO</div>
+      <div style="padding:11px;" id="specs-container">${sH}</div>
+      <div style="padding:0 11px 11px;"><button type="button" class="btn-sec" onclick="adicionarSpec()" style="display:flex;align-items:center;justify-content:center;gap:6px;"><i class="ti ti-plus"></i> Adicionar especificação</button></div>
+    </div>
+    <div class="rel-section" style="margin-bottom:11px;"><div class="rel-section-header"><i class="ti ti-maximize"></i> LARGURA E MATERIAL</div><div style="padding:11px;">
+      <div class="grid-2">
+        <div class="form-grupo"><label>Largura (mm)</label><input type="number" id="fc-largura" value="${ficha.largura||''}" placeholder="Ex: 1800"></div>
+        <div class="form-grupo"><label>Nº de Lonas</label><input type="number" id="fc-lonas" value="${ficha.lonas||''}" placeholder="Ex: 5"></div>
+      </div>
+      <div class="grid-2">
+        <div class="form-grupo"><label>Resistência</label><input type="text" id="fc-resist" value="${ficha.resistencia||''}" placeholder="Ex: 1,5%"></div>
+        <div class="form-grupo"><label>Material</label><input type="text" id="fc-material" value="${ficha.material||''}" placeholder="Ex: POLIESTER/POLIAMIDA"></div>
+      </div>
+      <div style="margin-top:4px;">
+        <label style="font-size:13px;color:#374151;font-weight:500;display:block;margin-bottom:4px;">Medidas de Ultrassom <span class="lbl-hint">(21 pontos · última medida abaixo)</span></label>
+        ${ussG}
+      </div>
+    </div></div>
+    <div class="rel-section" style="margin-bottom:11px;"><div class="rel-section-header"><i class="ti ti-notes"></i> OBSERVAÇÕES</div><div style="padding:11px;">
+      <textarea style="width:100%;font-size:13px;padding:10px;border:1px solid #D1D5DB;border-radius:8px;min-height:70px;resize:vertical;" id="fc-obs" placeholder="Observações relevantes...">${ficha.obs||''}</textarea>
+    </div></div>
+    <button class="btn-prim" onclick="salvarFicha()"><i class="ti ti-device-floppy"></i> Salvar ficha técnica</button>
+    <button class="btn-sec" onclick="renderMenu()"><i class="ti ti-arrow-left"></i> Voltar ao menu</button>
+    <div style="height:24px;"></div>`;
+  document.getElementById('content').innerHTML=h;
+}
+function buildTrechoForm(t,i){const l=LETRAS[i]||String(i+1);return `<div style="background:#F0F4FA;border-radius:8px;padding:10px;margin-bottom:9px;" id="trecho-bloco-${i}"><div style="font-size:12px;font-weight:700;color:#1F3864;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;">TRECHO ${l} ${i>0?`<button type="button" class="btn-sm btn-sm-danger" onclick="removerTrecho(${i})">Remover</button>`:''}</div><div class="grid-2"><div class="form-grupo"><label>De</label><input type="date" id="fc-de-${i}" value="${t.de||''}"></div><div class="form-grupo"><label>Até</label><input type="date" id="fc-ate-${i}" value="${t.ate||''}"></div></div><div class="grid-3"><div class="form-grupo"><label>Comp.(m)</label><input type="number" id="fc-comp-${i}" value="${t.comp||''}" placeholder="m"></div><div class="form-grupo"><label>MED</label><input type="number" id="fc-med-${i}" value="${t.med||''}" step="0.01"></div><div class="form-grupo"><label>OP</label><input type="number" id="fc-op-${i}" value="${t.op||''}"></div></div></div>`;}
+function buildSpecForm(s,i){const l=LETRAS[i]||String(i+1);return `<div style="background:#F0F4FA;border-radius:8px;padding:10px;margin-bottom:9px;" id="spec-bloco-${i}"><div style="font-size:12px;font-weight:700;color:#1F3864;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;">ESPECIFICAÇÃO ${l} ${i>0?`<button type="button" class="btn-sm btn-sm-danger" onclick="removerSpec(${i})">Remover</button>`:''}</div><div class="form-grupo"><label>Especificação</label><input type="text" id="fc-spec-${i}" value="${s.spec||''}" placeholder="Ex: PN 5000 5L 10X3 E.A"></div><div class="form-grupo"><label>Fabricante</label><input type="text" id="fc-fab-${i}" value="${s.fab||''}" placeholder="Ex: MERCURIO"></div></div>`;}
+function lerFichaAtual(){
+  const ficha=DB.fichas[ativoSel];
+  ficha.cod=document.getElementById('fc-cod')?.value||ficha.cod;
+  ficha.comprimento_total=document.getElementById('fc-comp-total')?.value||ficha.comprimento_total;
+  ficha.trechos.forEach((_,i)=>{ficha.trechos[i]={l:LETRAS[i]||'',de:document.getElementById('fc-de-'+i)?.value||'',ate:document.getElementById('fc-ate-'+i)?.value||'',comp:document.getElementById('fc-comp-'+i)?.value||'',med:document.getElementById('fc-med-'+i)?.value||'',op:document.getElementById('fc-op-'+i)?.value||''};});
+  ficha.specs.forEach((_,i)=>{ficha.specs[i]={l:LETRAS[i]||'',spec:document.getElementById('fc-spec-'+i)?.value||'',fab:document.getElementById('fc-fab-'+i)?.value||''};});
+  ficha.largura=document.getElementById('fc-largura')?.value||ficha.largura;
+  ficha.lonas=document.getElementById('fc-lonas')?.value||ficha.lonas;
+  ficha.resistencia=document.getElementById('fc-resist')?.value||ficha.resistencia;
+  ficha.material=document.getElementById('fc-material')?.value||ficha.material;
+  ficha.obs=document.getElementById('fc-obs')?.value||ficha.obs;
+  const uss=[];for(let i=0;i<21;i++)uss.push(document.getElementById('fc-uss-'+i)?.value||'');ficha.ultrassom=uss;
+}
+function adicionarTrecho(){lerFichaAtual();DB.fichas[ativoSel].trechos.push({l:'',de:'',ate:'',comp:'',med:'',op:''});renderFicha();}
+function removerTrecho(i){lerFichaAtual();DB.fichas[ativoSel].trechos.splice(i,1);renderFicha();}
+function adicionarSpec(){lerFichaAtual();DB.fichas[ativoSel].specs.push({l:'',spec:'',fab:''});renderFicha();}
+function removerSpec(i){lerFichaAtual();DB.fichas[ativoSel].specs.splice(i,1);renderFicha();}
+function salvarFicha(){
+  lerFichaAtual();
+  marcarMudanca(); autoBackup();
+  const btn=document.querySelector('.btn-prim');const o=btn.innerHTML;
+  btn.innerHTML='<i class="ti ti-check"></i> Salvo!';btn.style.background='#2E7D32';
+  setTimeout(()=>{btn.innerHTML=o;btn.style.background='';},1800);
+}
+
+// ════════════════════════════════
+// EDIÇÃO DE ANOTAÇÃO GERAL
+// ════════════════════════════════
+function abrirEdicaoAnotacao(idx){
+  const an=DB.anotacoesGerais[idx];
+  if(!an)return;
+  const ns='edit-an-'+idx;
+  galFotos[ns]=[...(an.fotos||[])];
+  document.getElementById('modal-anotacao-corpo').innerHTML=`
+    <div class="form-grupo"><label>Ativo</label>
+      <input type="text" id="ea-ativo" value="${an.ativo||''}">
+    </div>
+    <div class="form-grupo"><label>Data</label>
+      <input type="date" id="ea-data" value="${an.data||''}">
+    </div>
+    <div class="form-grupo"><label>Descrição</label>
+      <textarea id="ea-desc">${an.desc||''}</textarea>
+    </div>
+    ${buildGaleriaField(ns)}
+    <button class="btn-prim" onclick="salvarEdicaoAnotacao(${idx})">Salvar alterações</button>
+    <button class="btn-danger" onclick="excluirAnotacaoGeralModal(${idx})"><i class="ti ti-trash"></i> Excluir anotação</button>`;
+  document.getElementById('modal-anotacao').classList.add('vis');
+  setTimeout(()=>renderGaleriaGrid(ns),0);
+}
+function fecharModalAnotacao(){document.getElementById('modal-anotacao').classList.remove('vis');}
+function excluirAnotacaoGeralModal(idx){
+  if(!confirm('Excluir esta anotação?'))return;
+  DB.anotacoesGerais.splice(idx,1);
+  marcarMudanca(); autoBackup();
+  fecharModalAnotacao();
+  pagAnotacoes=1;
+  document.getElementById('content').innerHTML=buildAnotacoesGeraisHtml();setTimeout(()=>renderGaleriaGrid('gal-ag'),0);
+}
+function salvarEdicaoAnotacao(idx){
+  const an=DB.anotacoesGerais[idx];
+  if(!an)return;
+  const ns='edit-an-'+idx;
+  an.ativo=document.getElementById('ea-ativo')?.value||an.ativo;
+  an.data=document.getElementById('ea-data')?.value||an.data;
+  an.desc=document.getElementById('ea-desc')?.value?.trim()||an.desc;
+  an.fotos=getGalFotos(ns);
+  marcarMudanca(); autoBackup();
+  fecharModalAnotacao();
+  document.getElementById('content').innerHTML=buildAnotacoesGeraisHtml();setTimeout(()=>renderGaleriaGrid('gal-ag'),0);
+}
+
+// ════════════════════════════════
+// IMPRIMIR PDF
+// ════════════════════════════════
+function imprimirRelatorio(){
+  window.print();
+}
+
+// ════════════════════════════════
+// EXPORTAR / IMPORTAR BACKUP
+// ════════════════════════════════
+function exportarBackup(){
+  _fazerBackup(true);
+}
+
+function importarBackup(input){
+  const file=input.files[0];
+  if(!file)return;
+  if(!confirm('Importar este backup? Os dados atuais serão SUBSTITUÍDOS.'))return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const payload=JSON.parse(e.target.result);
+      if(!payload.versao||!payload.DB_registros){
+        alert('Arquivo de backup inválido.');return;
+      }
+      // Restaura cada ativo existente
+      ATIVOS.forEach(a=>{
+        if(payload.DB_registros[a.id]) DB.registros[a.id]=payload.DB_registros[a.id];
+        if(payload.DB_fichas[a.id])    DB.fichas[a.id]=payload.DB_fichas[a.id];
+        if(payload.DB_raspAtivos[a.id])DB.raspAtivos[a.id]=payload.DB_raspAtivos[a.id];
+      });
+      if(Array.isArray(payload.DB_anotacoesGerais)) DB.anotacoesGerais=payload.DB_anotacoesGerais;
+      if(payload.regCounter) regCounter=payload.regCounter+1;
+      mostrarToast('✓ Backup importado! Dados restaurados.','#1565C0');
+      marcarSalvo();
+      renderLista();
+    }catch(err){
+      alert('Erro ao ler o backup: '+err.message);
+    }
+  };
+  reader.readAsText(file);
+  input.value='';// reset para permitir reimportar mesmo arquivo
+}
+
+function mostrarToast(msg,cor){
+  let t=document.getElementById('toast-global');
+  if(!t){t=document.createElement('div');t.id='toast-global';
+    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1F2937;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;transition:opacity .3s;white-space:nowrap;';
+    document.body.appendChild(t);}
+  t.textContent=msg;t.style.background=cor||'#1F2937';t.style.opacity='1';
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>{t.style.opacity='0';},2500);
+}
+
+// ════════════════════════════════
+// DETECÇÃO DE MUDANÇAS
+// ════════════════════════════════
+let _dadosSalvos = ''; // snapshot do último save
+let _mudancasPendentes = false;
+
+function snapshotDados(){
+  return JSON.stringify({
+    r: DB.registros,
+    f: DB.fichas,
+    ra: DB.raspAtivos,
+    ag: DB.anotacoesGerais,
+    rc: regCounter
+  });
+}
+
+function marcarMudanca(){
+  const atual = snapshotDados();
+  _mudancasPendentes = (atual !== _dadosSalvos);
+  atualizarIndicadorMudanca();
+}
+
+function marcarSalvo(){
+  _dadosSalvos = snapshotDados();
+  _mudancasPendentes = false;
+  atualizarIndicadorMudanca();
+}
+
+function atualizarIndicadorMudanca(){
+  const ind = document.getElementById('indicador-mudanca');
+  if(ind) ind.style.display = _mudancasPendentes ? 'flex' : 'none';
+}
+
+// Intercepta fechamento da aba
+window.addEventListener('beforeunload', e => {
+  marcarMudanca();
+  if(_mudancasPendentes){
+    e.preventDefault();
+    e.returnValue = 'Há alterações não salvas. Deseja sair mesmo assim?';
+    return e.returnValue;
+  }
+});
+
+// Patch: chamar marcarMudanca após qualquer operação que altera dados
+const _origUnshift = Array.prototype.unshift;
+// Wrapper das funções de salvar para marcar mudança
+function _wrapSalvar(fn){
+  return function(){
+    const r = fn.apply(this, arguments);
+    setTimeout(marcarMudanca, 100);
+    autoBackup();
+    return r;
+  };
+}
+
+// ════════════════════════════════
+// AUTO-BACKUP LOCAL
+// ════════════════════════════════
+let _autoBackupTimer = null;
+
+function autoBackup(){
+  clearTimeout(_autoBackupTimer);
+  _autoBackupTimer = setTimeout(()=>{
+    _fazerBackup(false); // silencioso
+  }, 3000); // 3s após última alteração
+}
+
+function _gerarPayload(){
+  return {
+    versao: 1,
+    exportadoEm: new Date().toISOString(),
+    DB_registros: DB.registros,
+    DB_fichas: DB.fichas,
+    DB_raspAtivos: DB.raspAtivos,
+    DB_anotacoesGerais: DB.anotacoesGerais,
+    regCounter
+  };
+}
+
+function _fazerBackup(comFeedback=true){
+  const payload = _gerarPayload();
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const ts = new Date().toLocaleDateString('pt-BR').replace(/\//g,'-');
+  a.href = url;
+  a.download = `backup_inspecao.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  marcarSalvo();
+  if(comFeedback) mostrarToast('✓ Backup salvo!','#2E7D32');
+}
+
+// ════════════════════════════════
+// ONEDRIVE
+// ════════════════════════════════
+// ════════════════════════════════
+// COMPARTILHAR BACKUP
+// ════════════════════════════════
+async function compartilharBackup(){
+  const payload = _gerarPayload();
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const file = new File([blob], 'backup_inspecao.json', {type:'application/json'});
+
+  // Web Share API — funciona no Android/iOS com WhatsApp, Drive, e-mail, etc.
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{
+      await navigator.share({
+        title: 'Backup Inspeção de Correia',
+        text: `Backup gerado em ${new Date().toLocaleString('pt-BR')}`,
+        files: [file]
+      });
+      marcarSalvo();
+      mostrarToast('✓ Backup compartilhado!','#2E7D32');
+    } catch(e){
+      if(e.name !== 'AbortError') mostrarToast('Erro ao compartilhar','#C62828');
+    }
+  } else if(navigator.share){
+    // Dispositivo suporta share mas não arquivos — compartilha só texto
+    try{
+      await navigator.share({
+        title: 'Backup Inspeção de Correia',
+        text: json
+      });
+    } catch(e){ _fallbackDownload(json); }
+  } else {
+    // Desktop — faz download normal
+    _fallbackDownload(json);
+    mostrarToast('Arquivo salvo — envie pelo WhatsApp Web','#1565C0');
+  }
+}
+
+function _fallbackDownload(json){
+  const blob = new Blob([json],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'backup_inspecao.json';
+  a.click(); URL.revokeObjectURL(url);
+  marcarSalvo();
+}
+
+// ════════════════════════════════
+// NAVEGAÇÃO
+// ════════════════════════════════
+function voltar(){
+  if(passo==='menu'||passo==='anotacoes-gerais')renderLista();
+  else renderMenu();
+}
+
+renderLista();
+
+// ════════════════════════════════
+// SERVICE WORKER (PWA)
+// ════════════════════════════════
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+
+// ════════════════════════════════
+// LOCALSTORAGE — PERSISTÊNCIA
+// ════════════════════════════════
+const LS_KEY = 'inspecao_db_v1';
+
+function salvarLS(){
+  try{
+    const data = {
+      registros: DB.registros,
+      fichas: DB.fichas,
+      raspAtivos: DB.raspAtivos,
+      anotacoesGerais: DB.anotacoesGerais,
+      regCounter: regCounter
+    };
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
+  } catch(e){
+    // Storage cheio (fotos base64 pesam muito) — avisa
+    if(e.name === 'QuotaExceededError'){
+      mostrarToast('⚠ Armazenamento cheio! Exporte backup e libere espaço.','#C62828');
+    }
+  }
+}
+
+function carregarLS(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return false;
+    const data = JSON.parse(raw);
+    ATIVOS.forEach(a=>{
+      if(data.registros?.[a.id])  DB.registros[a.id]  = data.registros[a.id];
+      if(data.fichas?.[a.id])     DB.fichas[a.id]     = data.fichas[a.id];
+      if(data.raspAtivos?.[a.id]) DB.raspAtivos[a.id] = data.raspAtivos[a.id];
+    });
+    if(Array.isArray(data.anotacoesGerais)) DB.anotacoesGerais = data.anotacoesGerais;
+    if(data.regCounter) regCounter = data.regCounter + 1;
+    return true;
+  } catch(e){ return false; }
+}
+
+// Sobrescreve marcarMudanca para também salvar no localStorage
+const _origMarcarMudanca = marcarMudanca;
+function marcarMudanca(){
+  _origMarcarMudanca();
+  salvarLS();
+}
+
+// Carrega dados salvos ao iniciar
+const _carregou = carregarLS();
+if(_carregou) mostrarToast('✓ Dados restaurados!','#2E7D32');
+marcarSalvo();
+
+
+</script>
+</body>
+
+</html>
