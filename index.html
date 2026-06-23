@@ -2139,73 +2139,85 @@ function voltar(){
   else renderMenu();
 }
 
-renderLista();
 
-// ════════════════════════════════
-// SERVICE WORKER (PWA)
-// ════════════════════════════════
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
-  });
-}
 
-// ════════════════════════════════
-// LOCALSTORAGE — PERSISTÊNCIA AUTOMÁTICA
-// ════════════════════════════════
-const LS_KEY='inspecao_db_v2';
+
+// ══════════════════════════════════════
+// LOCALSTORAGE — SALVA AUTOMATICAMENTE
+// ══════════════════════════════════════
+const LS_KEY = 'inspecao_v3';
 
 function salvarLS(){
   try{
-    const data={
+    localStorage.setItem(LS_KEY, JSON.stringify({
       ativos: ATIVOS,
       registros: DB.registros,
       fichas: DB.fichas,
       raspAtivos: DB.raspAtivos,
       anotacoesGerais: DB.anotacoesGerais,
       favoritos: [...DB.favoritos],
-      regCounter
-    };
-    localStorage.setItem(LS_KEY, JSON.stringify(data));
+      rc: regCounter
+    }));
   }catch(e){
     if(e.name==='QuotaExceededError')
-      mostrarToast('⚠ Armazenamento cheio! Exporte backup.','#C62828');
+      mostrarToast('⚠ Armazenamento cheio!','#C62828');
   }
 }
 
 function carregarLS(){
   try{
-    const raw=localStorage.getItem(LS_KEY);
-    if(!raw)return false;
-    const data=JSON.parse(raw);
-    if(Array.isArray(data.ativos)&&data.ativos.length){
-      ATIVOS.length=0;
-      data.ativos.forEach(a=>{ATIVOS.push(a);_initAtivo(a.id);});
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return false;
+    const d = JSON.parse(raw);
+    if(Array.isArray(d.ativos) && d.ativos.length){
+      ATIVOS.length = 0;
+      d.ativos.forEach(a=>{ ATIVOS.push(a); _initAtivo(a.id); });
     }
     ATIVOS.forEach(a=>{
-      if(data.registros?.[a.id])  DB.registros[a.id] =data.registros[a.id];
-      if(data.fichas?.[a.id])     DB.fichas[a.id]    =data.fichas[a.id];
-      if(data.raspAtivos?.[a.id]) DB.raspAtivos[a.id]=data.raspAtivos[a.id];
+      if(d.registros?.[a.id])  DB.registros[a.id]  = d.registros[a.id];
+      if(d.fichas?.[a.id])     DB.fichas[a.id]      = d.fichas[a.id];
+      if(d.raspAtivos?.[a.id]) DB.raspAtivos[a.id]  = d.raspAtivos[a.id];
     });
-    if(Array.isArray(data.anotacoesGerais)) DB.anotacoesGerais=data.anotacoesGerais;
-    if(Array.isArray(data.favoritos)) DB.favoritos=new Set(data.favoritos);
-    if(data.regCounter) regCounter=data.regCounter+1;
+    if(Array.isArray(d.anotacoesGerais)) DB.anotacoesGerais = d.anotacoesGerais;
+    if(Array.isArray(d.favoritos))       DB.favoritos = new Set(d.favoritos);
+    if(d.rc) regCounter = d.rc + 1;
     return true;
-  }catch(e){return false;}
+  }catch(e){ return false; }
 }
 
-const _origMarcarMudanca2=marcarMudanca;
-function marcarMudanca(){
-  _origMarcarMudanca2();
+// Sobrescreve autoBackup para salvar no localStorage (sem download automático)
+function autoBackup(){ salvarLS(); }
+
+// Hooks de salvamento — chamados após cada operação
+const _ls_hooks = ['renderSucesso','salvarFicha','salvarEdicao','salvarEdicaoAnotacao','excluirRegistro','excluirAnotacaoGeralModal','mudaStatus','mudaStatusDefeito','toggleFavorito','novoAtivo','editarAtivo','excluirAtivo','salvarAnotacaoGeral'];
+
+// Patch simples: salva no localStorage sempre que marcarMudanca for chamada
+const _lsOrigMM = marcarMudanca;
+window.marcarMudanca = function(){
+  _lsOrigMM();
   salvarLS();
+};
+// Também garante que marcarMudanca global aponta para a nova versão
+// (necessário pois funções já declaradas referenciam o nome global)
+
+// Carrega dados salvos
+const _lsOk = carregarLS();
+
+// Service Worker
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
 }
 
-const _carregouLS=carregarLS();
-if(_carregouLS) mostrarToast('✓ Dados restaurados!','#2E7D32');
+// Re-renderiza com dados carregados
+renderLista();
+if(_lsOk) mostrarToast('✓ Dados restaurados!','#2E7D32');
 marcarSalvo();
 
+// Salva a cada 5 segundos como segurança extra
+setInterval(salvarLS, 5000);
 
 </script>
-
 </body>
 </html>
