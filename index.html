@@ -1615,10 +1615,9 @@ function _wrapSalvar(fn){
 let _autoBackupTimer = null;
 
 function autoBackup(){
-  clearTimeout(_autoBackupTimer);
-  _autoBackupTimer = setTimeout(()=>{
-    _fazerBackup(false); // silencioso
-  }, 3000); // 3s após última alteração
+  // No PWA: apenas salva no localStorage (salvarLS já é chamado via marcarMudanca)
+  // Download manual via botão Exportar ou Compartilhar
+  salvarLS();
 }
 
 function _gerarPayload(){
