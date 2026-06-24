@@ -173,12 +173,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ficha-table tr:last-child td{border-bottom:none;}
 .ficha-table .lbl{background:#F0F4FA;color:#374151;font-weight:600;}
 .trecho-header{background:#C5D8F0;font-weight:700;color:#1F3864;}
-.uss-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:6px;}
+.uss-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:8px;}
 .uss-cell{text-align:center;}
-.uss-num{font-size:10px;color:#6B7280;font-weight:600;margin-bottom:2px;}
-.uss-cell input{width:100%;font-size:10px;padding:4px 2px;border:1px solid #D1D5DB;border-radius:5px;text-align:center;background:#fff;}
-.uss-cell input:focus{outline:none;border-color:#2E75B6;}
-.uss-prev{font-size:9px;color:#9CA3AF;margin-top:1px;min-height:12px;}
+.uss-num{font-size:11px;color:#2E75B6;font-weight:700;margin-bottom:3px;}
+.uss-cell input{width:100%;font-size:13px;padding:7px 4px;border:1px solid #D1D5DB;border-radius:6px;text-align:center;background:#fff;box-sizing:border-box;}
+.uss-cell input:focus{outline:none;border-color:#2E75B6;background:#F0F6FF;}
+.uss-prev{font-size:9px;color:#9CA3AF;margin-top:2px;min-height:11px;}
+.uss-sec-wrap{background:#fff;border-radius:12px;border:1px solid #E5E8ED;margin-bottom:11px;overflow:hidden;}
+.uss-sec-hdr{background:#1F3864;padding:10px 14px;display:flex;align-items:center;gap:8px;}
+.uss-sec-hdr .ush-label{flex:1;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#fff;}
+.uss-sec-toggle{background:rgba(255,255,255,.2);border:none;color:#fff;width:24px;height:24px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.uss-sec-body{padding:12px;display:none;}
+.uss-trecho-hdr{font-size:11px;font-weight:700;color:#1F3864;margin:10px 0 6px;display:flex;align-items:center;justify-content:space-between;}
+.uss-trecho-hdr:first-child{margin-top:0;}
 .empty-state{text-align:center;padding:18px;color:#9CA3AF;font-size:13px;}
 .empty-state i{font-size:30px;display:block;margin-bottom:5px;opacity:.4;}
 
@@ -354,7 +361,7 @@ ATIVOS.forEach(a=>_initAtivo(a.id));
 
 function _initAtivo(id){
   if(!DB.registros[id]) DB.registros[id]=[];
-  if(!DB.fichas[id]) DB.fichas[id]={cod:'',comprimento_total:'',trechos:[{l:'A',de:'',ate:'',comp:'',med:'',op:''}],specs:[{l:'A',spec:'',fab:''}],largura:'',lonas:'',cob_sup:'',cob_inf:'',material:'',ultrassom:Array(21).fill(''),obs:''};
+  if(!DB.fichas[id]) DB.fichas[id]={cod:'',comprimento_total:'',trechos:[{l:'A',de:'',ate:'',comp:'',fab:'',op:'',unica:false,spec:'',uss:Array(21).fill('')}],largura:'',tipo_lona:'lona',cabo_breaker:false,cob_sup:'',cob_inf:'',material:'',obs:''};
   if(!DB.raspAtivos[id]) DB.raspAtivos[id]={prim:true,p2:false,s1:false,s2:false,s3:false,s4:false,s5:false};
 }
 
@@ -1202,29 +1209,43 @@ function renderRelatorio(){
   });
 
   // ── FICHA TÉCNICA ──
+  if(!ficha.trechos[0].uss) ficha.trechos.forEach(t=>{t.uss=Array(21).fill('');t.fab=t.fab||t.med||'';t.spec=t.spec||'';t.unica=t.unica||false;});
   const temFicha=ficha.comprimento_total||ficha.cod||ficha.trechos.some(t=>t.comp||t.de);
   let fichaBody='';
   if(!temFicha){fichaBody=`<div class="empty-state"><i class="ti ti-table"></i>Não preenchida</div>`;}
   else{
     if(ficha.comprimento_total||ficha.cod)fichaBody+=`<div class="rel-ficha-row"><div class="rel-ficha-label">Comprimento</div><div class="rel-ficha-val">${ficha.comprimento_total||'—'} m</div><div class="rel-ficha-label">COD</div><div class="rel-ficha-val">${ficha.cod||'—'}</div></div>`;
     const tC=ficha.trechos.filter(t=>t.de||t.comp);
-    if(tC.length){fichaBody+=`<div style="overflow-x:auto;"><table class="ficha-table"><tr><th>Trecho</th><th>De</th><th>Até</th><th>Comp.</th><th>MED</th><th>OP</th></tr>`;tC.forEach(t=>{fichaBody+=`<tr><td class="lbl trecho-header">${t.l}</td><td>${fmtData(t.de)}</td><td>${fmtData(t.ate)}</td><td>${t.comp||'—'}</td><td>${t.med||'—'}</td><td>${t.op||'—'}</td></tr>`;});fichaBody+=`</table></div>`;}
-    const sC=ficha.specs.filter(s=>s.spec||s.fab);
-    if(sC.length){fichaBody+=`<div style="padding:6px 10px;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;background:#F8F9FB;border-top:1px solid #F0F2F5;">Especificação</div><div style="overflow-x:auto;"><table class="ficha-table"><tr><th>Esp.</th><th>Especificação</th><th>Fabricante</th></tr>`;sC.forEach(s=>{fichaBody+=`<tr><td class="lbl">${s.l}</td><td>${s.spec||'—'}</td><td>${s.fab||'—'}</td></tr>`;});fichaBody+=`</table></div>`;}
-    if(ficha.largura||ficha.lonas)fichaBody+=`<div class="rel-ficha-row"><div class="rel-ficha-label">Largura</div><div class="rel-ficha-val">${ficha.largura||'—'} mm</div><div class="rel-ficha-label">Lonas/Cabos</div><div class="rel-ficha-val">${ficha.lonas||'—'}</div></div>`;
+    if(tC.length){
+      fichaBody+=`<div style="overflow-x:auto;"><table class="ficha-table"><tr><th>Trecho</th><th>De</th><th>Até</th><th>Comp.(m)</th><th>Fabricante</th><th>OP</th><th>Especificação</th><th>Única</th></tr>`;
+      tC.forEach(t=>{fichaBody+=`<tr><td class="lbl trecho-header">${t.l}</td><td>${t.de||'—'}</td><td>${t.ate||'—'}</td><td>${t.comp||'—'}</td><td>${t.fab||'—'}</td><td>${t.op||'—'}</td><td>${t.spec||'—'}</td><td>${t.unica?'✓':''}</td></tr>`;});
+      fichaBody+=`</table></div>`;
+      // Ultrassom por trecho — recolhido por padrão
+      tC.forEach((t,idx)=>{
+        const ussV=t.uss||Array(21).fill('');
+        if(!ussV.some(v=>v))return;
+        const uid='uss-rel-'+idx;
+        let g='<div class="uss-grid" style="margin-top:6px;">';
+        for(let j=0;j<21;j++){const n=String(j+1).padStart(2,'0');g+=`<div class="uss-cell"><div class="uss-num">${n}</div><div style="font-size:11px;padding:4px 2px;border:1px solid #E5E8ED;border-radius:5px;text-align:center;background:#F8F9FB;">${ussV[j]||'—'}</div></div>`;}
+        g+='</div>';
+        fichaBody+=`<div style="border-top:1px solid #F0F2F5;margin-top:4px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;cursor:pointer;" onclick="toggleUssRel('${uid}')">
+            <span style="font-size:11px;font-weight:700;color:#1F3864;"><i class="ti ti-wave-sine" style="margin-right:4px;"></i>Ultrassom — Trecho ${t.l}</span>
+            <button class="rel-sec-toggle no-print" id="${uid}-btn" style="background:#EEF0F3;color:#374151;">+</button>
+          </div>
+          <div id="${uid}" style="display:none;">${g}</div>
+        </div>`;
+      });
+    }
+    const tipoLona=ficha.tipo_lona||'lona';
+    if(ficha.largura||ficha.cob_sup)fichaBody+=`<div class="rel-ficha-row"><div class="rel-ficha-label">Largura</div><div class="rel-ficha-val">${ficha.largura||'—'} mm</div><div class="rel-ficha-label">Tipo</div><div class="rel-ficha-val">${tipoLona==='cabo'?'Cabo de aço'+(ficha.cabo_breaker?' + Breaker':''):'Lona'}</div></div>`;
     if(ficha.cob_sup||ficha.cob_inf)fichaBody+=`<div class="rel-ficha-row"><div class="rel-ficha-label">Cob. Superior</div><div class="rel-ficha-val">${ficha.cob_sup||'—'}</div><div class="rel-ficha-label">Cob. Inferior</div><div class="rel-ficha-val">${ficha.cob_inf||'—'}</div></div>`;
     if(ficha.material)fichaBody+=`<div class="rel-ficha-row"><div class="rel-ficha-label">Material</div><div class="rel-ficha-val">${ficha.material}</div></div>`;
     if(ficha.obs)fichaBody+=`<div class="rel-ficha-row"><div class="rel-ficha-label">Obs.</div><div class="rel-ficha-val" style="white-space:pre-line;">${ficha.obs}</div></div>`;
     fichaBody+=`<div style="padding:8px;"><button class="btn-sec no-print" onclick="renderFicha()"><i class="ti ti-edit"></i> Editar ficha</button></div>`;
   }
   const fichaHtml=buildSecaoRel('ficha','ti-table','FICHA TÉCNICA — '+ativoSel,fichaBody,false,'');
-
-  // ── ULTRASSOM ──
-  const ussVals=ficha.ultrassom||Array(21).fill('');
-  let ussBody=`<div class="uss-grid">`;
-  for(let i=0;i<21;i++){const n=String(i+1).padStart(2,'0');ussBody+=`<div class="uss-cell"><div class="uss-num">${n}</div><input type="text" id="uss-${i}" value="${ussVals[i]||''}" placeholder="—" inputmode="decimal" onchange="salvarUss()"></div>`;}
-  ussBody+=`</div><div style="margin-top:7px;font-size:11px;color:#9CA3AF;text-align:right;" id="uss-saved-msg"></div>`;
-  const ussHtml=buildSecaoRel('uss','ti-wave-sine','MEDIDAS DE ULTRASSOM',ussBody,false,'');
+  const ussHtml=''; // Ultrassom agora fica dentro de cada trecho
 
   // ── RASPADORES (por componente) ──
   const raspAtiv=DB.raspAtivos[ativoSel];
@@ -1301,6 +1322,15 @@ function buildSecaoRel(uid,icon,titulo,body,isHist,extraHdrClass){
     </div>
     <div class="rel-sec-body" id="${bodyId}">${body}</div>
   </div>`;
+}
+
+function toggleUssRel(uid){
+  const el=document.getElementById(uid);
+  const btn=document.getElementById(uid+'-btn');
+  if(!el)return;
+  const open=el.style.display==='none';
+  el.style.display=open?'block':'none';
+  if(btn)btn.textContent=open?'−':'+';
 }
 
 function toggleSecao(bodyId,uid){
@@ -1666,85 +1696,224 @@ function excluirRegistro(regId){
 function renderFicha(){
   passo='ficha';
   const ficha=DB.fichas[ativoSel];
+  // Migrate old structure if needed
+  if(!ficha.trechos[0].uss) ficha.trechos.forEach(t=>{t.uss=Array(21).fill('');t.fab=t.fab||t.med||'';t.spec=t.spec||'';t.unica=t.unica||false;});
   setTopbar('Dados do Transportador',ativoSel,true,false);
   setStepBar(false);
-  let tH='';ficha.trechos.forEach((t,i)=>{tH+=buildTrechoForm(t,i);});
-  let sH='';ficha.specs.forEach((s,i)=>{sH+=buildSpecForm(s,i);});
-  const ussVals=ficha.ultrassom||Array(21).fill('');
-  let ussG='<div class="uss-grid">';
-  for(let i=0;i<21;i++){
-    const n=String(i+1).padStart(2,'0');
-    const pv=ussVals[i]||'';
-    ussG+=`<div class="uss-cell">
-      <div class="uss-num">${n}</div>
-      <input type="text" id="fc-uss-${i}" value="" placeholder="${pv||'—'}" inputmode="decimal">
-      <div class="uss-prev" title="Última medida">${pv?'↑ '+pv:''}</div>
-    </div>`;
-  }
-  ussG+='</div>';
-  let h=`<div class="ativo-banner"><i class="ti ti-table" style="font-size:20px;color:#2E75B6;"></i><div><div class="ab-id">Ficha Técnica</div><div class="ab-nome">${ativoSel}</div></div></div>
+  let tH=''; ficha.trechos.forEach((t,i)=>{tH+=buildTrechoForm(t,i);});
+  const tipoLona=ficha.tipo_lona||'lona';
+  const breaker=ficha.cabo_breaker||false;
+  let h=`<div class="ativo-banner"><i class="ti ti-table" style="font-size:20px;color:#2E75B6;"></i>
+    <div><div class="ab-id">Ficha Técnica</div><div class="ab-nome">${ativoSel}</div></div></div>
     <div class="rel-section" style="margin-bottom:11px;"><div class="rel-section-header"><i class="ti ti-ruler"></i> IDENTIFICAÇÃO</div><div style="padding:11px;">
-      <div class="grid-2"><div class="form-grupo"><label>COD</label><input type="text" id="fc-cod" value="${ficha.cod||''}" placeholder="Ex: 15430151"></div>
-      <div class="form-grupo"><label>Comprimento total (m)</label><input type="number" id="fc-comp-total" value="${ficha.comprimento_total||''}" placeholder="Ex: 1428.90"></div></div>
+      <div class="grid-2">
+        <div class="form-grupo"><label>COD</label><input type="text" id="fc-cod" value="${ficha.cod||''}" placeholder="Ex: 15430151"></div>
+        <div class="form-grupo"><label>Comprimento total (m)</label><input type="text" id="fc-comp-total" value="${ficha.comprimento_total||''}" placeholder="Ex: 1428,90"></div>
+      </div>
     </div></div>
-    <div class="rel-section" style="margin-bottom:11px;"><div class="rel-section-header"><i class="ti ti-arrows-right-left"></i> TRECHOS</div>
+    <div class="rel-section" style="margin-bottom:11px;">
+      <div class="rel-section-header"><i class="ti ti-arrows-right-left"></i> TRECHOS</div>
       <div style="padding:11px;" id="trechos-container">${tH}</div>
-      <div style="padding:0 11px 11px;"><button type="button" class="btn-sec" onclick="adicionarTrecho()" style="display:flex;align-items:center;justify-content:center;gap:6px;"><i class="ti ti-plus"></i> Adicionar trecho</button></div>
-    </div>
-    <div class="rel-section" style="margin-bottom:11px;"><div class="rel-section-header"><i class="ti ti-settings"></i> ESPECIFICAÇÃO</div>
-      <div style="padding:11px;" id="specs-container">${sH}</div>
-      <div style="padding:0 11px 11px;"><button type="button" class="btn-sec" onclick="adicionarSpec()" style="display:flex;align-items:center;justify-content:center;gap:6px;"><i class="ti ti-plus"></i> Adicionar especificação</button></div>
+      <div style="padding:0 11px 11px;">
+        <button type="button" class="btn-sec" onclick="adicionarTrecho()" style="display:flex;align-items:center;justify-content:center;gap:6px;"><i class="ti ti-plus"></i> Adicionar trecho</button>
+      </div>
     </div>
     <div class="rel-section" style="margin-bottom:11px;"><div class="rel-section-header"><i class="ti ti-maximize"></i> LARGURA E MATERIAL</div><div style="padding:11px;">
-      <div class="grid-2">
-        <div class="form-grupo"><label>Largura (mm)</label><input type="number" id="fc-largura" value="${ficha.largura||''}" placeholder="Ex: 1800"></div>
-        <div class="form-grupo"><label>Nº de Lonas/Cabos</label><input type="text" id="fc-lonas" value="${ficha.lonas||''}" placeholder="Ex: 5 ou 15x10x92"></div>
+      <!-- Linha 1: Largura + Lona/Cabo + Material -->
+      <div class="grid-3">
+        <div class="form-grupo"><label>Largura (mm)</label><input type="text" id="fc-largura" value="${ficha.largura||''}" placeholder="1800" style="font-size:13px;padding:8px;"></div>
+        <div class="form-grupo"><label>Cob. Superior</label><input type="text" id="fc-cob-sup" value="${ficha.cob_sup||''}" placeholder="Ex: 10mm" style="font-size:13px;padding:8px;"></div>
+        <div class="form-grupo"><label>Cob. Inferior</label><input type="text" id="fc-cob-inf" value="${ficha.cob_inf||''}" placeholder="Ex: 6mm" style="font-size:13px;padding:8px;"></div>
       </div>
-      <div class="grid-2">
-        <div class="form-grupo"><label>Cob. Superior</label><input type="text" id="fc-cob-sup" value="${ficha.cob_sup||''}" placeholder="Ex: 10mm"></div>
-        <div class="form-grupo"><label>Cob. Inferior</label><input type="text" id="fc-cob-inf" value="${ficha.cob_inf||''}" placeholder="Ex: 6mm"></div>
-      </div>
-      <div class="form-grupo"><label>Material</label><input type="text" id="fc-material" value="${ficha.material||''}" placeholder="Ex: POLIESTER/POLIAMIDA"></div>
-      <div style="margin-top:4px;">
-        <label style="font-size:13px;color:#374151;font-weight:500;display:block;margin-bottom:4px;">Medidas de Ultrassom <span class="lbl-hint">(21 pontos · última medida abaixo)</span></label>
-        ${ussG}
+      <!-- Linha 2: Tipo Lona/Cabo + Material -->
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px;">
+        <label style="font-size:13px;font-weight:500;color:#374151;">Tipo:</label>
+        <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;">
+          <input type="radio" name="fc-tipo-lona" value="lona" ${tipoLona==='lona'?'checked':''} onchange="toggleCaboBreaker()" style="accent-color:#1F3864;"> Lona
+        </label>
+        <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;">
+          <input type="radio" name="fc-tipo-lona" value="cabo" ${tipoLona==='cabo'?'checked':''} onchange="toggleCaboBreaker()" style="accent-color:#1F3864;"> Cabo de aço
+        </label>
+        <span id="breaker-wrap" style="${tipoLona==='cabo'?'':'display:none'}">
+          <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;">
+            <input type="checkbox" id="fc-cabo-breaker" ${breaker?'checked':''} style="accent-color:#1F3864;"> Breaker
+          </label>
+        </span>
+        <div class="form-grupo" style="margin-bottom:0;flex:1;min-width:120px;">
+          <input type="text" id="fc-material" value="${ficha.material||''}" placeholder="Material (ex: POLIESTER)" style="font-size:13px;padding:8px;">
+        </div>
       </div>
     </div></div>
     <div class="rel-section" style="margin-bottom:11px;"><div class="rel-section-header"><i class="ti ti-notes"></i> OBSERVAÇÕES</div><div style="padding:11px;">
       <textarea style="width:100%;font-size:13px;padding:10px;border:1px solid #D1D5DB;border-radius:8px;min-height:70px;resize:vertical;" id="fc-obs" placeholder="Observações relevantes...">${ficha.obs||''}</textarea>
     </div></div>
+    ${buildUssSecao(ficha)}
     <button class="btn-prim" onclick="salvarFicha()"><i class="ti ti-device-floppy"></i> Salvar ficha técnica</button>
     <button class="btn-sec" onclick="renderMenu()"><i class="ti ti-arrow-left"></i> Voltar ao menu</button>
     <div style="height:24px;"></div>`;
   document.getElementById('content').innerHTML=h;
 }
-function buildTrechoForm(t,i){const l=LETRAS[i]||String(i+1);return `<div style="background:#F0F4FA;border-radius:8px;padding:10px;margin-bottom:9px;" id="trecho-bloco-${i}"><div style="font-size:12px;font-weight:700;color:#1F3864;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;">TRECHO ${l} ${i>0?`<button type="button" class="btn-sm btn-sm-danger" onclick="removerTrecho(${i})">Remover</button>`:''}</div><div class="grid-2"><div class="form-grupo"><label>De</label><input type="date" id="fc-de-${i}" value="${t.de||''}"></div><div class="form-grupo"><label>Até</label><input type="date" id="fc-ate-${i}" value="${t.ate||''}"></div></div><div class="grid-3"><div class="form-grupo"><label>Comp.(m)</label><input type="number" id="fc-comp-${i}" value="${t.comp||''}" placeholder="m"></div><div class="form-grupo"><label>MED</label><input type="number" id="fc-med-${i}" value="${t.med||''}" step="0.01"></div><div class="form-grupo"><label>OP</label><input type="number" id="fc-op-${i}" value="${t.op||''}"></div></div></div>`;}
-function buildSpecForm(s,i){const l=LETRAS[i]||String(i+1);return `<div style="background:#F0F4FA;border-radius:8px;padding:10px;margin-bottom:9px;" id="spec-bloco-${i}"><div style="font-size:12px;font-weight:700;color:#1F3864;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;">ESPECIFICAÇÃO ${l} ${i>0?`<button type="button" class="btn-sm btn-sm-danger" onclick="removerSpec(${i})">Remover</button>`:''}</div><div class="form-grupo"><label>Especificação</label><input type="text" id="fc-spec-${i}" value="${s.spec||''}" placeholder="Ex: PN 5000 5L 10X3 E.A"></div><div class="form-grupo"><label>Fabricante</label><input type="text" id="fc-fab-${i}" value="${s.fab||''}" placeholder="Ex: MERCURIO"></div></div>`;}
+
+function toggleCaboBreaker(){
+  const isCabo=document.querySelector('input[name="fc-tipo-lona"]:checked')?.value==='cabo';
+  const wrap=document.getElementById('breaker-wrap');
+  if(wrap) wrap.style.display=isCabo?'':'none';
+}
+function buildTrechoForm(t,i){
+  const l=LETRAS[i]||String(i+1);
+  const isA=i===0;
+  const unica=t.unica||false;
+  return `<div style="background:#F0F4FA;border-radius:8px;padding:10px;margin-bottom:9px;" id="trecho-bloco-${i}">
+    <div style="font-size:12px;font-weight:700;color:#1F3864;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;">
+      TRECHO ${l}
+      <div style="display:flex;gap:6px;align-items:center;">
+        ${isA?`<label style="font-size:11px;font-weight:600;color:#374151;display:flex;align-items:center;gap:4px;cursor:pointer;">
+          <input type="checkbox" id="fc-unica-${i}" ${unica?'checked':''} onclick="toggleUnica(${i})" style="width:14px;height:14px;accent-color:#1F3864;"> Única
+        </label>`:''}
+        ${i>0?`<button type="button" class="btn-sm btn-sm-danger" onclick="removerTrecho(${i})">Remover</button>`:''}
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-grupo"><label>De <span class="lbl-hint">(data ou texto)</span></label>
+        <input type="text" id="fc-de-${i}" value="${t.de||''}" placeholder="Ex: 16/06/24 ou Cabeça"></div>
+      <div class="form-grupo"><label>Até <span class="lbl-hint">(data ou texto)</span></label>
+        <input type="text" id="fc-ate-${i}" value="${t.ate||''}" placeholder="Ex: 22/06/24 ou Pé"></div>
+    </div>
+    <div class="grid-3">
+      <div class="form-grupo"><label>Comp.(m)</label>
+        <input type="text" id="fc-comp-${i}" value="${t.comp||''}" placeholder="m"></div>
+      <div class="form-grupo"><label>Fabricante</label>
+        <input type="text" id="fc-fab-${i}" value="${t.fab||''}" placeholder="Ex: Mercúrio"></div>
+      <div class="form-grupo"><label>OP</label>
+        <input type="text" id="fc-op-${i}" value="${t.op||''}"></div>
+    </div>
+    <div class="form-grupo">
+      <label>Especificação</label>
+      <input type="text" id="fc-spec-${i}" value="${t.spec||''}" placeholder="Ex: PN 5000 5L 10X3 E.A">
+    </div>
+  </div>`;
+}
+
+function buildUssGrid(vals,trechoIdx){
+  let h='';
+  for(let j=0;j<21;j++){
+    const n=String(j+1).padStart(2,'0');
+    const pv=(vals&&vals[j])||'';
+    h+=`<div class="uss-cell">
+      <div class="uss-num">${n}</div>
+      <input type="text" id="fc-uss-${trechoIdx}-${j}" value="" placeholder="${pv||'—'}" inputmode="decimal">
+      <div class="uss-prev">${pv?'↑'+pv:''}</div>
+    </div>`;
+  }
+  return h;
+}
+
+function buildUssSecao(ficha){
+  const trechos=ficha.trechos||[];
+  let trechosHtml='';
+  trechos.forEach((t,i)=>{
+    const l=LETRAS[i]||String(i+1);
+    const vals=t.uss||Array(21).fill('');
+    trechosHtml+=`
+      <div class="uss-trecho-hdr">
+        Trecho ${l}
+        ${i>0?`<button type="button" class="btn-sm btn-sm-danger" onclick="removerUssExtraTrecho(${i})">Remover</button>`:''}
+      </div>
+      <div class="uss-grid">${buildUssGrid(vals,i)}</div>`;
+  });
+  return `<div class="uss-sec-wrap">
+    <div class="uss-sec-hdr" onclick="toggleUssSecao()" style="cursor:pointer;">
+      <i class="ti ti-wave-sine" style="color:#BDD9F8;font-size:16px;"></i>
+      <span class="ush-label">Medidas de Ultrassom</span>
+      <button type="button" class="uss-sec-toggle" id="uss-sec-btn" onclick="event.stopPropagation();toggleUssSecao()">+</button>
+    </div>
+    <div class="uss-sec-body" id="uss-sec-body">
+      ${trechosHtml}
+      ${trechos.length<8?`<button type="button" class="btn-sec" style="margin-top:10px;" onclick="adicionarUssExtraTrecho()">
+        <i class="ti ti-plus"></i> Adicionar Trecho ${LETRAS[trechos.length]||''}
+      </button>`:''}
+    </div>
+  </div>`;
+}
+
+function toggleUssSecao(){
+  const body=document.getElementById('uss-sec-body');
+  const btn=document.getElementById('uss-sec-btn');
+  if(!body)return;
+  const open=body.style.display==='none'||body.style.display==='';
+  body.style.display=open?'block':'none';
+  if(btn)btn.textContent=open?'−':'+';
+}
+
+function adicionarUssExtraTrecho(){
+  lerFichaAtual();
+  const ficha=DB.fichas[ativoSel];
+  // Adiciona trecho de dados básico se não existir
+  if(ficha.trechos.length<8){
+    ficha.trechos.push({l:LETRAS[ficha.trechos.length]||'',de:'',ate:'',comp:'',fab:'',op:'',spec:'',unica:false,uss:Array(21).fill('')});
+  }
+  renderFicha();
+  // Expande a seção USS após render
+  setTimeout(()=>{
+    const body=document.getElementById('uss-sec-body');
+    const btn=document.getElementById('uss-sec-btn');
+    if(body){body.style.display='block';}
+    if(btn){btn.textContent='−';}
+  },50);
+}
+
+function removerUssExtraTrecho(i){
+  lerFichaAtual();
+  DB.fichas[ativoSel].trechos.splice(i,1);
+  renderFicha();
+  setTimeout(()=>{
+    const body=document.getElementById('uss-sec-body');
+    const btn=document.getElementById('uss-sec-btn');
+    if(body){body.style.display='block';}
+    if(btn){btn.textContent='−';}
+  },50);
+}
+
+function toggleUnica(i){
+  lerFichaAtual();
+  DB.fichas[ativoSel].trechos[i].unica=document.getElementById('fc-unica-'+i)?.checked||false;
+  renderFicha();
+}
 function lerFichaAtual(){
   const ficha=DB.fichas[ativoSel];
   ficha.cod=document.getElementById('fc-cod')?.value||ficha.cod;
   ficha.comprimento_total=document.getElementById('fc-comp-total')?.value||ficha.comprimento_total;
-  ficha.trechos.forEach((_,i)=>{ficha.trechos[i]={l:LETRAS[i]||'',de:document.getElementById('fc-de-'+i)?.value||'',ate:document.getElementById('fc-ate-'+i)?.value||'',comp:document.getElementById('fc-comp-'+i)?.value||'',med:document.getElementById('fc-med-'+i)?.value||'',op:document.getElementById('fc-op-'+i)?.value||''};});
-  ficha.specs.forEach((_,i)=>{ficha.specs[i]={l:LETRAS[i]||'',spec:document.getElementById('fc-spec-'+i)?.value||'',fab:document.getElementById('fc-fab-'+i)?.value||''};});
+  ficha.trechos.forEach((_,i)=>{
+    const ussAtual=[...(ficha.trechos[i].uss||Array(21).fill(''))];
+    for(let j=0;j<21;j++){
+      const v=document.getElementById(`fc-uss-${i}-${j}`)?.value||'';
+      if(v) ussAtual[j]=v;
+    }
+    ficha.trechos[i]={
+      l:LETRAS[i]||'',
+      de:document.getElementById('fc-de-'+i)?.value??ficha.trechos[i].de,
+      ate:document.getElementById('fc-ate-'+i)?.value??ficha.trechos[i].ate,
+      comp:document.getElementById('fc-comp-'+i)?.value??ficha.trechos[i].comp,
+      fab:document.getElementById('fc-fab-'+i)?.value??ficha.trechos[i].fab,
+      op:document.getElementById('fc-op-'+i)?.value??ficha.trechos[i].op,
+      spec:document.getElementById('fc-spec-'+i)?.value??ficha.trechos[i].spec,
+      unica:document.getElementById('fc-unica-'+i)?.checked??ficha.trechos[i].unica,
+      uss:ussAtual
+    };
+  });
   ficha.largura=document.getElementById('fc-largura')?.value||ficha.largura;
-  ficha.lonas=document.getElementById('fc-lonas')?.value||ficha.lonas;
+  const tipoLona=document.querySelector('input[name="fc-tipo-lona"]:checked')?.value;
+  if(tipoLona) ficha.tipo_lona=tipoLona;
+  ficha.cabo_breaker=document.getElementById('fc-cabo-breaker')?.checked||false;
   ficha.cob_sup=document.getElementById('fc-cob-sup')?.value||ficha.cob_sup||'';
   ficha.cob_inf=document.getElementById('fc-cob-inf')?.value||ficha.cob_inf||'';
   ficha.material=document.getElementById('fc-material')?.value||ficha.material;
   ficha.obs=document.getElementById('fc-obs')?.value||ficha.obs;
-  // Ultrassom: só substitui se o campo foi preenchido; senão mantém anterior
-  const uss=[...( ficha.ultrassom||Array(21).fill(''))];
-  for(let i=0;i<21;i++){
-    const v=document.getElementById('fc-uss-'+i)?.value||'';
-    if(v) uss[i]=v; // nova medida digitada substitui
-    // se vazio, mantém a medida anterior
-  }
-  ficha.ultrassom=uss;
 }
-function adicionarTrecho(){lerFichaAtual();DB.fichas[ativoSel].trechos.push({l:'',de:'',ate:'',comp:'',med:'',op:''});renderFicha();}
+function adicionarTrecho(){lerFichaAtual();DB.fichas[ativoSel].trechos.push({l:'',de:'',ate:'',comp:'',fab:'',op:'',spec:'',unica:false,uss:Array(21).fill('')});renderFicha();}
 function removerTrecho(i){lerFichaAtual();DB.fichas[ativoSel].trechos.splice(i,1);renderFicha();}
-function adicionarSpec(){lerFichaAtual();DB.fichas[ativoSel].specs.push({l:'',spec:'',fab:''});renderFicha();}
-function removerSpec(i){lerFichaAtual();DB.fichas[ativoSel].specs.splice(i,1);renderFicha();}
+function adicionarSpec(){/* specs removed - specs now inside trechos */}
+function removerSpec(i){}
 function salvarFicha(){
   lerFichaAtual();
   marcarMudanca(); autoBackup();
@@ -1989,7 +2158,7 @@ async function compartilharPDF(){
   }
   mostrarToast('Gerando PDF...','#1565C0');
 
-  // Carrega html2pdf.js dinamicamente se não carregado
+  // Carrega html2pdf.js
   if(!window.html2pdf){
     try{
       await new Promise((res,rej)=>{
@@ -1999,91 +2168,109 @@ async function compartilharPDF(){
         document.head.appendChild(s);
       });
     } catch(e){
-      mostrarToast('Erro: sem conexão para carregar biblioteca PDF','#C62828');
+      mostrarToast('Sem conexão — use o botão Imprimir','#E65100');
       return;
     }
   }
 
-  // Aplica mesmas regras dos checkboxes
+  // Expande seções recolhidas
+  const eraRecolhido=[];
+  document.querySelectorAll('.rel-sec-body.recolhido').forEach(el=>{
+    el.classList.remove('recolhido');
+    eraRecolhido.push(el);
+    const uid=el.id.replace('sec-body-','');
+    const btn=document.getElementById('sec-btn-'+uid);
+    if(btn)btn.textContent='−';
+  });
+  // Expande ultrassom recolhido
+  const ussAbertos=[];
+  document.querySelectorAll('[id^="uss-rel-"]').forEach(el=>{
+    if(el.style.display==='none'){
+      el.style.display='block';
+      ussAbertos.push(el);
+    }
+  });
+
+  // Aplica checkboxes
   const ocultos=[];
   document.querySelectorAll('.rel-sec-wrap').forEach(wrap=>{
     const secChk=wrap.querySelector('.rel-sec-chk');
-    if(secChk&&!secChk.checked){
-      wrap.classList.add('print-item-oculto'); ocultos.push(wrap);
-    } else {
+    if(secChk&&!secChk.checked){wrap.classList.add('print-item-oculto');ocultos.push(wrap);}
+    else{
       wrap.querySelectorAll('.item-print-chk').forEach(chk=>{
         const card=chk.closest('.reg-card');
         if(card&&!chk.checked){card.classList.add('print-item-oculto');ocultos.push(card);}
       });
-      // Expande seções recolhidas para o PDF
-      const body=wrap.querySelector('.rel-sec-body');
-      if(body&&body.classList.contains('recolhido')){
-        body.classList.remove('recolhido');
-        body.dataset.eraRecolhido='1';
-      }
     }
   });
 
-  // Cria clone limpo do conteúdo
+  // Coleta CSS do documento
+  let cssText='';
+  document.querySelectorAll('style').forEach(s=>{cssText+=s.textContent;});
+
+  // Cria clone com estilos
   const content=document.getElementById('content');
   const clone=content.cloneNode(true);
-  clone.querySelectorAll('.no-print,.rel-sec-toggle,.rel-sec-chk,.item-print-chk,.btn-prim,.btn-sec,.btn-sm,.reg-card-footer').forEach(el=>el.remove());
+  clone.querySelectorAll('.no-print,.rel-sec-toggle,.rel-sec-chk,.item-print-chk,.btn-prim,.btn-sec,.btn-sm,.reg-card-footer,.galeria-add-btn').forEach(el=>el.remove());
   clone.querySelectorAll('.print-item-oculto').forEach(el=>el.remove());
-  // Garante que seções expandidas apareçam
   clone.querySelectorAll('.rel-sec-body.recolhido').forEach(el=>el.classList.remove('recolhido'));
+  clone.querySelectorAll('[style*="display:none"]').forEach(el=>{
+    if(el.id&&el.id.startsWith('uss-rel-'))el.style.display='block';
+  });
 
   const wrapper=document.createElement('div');
-  wrapper.style.cssText='font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:8px;background:#fff;color:#111;max-width:100%;';
+  wrapper.innerHTML=`<style>${cssText}
+    body,div{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important;}
+    .no-print,.rel-sec-toggle,.rel-sec-chk,.item-print-chk,.btn-prim,.btn-sec,.btn-sm,.galeria-add-btn{display:none!important;}
+    .rel-sec-body.recolhido{display:block!important;}
+    .rel-sec-wrap{border:1px solid #ccc;border-radius:4px;margin-bottom:8px;page-break-inside:avoid;}
+    .rel-sec-hdr{background:#1F3864!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  </style>`;
   wrapper.appendChild(clone);
+  wrapper.style.cssText='padding:8px;background:#fff;max-width:794px;';
   document.body.appendChild(wrapper);
 
   const nomeAtivo=ativoSel||'relatorio';
   const opt={
-    margin:[8,6,8,6],
+    margin:[10,8,10,8],
     filename:`relatorio_${nomeAtivo}.pdf`,
-    image:{type:'jpeg',quality:0.9},
-    html2canvas:{scale:2,useCORS:true,backgroundColor:'#fff',logging:false},
+    image:{type:'jpeg',quality:0.88},
+    html2canvas:{scale:1.5,useCORS:true,backgroundColor:'#fff',logging:false,allowTaint:true},
     jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
-    pagebreak:{mode:['avoid-all']}
+    pagebreak:{mode:'avoid-all'}
   };
 
-  try{
-    const pdfBlob=await html2pdf().set(opt).from(wrapper).outputPdf('blob');
-    document.body.removeChild(wrapper);
-
-    // Restaura estado
+  const restaurar=()=>{
+    if(document.body.contains(wrapper))document.body.removeChild(wrapper);
     ocultos.forEach(el=>el.classList.remove('print-item-oculto'));
-    document.querySelectorAll('[data-era-recolhido="1"]').forEach(el=>{
+    eraRecolhido.forEach(el=>{
       el.classList.add('recolhido');
-      delete el.dataset.eraRecolhido;
       const uid=el.id.replace('sec-body-','');
       const btn=document.getElementById('sec-btn-'+uid);
       if(btn)btn.textContent='+';
     });
+    ussAbertos.forEach(el=>{el.style.display='none';});
+  };
 
+  try{
+    const pdfBlob=await html2pdf().set(opt).from(wrapper).outputPdf('blob');
+    restaurar();
     const pdfFile=new File([pdfBlob],`relatorio_${nomeAtivo}.pdf`,{type:'application/pdf'});
-
-    // Celular: Web Share API com arquivo
     if(navigator.canShare&&navigator.canShare({files:[pdfFile]})){
       try{
         await navigator.share({title:`Relatório ${nomeAtivo}`,files:[pdfFile]});
         mostrarToast('✓ PDF compartilhado!','#2E7D32');
-      } catch(e){
-        if(e.name!=='AbortError'){
-          // Fallback: baixa o PDF
-          _downloadBlob(pdfBlob,`relatorio_${nomeAtivo}.pdf`);
-          mostrarToast('PDF salvo! Envie pelo WhatsApp.','#1565C0');
-        }
+      }catch(e){
+        if(e.name!=='AbortError'){_downloadBlob(pdfBlob,`relatorio_${nomeAtivo}.pdf`);mostrarToast('PDF salvo!','#1565C0');}
       }
     } else {
-      // Desktop: baixa o PDF
       _downloadBlob(pdfBlob,`relatorio_${nomeAtivo}.pdf`);
-      mostrarToast('PDF baixado! Envie pelo WhatsApp Web.','#1565C0');
+      mostrarToast('✓ PDF baixado!','#2E7D32');
     }
-  } catch(e){
-    if(document.body.contains(wrapper)) document.body.removeChild(wrapper);
-    ocultos.forEach(el=>el.classList.remove('print-item-oculto'));
-    mostrarToast('Erro ao gerar PDF: '+e.message,'#C62828');
+  }catch(e){
+    restaurar();
+    mostrarToast('Erro PDF: use o botão Imprimir','#C62828');
+    setTimeout(()=>window.print(),300);
   }
 }
 
@@ -2152,44 +2339,16 @@ renderLista();
 marcarSalvo();
 
 
-
-// ══════════════════════════════════════
-// LOCALSTORAGE
-// ══════════════════════════════════════
-const LS_KEY = 'inspecao_v3';
-function salvarLS(){
-  try{
-    localStorage.setItem(LS_KEY, JSON.stringify({
-      ativos:ATIVOS, registros:DB.registros, fichas:DB.fichas,
-      raspAtivos:DB.raspAtivos, anotacoesGerais:DB.anotacoesGerais,
-      favoritos:[...DB.favoritos], rc:regCounter
-    }));
-  }catch(e){ if(e.name==='QuotaExceededError') mostrarToast('⚠ Armazenamento cheio!','#C62828'); }
-}
-function carregarLS(){
-  try{
-    const raw=localStorage.getItem(LS_KEY);
-    if(!raw)return false;
-    const d=JSON.parse(raw);
-    if(Array.isArray(d.ativos)&&d.ativos.length){ ATIVOS.length=0; d.ativos.forEach(a=>{ATIVOS.push(a);_initAtivo(a.id);}); }
-    ATIVOS.forEach(a=>{
-      if(d.registros?.[a.id]) DB.registros[a.id]=d.registros[a.id];
-      if(d.fichas?.[a.id])    DB.fichas[a.id]=d.fichas[a.id];
-      if(d.raspAtivos?.[a.id])DB.raspAtivos[a.id]=d.raspAtivos[a.id];
-    });
-    if(Array.isArray(d.anotacoesGerais)) DB.anotacoesGerais=d.anotacoesGerais;
-    if(Array.isArray(d.favoritos))       DB.favoritos=new Set(d.favoritos);
-    if(d.rc) regCounter=d.rc+1;
-    return true;
-  }catch(e){return false;}
-}
-function autoBackup(){ salvarLS(); }
+const LS_KEY='inspecao_v3';
+function salvarLS(){try{localStorage.setItem(LS_KEY,JSON.stringify({ativos:ATIVOS,registros:DB.registros,fichas:DB.fichas,raspAtivos:DB.raspAtivos,anotacoesGerais:DB.anotacoesGerais,favoritos:[...DB.favoritos],rc:regCounter}));}catch(e){if(e.name==='QuotaExceededError')mostrarToast('⚠ Armazenamento cheio!','#C62828');}}
+function carregarLS(){try{const raw=localStorage.getItem(LS_KEY);if(!raw)return false;const d=JSON.parse(raw);if(Array.isArray(d.ativos)&&d.ativos.length){ATIVOS.length=0;d.ativos.forEach(a=>{ATIVOS.push(a);_initAtivo(a.id);});}ATIVOS.forEach(a=>{if(d.registros?.[a.id])DB.registros[a.id]=d.registros[a.id];if(d.fichas?.[a.id])DB.fichas[a.id]=d.fichas[a.id];if(d.raspAtivos?.[a.id])DB.raspAtivos[a.id]=d.raspAtivos[a.id];});if(Array.isArray(d.anotacoesGerais))DB.anotacoesGerais=d.anotacoesGerais;if(Array.isArray(d.favoritos))DB.favoritos=new Set(d.favoritos);if(d.rc)regCounter=d.rc+1;return true;}catch(e){return false;}}
+function autoBackup(){salvarLS();}
 const _lsOrigMM=marcarMudanca;
-window.marcarMudanca=function(){ _lsOrigMM(); salvarLS(); };
+window.marcarMudanca=function(){_lsOrigMM();salvarLS();};
 const _lsOk=carregarLS();
-if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 renderLista();
-if(_lsOk) mostrarToast('✓ Dados restaurados!','#2E7D32');
+if(_lsOk)mostrarToast('✓ Dados restaurados!','#2E7D32');
 marcarSalvo();
 setInterval(salvarLS,5000);
 </script>
