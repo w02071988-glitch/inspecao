@@ -771,14 +771,23 @@ function buildGaleriaField(ns){
     <label>Fotos <span class="lbl-hint">(até 6)</span></label>
     <div class="galeria-wrap">
       <div class="galeria-grid" id="gal-grid-${ns}"></div>
-      <div id="gal-btn-${ns}">
-        <div class="galeria-add-btn" onclick="document.getElementById('gal-inp-${ns}').click()">
-          <i class="ti ti-camera"></i> Adicionar foto
+      <div id="gal-btn-${ns}" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+        <div class="galeria-add-btn" onclick="abrirFotoOpcoes('${ns}','cam')">
+          <i class="ti ti-camera"></i> Câmera
+        </div>
+        <div class="galeria-add-btn" onclick="abrirFotoOpcoes('${ns}','gal')">
+          <i class="ti ti-photo"></i> Galeria
         </div>
       </div>
     </div>
-    <input type="file" id="gal-inp-${ns}" accept="image/*" multiple style="display:none" onchange="adicionarFotos('${ns}',this)">
+    <input type="file" id="gal-inp-cam-${ns}" accept="image/*" capture="environment" style="display:none" onchange="adicionarFotos('${ns}',this)">
+    <input type="file" id="gal-inp-gal-${ns}" accept="image/*" multiple style="display:none" onchange="adicionarFotos('${ns}',this)">
   </div>`;
+}
+
+function abrirFotoOpcoes(ns, tipo){
+  const id = tipo==='cam' ? 'gal-inp-cam-'+ns : 'gal-inp-gal-'+ns;
+  document.getElementById(id)?.click();
 }
 
 function renderGaleriaGrid(ns){
@@ -794,9 +803,9 @@ function renderGaleriaGrid(ns){
     </div>`;
   });
   grid.innerHTML=h;
-  // Mostra/oculta botão de adicionar
+  // Mostra/oculta botões de adicionar
   const btn=document.getElementById('gal-btn-'+ns);
-  if(btn) btn.style.display=fotos.length>=6?'none':'block';
+  if(btn) btn.style.display=fotos.length>=6?'none':'flex';
 }
 
 function adicionarFotos(ns,input){
@@ -2139,85 +2148,50 @@ function voltar(){
   else renderMenu();
 }
 
+renderLista();
+marcarSalvo();
 
 
 
 // ══════════════════════════════════════
-// LOCALSTORAGE — SALVA AUTOMATICAMENTE
+// LOCALSTORAGE
 // ══════════════════════════════════════
 const LS_KEY = 'inspecao_v3';
-
 function salvarLS(){
   try{
     localStorage.setItem(LS_KEY, JSON.stringify({
-      ativos: ATIVOS,
-      registros: DB.registros,
-      fichas: DB.fichas,
-      raspAtivos: DB.raspAtivos,
-      anotacoesGerais: DB.anotacoesGerais,
-      favoritos: [...DB.favoritos],
-      rc: regCounter
+      ativos:ATIVOS, registros:DB.registros, fichas:DB.fichas,
+      raspAtivos:DB.raspAtivos, anotacoesGerais:DB.anotacoesGerais,
+      favoritos:[...DB.favoritos], rc:regCounter
     }));
-  }catch(e){
-    if(e.name==='QuotaExceededError')
-      mostrarToast('⚠ Armazenamento cheio!','#C62828');
-  }
+  }catch(e){ if(e.name==='QuotaExceededError') mostrarToast('⚠ Armazenamento cheio!','#C62828'); }
 }
-
 function carregarLS(){
   try{
-    const raw = localStorage.getItem(LS_KEY);
-    if(!raw) return false;
-    const d = JSON.parse(raw);
-    if(Array.isArray(d.ativos) && d.ativos.length){
-      ATIVOS.length = 0;
-      d.ativos.forEach(a=>{ ATIVOS.push(a); _initAtivo(a.id); });
-    }
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw)return false;
+    const d=JSON.parse(raw);
+    if(Array.isArray(d.ativos)&&d.ativos.length){ ATIVOS.length=0; d.ativos.forEach(a=>{ATIVOS.push(a);_initAtivo(a.id);}); }
     ATIVOS.forEach(a=>{
-      if(d.registros?.[a.id])  DB.registros[a.id]  = d.registros[a.id];
-      if(d.fichas?.[a.id])     DB.fichas[a.id]      = d.fichas[a.id];
-      if(d.raspAtivos?.[a.id]) DB.raspAtivos[a.id]  = d.raspAtivos[a.id];
+      if(d.registros?.[a.id]) DB.registros[a.id]=d.registros[a.id];
+      if(d.fichas?.[a.id])    DB.fichas[a.id]=d.fichas[a.id];
+      if(d.raspAtivos?.[a.id])DB.raspAtivos[a.id]=d.raspAtivos[a.id];
     });
-    if(Array.isArray(d.anotacoesGerais)) DB.anotacoesGerais = d.anotacoesGerais;
-    if(Array.isArray(d.favoritos))       DB.favoritos = new Set(d.favoritos);
-    if(d.rc) regCounter = d.rc + 1;
+    if(Array.isArray(d.anotacoesGerais)) DB.anotacoesGerais=d.anotacoesGerais;
+    if(Array.isArray(d.favoritos))       DB.favoritos=new Set(d.favoritos);
+    if(d.rc) regCounter=d.rc+1;
     return true;
-  }catch(e){ return false; }
+  }catch(e){return false;}
 }
-
-// Sobrescreve autoBackup para salvar no localStorage (sem download automático)
 function autoBackup(){ salvarLS(); }
-
-// Hooks de salvamento — chamados após cada operação
-const _ls_hooks = ['renderSucesso','salvarFicha','salvarEdicao','salvarEdicaoAnotacao','excluirRegistro','excluirAnotacaoGeralModal','mudaStatus','mudaStatusDefeito','toggleFavorito','novoAtivo','editarAtivo','excluirAtivo','salvarAnotacaoGeral'];
-
-// Patch simples: salva no localStorage sempre que marcarMudanca for chamada
-const _lsOrigMM = marcarMudanca;
-window.marcarMudanca = function(){
-  _lsOrigMM();
-  salvarLS();
-};
-// Também garante que marcarMudanca global aponta para a nova versão
-// (necessário pois funções já declaradas referenciam o nome global)
-
-// Carrega dados salvos
-const _lsOk = carregarLS();
-
-// Service Worker
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
-  });
-}
-
-// Re-renderiza com dados carregados
+const _lsOrigMM=marcarMudanca;
+window.marcarMudanca=function(){ _lsOrigMM(); salvarLS(); };
+const _lsOk=carregarLS();
+if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 renderLista();
 if(_lsOk) mostrarToast('✓ Dados restaurados!','#2E7D32');
 marcarSalvo();
-
-// Salva a cada 5 segundos como segurança extra
-setInterval(salvarLS, 5000);
-
+setInterval(salvarLS,5000);
 </script>
 </body>
 </html>
