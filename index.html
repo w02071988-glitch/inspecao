@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#1F3864">
 <link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="./icon-192.png">
-<title>Inspeção de Correia</title>
+<title>Inspeção de Correia — Washington Sales</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -18,6 +18,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .topbar{background:#1F3864;color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;}
 .topbar-back{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:2px 6px 2px 0;display:none;}
 .topbar-back.vis{display:block;}
+.topbar-home{background:rgba(255,255,255,.15);border:none;color:#fff;font-size:16px;cursor:pointer;padding:5px 9px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;gap:4px;transition:background .15s;}
+.topbar-home:active{background:rgba(255,255,255,.3);}
+
+/* ── BOTÃO FLUTUANTE DRIVE ── */
+.drive-fab{position:fixed;bottom:22px;right:16px;z-index:200;display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+.drive-fab-btn{display:flex;align-items:center;gap:8px;padding:11px 16px;border-radius:50px;border:none;cursor:pointer;font-size:13px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,.18);transition:transform .15s,box-shadow .15s;}
+.drive-fab-btn:active{transform:scale(.96);}
+.drive-fab-main{background:#1F3864;color:#fff;}
+.drive-fab-main.sincronizado{background:#2E7D32;}
+.drive-fab-main.pendente{background:#E65100;animation:pulse-fab 2s infinite;}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes pulse-fab{0%,100%{box-shadow:0 4px 16px rgba(230,81,0,.3);}50%{box-shadow:0 4px 24px rgba(230,81,0,.6);}}
+.drive-fab-status{font-size:10px;color:#fff;background:rgba(0,0,0,.45);padding:3px 9px;border-radius:10px;text-align:right;pointer-events:none;}
+
+/* ── LEMBRETE DRIVE ── */
+.drive-lembrete{position:fixed;bottom:80px;right:16px;left:16px;z-index:199;background:#1F3864;color:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 6px 24px rgba(0,0,0,.25);display:none;animation:slide-up .25s ease;}
+@keyframes slide-up{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.drive-lembrete-titulo{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.drive-lembrete-sub{font-size:12px;opacity:.8;margin-bottom:12px;}
+.drive-lembrete-btns{display:flex;gap:8px;}
+.drive-lembrete-btns button{flex:1;padding:9px;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;}
+.drive-btn-sim{background:#fff;color:#1F3864;}
+.drive-btn-depois{background:rgba(255,255,255,.2);color:#fff;}
+.topbar-home span{font-size:11px;font-weight:600;letter-spacing:.02em;}
 .topbar-info{flex:1;}
 .topbar h1{font-size:15px;font-weight:600;}
 .topbar p{font-size:11px;opacity:.65;margin-top:1px;}
@@ -174,6 +198,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .status-em{background:#FFF3E0;color:#E65100;}
 .status-ac{background:#E3F2FD;color:#1565C0;}
 .status-co{background:#E8F5E9;color:#2E7D32;}
+.status-enc{background:#EDE7F6;color:#4527A0;}
+.btn-encerrar{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid #4527A0;background:#EDE7F6;color:#4527A0;}
+.btn-encerrar:active{background:#D1C4E9;}
 .ficha-table{width:100%;border-collapse:collapse;font-size:12px;}
 .ficha-table th{background:#1F3864;color:#fff;padding:6px 8px;text-align:left;font-weight:600;}
 .ficha-table td{padding:6px 8px;border-bottom:1px solid #F0F2F5;}
@@ -195,6 +222,65 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .uss-trecho-hdr:first-child{margin-top:0;}
 .empty-state{text-align:center;padding:18px;color:#9CA3AF;font-size:13px;}
 .empty-state i{font-size:30px;display:block;margin-bottom:5px;opacity:.4;}
+
+/* ── FILTROS DO HISTÓRICO ── */
+.hist-filtro-wrap{background:#F0F4FA;border-top:1px solid #E5E8ED;padding:10px 12px;}
+.hist-filtro-titulo{font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.hist-filtro-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;}
+.hist-filtro-grid.cols3{grid-template-columns:1fr 1fr 1fr;}
+.hist-filtro-item label{font-size:11px;color:#6B7280;font-weight:500;display:block;margin-bottom:3px;}
+.hist-filtro-item select,.hist-filtro-item input{width:100%;font-size:12px;padding:6px 8px;border:1px solid #D1D5DB;border-radius:7px;background:#fff;color:#111827;-webkit-appearance:none;}
+.hist-filtro-item input[type=month]{font-size:12px;}
+.hist-filtro-data-wrap{display:flex;gap:5px;align-items:center;margin-bottom:7px;}
+.hist-filtro-data-wrap label{font-size:11px;color:#6B7280;font-weight:500;white-space:nowrap;}
+.hist-filtro-data-wrap input{flex:1;font-size:12px;padding:5px 7px;border:1px solid #D1D5DB;border-radius:7px;background:#fff;}
+.hist-filtro-btns{display:flex;gap:6px;margin-top:4px;}
+.hist-filtro-aplicar{flex:1;padding:7px;background:#1F3864;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;}
+.hist-filtro-limpar{padding:7px 12px;background:#EEF0F3;color:#374151;border:none;border-radius:8px;font-size:12px;cursor:pointer;}
+.hist-filtro-resultado{font-size:11px;color:#2E75B6;font-weight:600;margin-top:6px;display:none;}
+.hist-filtro-toggle{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#2E75B6;cursor:pointer;padding:4px 8px;border-radius:6px;background:#EBF3FF;border:none;margin-bottom:6px;}
+.hist-filtro-toggle:active{background:#D0E8FF;}
+.hist-modo-data{display:flex;gap:4px;margin-bottom:8px;}
+.hist-modo-btn{flex:1;padding:5px;font-size:11px;font-weight:600;border-radius:6px;border:1px solid #D1D5DB;background:#fff;color:#6B7280;cursor:pointer;}
+.hist-modo-btn.ativo{background:#1F3864;color:#fff;border-color:#1F3864;}
+.hist-tag-ativo{display:inline-flex;align-items:center;gap:3px;background:#EBF3FF;color:#1F3864;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:600;margin:1px;}
+
+/* ── LINHA DO TEMPO DE DEFEITO ── */
+.def-timeline{margin-top:8px;border-left:2px solid #E5E8ED;padding-left:12px;}
+.def-tl-item{position:relative;margin-bottom:10px;}
+.def-tl-dot{position:absolute;left:-19px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 2px #E5E8ED;background:#9CA3AF;}
+.def-tl-dot.dot-em{background:#E65100;box-shadow:0 0 0 2px #FFC947;}
+.def-tl-dot.dot-ac{background:#1565C0;box-shadow:0 0 0 2px #90CAF9;}
+.def-tl-dot.dot-co{background:#2E7D32;box-shadow:0 0 0 2px #A5D6A7;}
+.def-tl-dot.dot-new{background:#1F3864;box-shadow:0 0 0 2px #90CAF9;}
+.def-tl-meta{font-size:10px;color:#9CA3AF;margin-bottom:3px;display:flex;align-items:center;gap:5px;}
+.def-tl-body{background:#F8F9FB;border:1px solid #E5E8ED;border-radius:7px;padding:8px 10px;font-size:12px;color:#374151;}
+.def-tl-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px;}
+.btn-atualizar{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #1F3864;background:#EBF3FF;color:#1F3864;margin-top:6px;}
+.btn-atualizar:active{background:#D0E8FF;}
+.btn-mesclar{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:1px dashed #6B7280;background:#fff;color:#6B7280;margin-top:4px;}
+.btn-mesclar:active{background:#F3F4F6;}
+.mesclar-sel{border:2px solid #2E75B6!important;background:#EBF3FF!important;}
+.mesclar-banner{background:#1F3864;color:#fff;border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;}
+.mesclar-banner button{background:rgba(255,255,255,.2);border:none;color:#fff;padding:5px 10px;border-radius:7px;font-size:12px;cursor:pointer;font-weight:600;}
+.upd-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:flex-end;justify-content:center;}
+.upd-modal-box{background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:18px 16px 30px;max-height:90vh;overflow-y:auto;}
+.upd-modal-titulo{font-size:15px;font-weight:700;color:#1F3864;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+
+/* MENSAGENS RÁPIDAS */
+.msgs-rapidas-wrap{margin-bottom:6px;}
+.msgs-rapidas-row{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-bottom:5px;}
+.msg-rap-btn{padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #D1D5DB;background:#fff;color:#374151;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
+.msg-rap-btn:active{background:#F0F0F0;}
+.msg-rap-del{background:none;border:none;color:#C62828;font-size:12px;cursor:pointer;padding:0 2px;line-height:1;opacity:.7;}
+.msg-rap-del:hover{opacity:1;}
+.msg-rap-add{padding:4px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px dashed #2E75B6;background:#EBF3FF;color:#1F3864;display:inline-flex;align-items:center;gap:3px;}
+.msg-rap-add:active{background:#D6EAFF;}
+.msg-rap-input-row{display:flex;gap:5px;margin-bottom:5px;align-items:center;}
+.msg-rap-input-row input{flex:1;font-size:12px;padding:5px 8px;border:1px solid #2E75B6;border-radius:6px;background:#fff;}
+.msg-rap-input-row button{padding:5px 10px;font-size:12px;font-weight:700;border-radius:6px;border:none;cursor:pointer;}
+.msg-rap-ok{background:#1F3864;color:#fff;}
+.msg-rap-cancel{background:#EEF0F3;color:#374151;}
 
 /* ANOTAÇÕES GERAIS */
 .anotacao-card{background:#fff;border:1px solid #E5E8ED;border-radius:10px;padding:12px;margin-bottom:8px;}
@@ -266,6 +352,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <h1 id="topbar-titulo">Inspeção de Correia</h1>
     <p id="topbar-sub"></p>
   </div>
+  <button class="topbar-home" id="btn-home" onclick="renderLista()" title="Ir para início" style="display:none;">
+    <i class="ti ti-home"></i><span>Início</span>
+  </button>
   <div class="topbar-actions" id="topbar-actions" style="display:none;">
     <button class="topbar-icon-btn" id="btn-print" title="Imprimir" onclick="imprimirRelatorio()" style="display:none;"><i class="ti ti-printer"></i></button>
     <button class="topbar-icon-btn" id="btn-share-pdf" title="Compartilhar relatório PDF" onclick="compartilharPDF()" style="display:none;"><i class="ti ti-share"></i></button>
@@ -274,11 +363,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <input type="file" id="import-input" accept=".json" style="display:none" onchange="importarBackup(this)">
   </div>
 </div>
-<!-- Indicador de mudanças não salvas -->
-<div id="indicador-mudanca" style="display:none;background:#E65100;color:#fff;font-size:11px;font-weight:600;padding:5px 14px;text-align:center;align-items:center;justify-content:center;gap:8px;">
-  <i class="ti ti-alert-circle" style="font-size:13px;"></i>
-  Alterações não salvas
-  <button onclick="exportarBackup()" style="background:rgba(255,255,255,.25);border:none;color:#fff;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;">Salvar agora</button>
+<!-- Indicador de mudanças não salvas (mantido para compatibilidade) -->
+<div id="indicador-mudanca" style="display:none;"></div>
+
+<!-- Lembrete automático de sincronização -->
+<div class="drive-lembrete" id="drive-lembrete">
+  <div class="drive-lembrete-titulo">
+    <svg width="18" height="18" viewBox="0 0 87.3 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5z" fill="#0066DA"/>
+      <path d="M43.65 25L29.9 1.2C28.55 2 27.4 3.1 26.6 4.5L1.2 48.4A9 9 0 000 52.9h27.5z" fill="#00AC47"/>
+      <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8l5.85 11.5z" fill="#EA4335"/>
+      <path d="M43.65 25L57.4 1.2A9.06 9.06 0 0053.9 0H33.4c-1.3 0-2.6.35-3.75 1.1z" fill="#00832D"/>
+      <path d="M59.8 52.9h27.5c0-1.55-.4-3.1-1.2-4.5L60.7 4.5c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25z" fill="#2684FC"/>
+      <path d="M27.45 52.9l-13.7 23.8c1.35.8 2.9 1.2 4.5 1.2h51c1.6 0 3.1-.45 4.5-1.2L59.8 52.9z" fill="#FFBA00"/>
+    </svg>
+    Salvar no Google Drive
+  </div>
+  <div class="drive-lembrete-sub" id="drive-lembrete-sub">Você tem alterações não sincronizadas.</div>
+  <div class="drive-lembrete-btns">
+    <button class="drive-btn-sim" onclick="salvarNoDrive(true)">📤 Salvar agora</button>
+    <button class="drive-btn-depois" onclick="fecharLembrete()">Depois</button>
+  </div>
+</div>
+
+<!-- Botão flutuante Google Drive -->
+<div class="drive-fab" id="drive-fab" style="display:none;">
+  <div class="drive-fab-status" id="drive-fab-status"></div>
+  <button class="drive-fab-btn drive-fab-main" id="drive-fab-btn" onclick="salvarNoDrive(false)" title="Salvar backup no Google Drive">
+    <svg width="18" height="16" viewBox="0 0 87.3 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5z" fill="#fff" opacity=".9"/>
+      <path d="M43.65 25L29.9 1.2C28.55 2 27.4 3.1 26.6 4.5L1.2 48.4A9 9 0 000 52.9h27.5z" fill="#fff" opacity=".9"/>
+      <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8l5.85 11.5z" fill="#fff" opacity=".9"/>
+      <path d="M43.65 25L57.4 1.2A9.06 9.06 0 0053.9 0H33.4c-1.3 0-2.6.35-3.75 1.1z" fill="#fff"/>
+      <path d="M59.8 52.9h27.5c0-1.55-.4-3.1-1.2-4.5L60.7 4.5c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25z" fill="#fff" opacity=".9"/>
+      <path d="M27.45 52.9l-13.7 23.8c1.35.8 2.9 1.2 4.5 1.2h51c1.6 0 3.1-.45 4.5-1.2L59.8 52.9z" fill="#fff"/>
+    </svg>
+    Drive
+  </button>
 </div>
 <!-- Modal edição anotação geral -->
 <div class="modal-overlay" id="modal-anotacao">
@@ -408,6 +529,9 @@ function setTopbar(titulo,sub,back,showPrint){
   document.getElementById('topbar-titulo').textContent=titulo;
   document.getElementById('topbar-sub').textContent=sub||'';
   document.getElementById('btn-voltar').classList.toggle('vis',!!back);
+  // Mostrar botão Home em todas as telas exceto a lista principal
+  const btnHome=document.getElementById('btn-home');
+  if(btnHome)btnHome.style.display=(passo&&passo!=='lista')?'flex':'none';
   document.getElementById('topbar-actions').style.display='flex';
   const btnP=document.getElementById('btn-print');
   if(btnP)btnP.style.display=showPrint?'flex':'none';
@@ -430,7 +554,7 @@ function setStepBar(show,step){
 // ════════════════════════════════
 function renderLista(){
   passo='lista';
-  setTopbar('Inspeção de Correia',hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}),false,false);
+  setTopbar('Inspeção de Correia — Washington Sales',hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}),false,false);
   setStepBar(true,1);
   const favCount=DB.favoritos.size;
   let h=`
@@ -498,7 +622,17 @@ function novoAtivo(){
   _initAtivo(nome);
   marcarMudanca();autoBackup();
   mostrarToast('✓ Ativo '+nome+' criado!','#2E7D32');
-  renderLista();
+  // ── Migração: status 'em' → 'ac' em todos os registros ──
+(function migrarStatusEm(){
+  Object.values(DB.registros).forEach(regs=>{
+    regs.forEach(r=>{
+      if(r.campos?.status==='em')r.campos.status='ac';
+      if(r.tipo==='defeito')(r.campos?.defeitos||[]).forEach(d=>{if(d.status==='em')d.status='ac';});
+      (r.campos?.defeitos||[]).forEach(d=>{(d.atualizacoes||[]).forEach(u=>{if(u.status==='em')u.status='ac';});});
+    });
+  });
+})();
+renderLista();
 }
 function editarAtivo(id){
   fecharMenusAtivo();
@@ -866,7 +1000,7 @@ function lbOpenSaved(uid,idx,arr){
 function buildAnotacaoForm(hDesc){
   resetGal('gal-anotacao');
   setTimeout(()=>renderGaleriaGrid('gal-anotacao'),0);
-  return buildDescGroup('f-desc',hDesc)+buildGaleriaField('gal-anotacao');
+  return buildDescGroup('f-desc',hDesc,'anotacao')+buildGaleriaField('gal-anotacao');
 }
 
 function resetGal(ns){
@@ -931,28 +1065,78 @@ function carregarFoto(input,prevId){
 }
 
 function buildInterfForm(rU){
-  return buildDescGroup('f-desc',rU?.desc||'')+`
+  const ultCrit=rU?.campos?.crit||'';
+  const ultStatus=rU?.campos?.status||'';
+  return `
+  <div class="form-grupo"><label>Criticidade</label>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button type="button" class="btn-opcao btn-opcao-verde ${ultCrit==='Baixo'?'btn-opcao-ativo':''}" id="interf-crit-baixo" onclick="selecionarOpcao('interf-crit','Baixo',this)">Baixo</button>
+      <button type="button" class="btn-opcao btn-opcao-amarelo ${ultCrit==='Médio'?'btn-opcao-ativo':''}" id="interf-crit-medio" onclick="selecionarOpcao('interf-crit','Médio',this)">Médio</button>
+      <button type="button" class="btn-opcao btn-opcao-vermelho ${ultCrit==='Alto'?'btn-opcao-ativo':''}" id="interf-crit-alto" onclick="selecionarOpcao('interf-crit','Alto',this)">Alto</button>
+    </div>
+    <input type="hidden" id="interf-crit" value="${ultCrit}">
+  </div>
+  <div class="form-grupo"><label>Status</label>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button type="button" class="btn-opcao btn-opcao-azul ${ultStatus==='ac'?'btn-opcao-ativo':''}" id="interf-status-ac" onclick="selecionarOpcao('interf-status','ac',this)">Acompanhando</button>
+      <button type="button" class="btn-opcao btn-opcao-verde ${ultStatus==='co'?'btn-opcao-ativo':''}" id="interf-status-co" onclick="selecionarOpcao('interf-status','co',this)">Concluído</button>
+    </div>
+    <input type="hidden" id="interf-status" value="${ultStatus||'ac'}">
+  </div>
   <div class="form-grupo"><label>Tipo</label>
-    <select id="f-tipo-interf" onchange="toggleEl('f-tipo-interf','outros','bloco-outros-interf')">
-      <option value="">Selecione</option><option>Interferência</option><option>Interdição</option>
-      <option value="outros">Outros (digitar)</option>
-    </select></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+      <button type="button" class="btn-opcao" id="interf-tipo-interf" onclick="selecionarOpcaoInterf('Interferência',this)">Interferência</button>
+      <button type="button" class="btn-opcao" id="interf-tipo-inter" onclick="selecionarOpcaoInterf('Interdição',this)">Interdição</button>
+      <button type="button" class="btn-opcao" id="interf-tipo-outros" onclick="selecionarOpcaoInterf('outros',this)">Outros</button>
+    </div>
+    <input type="hidden" id="f-tipo-interf" value="">
+  </div>
   <div id="bloco-outros-interf" style="display:none;">
     <div class="form-grupo"><label>Especificar</label><input type="text" id="f-tipo-outros" placeholder="Descreva..."></div>
   </div>
   <div class="form-grupo"><label>Baliza / local</label><input type="text" id="f-bal" placeholder="Ex: B3, PE, cabeça..."></div>
-  <div class="check-row"><input type="checkbox" id="f-novo"><label for="f-novo">Novo evento (não existia antes)</label></div>
-  <div class="form-grupo" style="margin-top:8px;"><label>Criticidade</label>
-    <select id="f-crit"><option value="">Selecione</option><option>Baixo</option><option>Médio</option><option>Alto</option></select></div>
-  <div class="form-grupo"><label>Status</label>
-    <select id="f-status"><option value="em">Em andamento</option><option value="ac">Acompanhando</option><option value="co">Concluído</option></select></div>`;
+  `+buildDescGroup('f-desc',rU?.desc||'')+`
+  <div onclick="toggleAddAnotacao('interf')" style="display:flex;align-items:center;gap:8px;margin-top:4px;margin-bottom:12px;cursor:pointer;user-select:none;">
+    <span id="interf-anotacao-box" style="width:16px;height:16px;border:2px solid #1F3864;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;background:#fff;flex-shrink:0;"></span>
+    <input type="hidden" id="interf-add-anotacao" value="0">
+    <span style="font-size:13px;color:#374151;font-weight:500;">Inserir também em Anotações</span>
+  </div>`;
+}
+
+function selecionarOpcaoInterf(valor, btn){
+  document.querySelectorAll('#interf-tipo-interf,#interf-tipo-inter,#interf-tipo-outros').forEach(b=>b.classList.remove('btn-opcao-ativo'));
+  btn.classList.add('btn-opcao-ativo');
+  document.getElementById('f-tipo-interf').value=valor;
+  const bl=document.getElementById('bloco-outros-interf');
+  if(bl)bl.style.display=(valor==='outros'?'block':'none');
 }
 
 function buildDesalForm(rU){
-  return buildDescGroup('f-desc',rU?.desc||'')+`
-  <div class="form-grupo"><label>Local</label><input type="text" id="f-local" placeholder="Ex: retorno, carga, meio..."></div>
+  const ultCrit=rU?.campos?.crit||'';
+  const ultStatus=rU?.campos?.status||'';
+  return `
+  <div class="form-grupo"><label>Criticidade</label>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button type="button" class="btn-opcao btn-opcao-verde ${ultCrit==='Baixo'?'btn-opcao-ativo':''}" id="desal-crit-baixo" onclick="selecionarOpcao('desal-crit','Baixo',this)">Baixo</button>
+      <button type="button" class="btn-opcao btn-opcao-amarelo ${ultCrit==='Médio'?'btn-opcao-ativo':''}" id="desal-crit-medio" onclick="selecionarOpcao('desal-crit','Médio',this)">Médio</button>
+      <button type="button" class="btn-opcao btn-opcao-vermelho ${ultCrit==='Alto'?'btn-opcao-ativo':''}" id="desal-crit-alto" onclick="selecionarOpcao('desal-crit','Alto',this)">Alto</button>
+    </div>
+    <input type="hidden" id="desal-crit" value="${ultCrit}">
+  </div>
   <div class="form-grupo"><label>Status</label>
-    <select id="f-status-desal"><option value="ac">Acompanhando</option><option value="em">Em andamento</option><option value="co">Concluído</option></select></div>`;
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button type="button" class="btn-opcao btn-opcao-azul ${ultStatus==='ac'?'btn-opcao-ativo':''}" id="desal-status-ac" onclick="selecionarOpcao('desal-status','ac',this)">Acompanhando</button>
+      <button type="button" class="btn-opcao btn-opcao-verde ${ultStatus==='co'?'btn-opcao-ativo':''}" id="desal-status-co" onclick="selecionarOpcao('desal-status','co',this)">Concluído</button>
+    </div>
+    <input type="hidden" id="desal-status" value="${ultStatus||'ac'}">
+  </div>
+  <div class="form-grupo"><label>Baliza / local</label><input type="text" id="f-local" placeholder="Ex: retorno, carga, meio, B3..."></div>
+  `+buildDescGroup('f-desc',rU?.desc||'')+`
+  <div onclick="toggleAddAnotacao('desal')" style="display:flex;align-items:center;gap:8px;margin-top:4px;margin-bottom:12px;cursor:pointer;user-select:none;">
+    <span id="desal-anotacao-box" style="width:16px;height:16px;border:2px solid #1F3864;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;background:#fff;flex-shrink:0;"></span>
+    <input type="hidden" id="desal-add-anotacao" value="0">
+    <span style="font-size:13px;color:#374151;font-weight:500;">Inserir também em Anotações</span>
+  </div>`;
 }
 
 function buildContraForm(rU){
@@ -1017,13 +1201,11 @@ function buildDefeitoBloco(idx){
         <button type="button" class="btn-opcao btn-opcao-azul" id="${id}-status-ac" onclick="selecionarOpcao('${id}-status','ac',this)">Acompanhando</button>
         <button type="button" class="btn-opcao btn-opcao-verde" id="${id}-status-co" onclick="selecionarOpcao('${id}-status','co',this)">Concluído</button>
       </div>
-      <input type="hidden" id="${id}-status" value="em">
+      <input type="hidden" id="${id}-status" value="ac">
     </div>
 
     <div class="form-grupo"><label>Descrição</label>
-      <div style="display:flex;gap:6px;margin-bottom:5px;flex-wrap:wrap;">
-        <button type="button" class="btn-sm btn-sm-sec" onclick="setSemRelato('${id}-desc')">Sem relato</button>
-      </div>
+      ${buildMsgsRapidas(id+'-desc','defeito')}
       <textarea id="${id}-desc" rows="2" style="width:100%;font-size:13px;padding:8px;border:1px solid #D1D5DB;border-radius:8px;resize:vertical;" placeholder="Descreva a condição..."></textarea>
       <div onclick="toggleAddAnotacao('${id}')" style="display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer;user-select:none;">
         <span id="${id}-anotacao-box" style="width:16px;height:16px;border:2px solid #1F3864;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;background:#fff;flex-shrink:0;"></span>
@@ -1059,10 +1241,6 @@ function toggleAddAnotacao(id){
   }
 }
 
-function setSemRelato(id){
-  const el=document.getElementById(id);
-  if(el)el.value='Sem relato';
-}
 
 function abrirNotaDefeito(id){
   const desc=document.getElementById(id+'-desc')?.value||'';
@@ -1118,25 +1296,88 @@ function buildRaspBloco(chave){
   const ultPct=rU?.campos?.[chave]?.pct||'';
   const ultCrit=rU?.campos?.[chave]?.crit||'';
   const ultData=rU?fmtData(rU.data):'';
+  // Barra visual de desgaste
+  function desgasteCor(p){
+    const n=parseInt(p)||0;
+    if(n<=30)return{bg:'#C62828',label:'Crítico'};
+    if(n<=50)return{bg:'#E65100',label:'Alto'};
+    if(n<=75)return{bg:'#F9A825',label:'Médio'};
+    return{bg:'#2E7D32',label:'Bom'};
+  }
+  const cor=ultPct?desgasteCor(ultPct):null;
+  const barraUlt=cor?`<div style="margin-bottom:4px;font-size:10px;color:#6B7280;">Último: ${ultPct}% — <span style="color:${cor.bg};font-weight:700;">${cor.label}</span></div>
+    <div style="background:#E5E8ED;border-radius:6px;height:10px;overflow:hidden;margin-bottom:8px;">
+      <div style="height:100%;width:${Math.min(parseInt(ultPct),100)}%;background:${cor.bg};border-radius:6px;transition:width .3s;"></div>
+    </div>`:'';
   return `<div class="rasp-bloco" id="rasp-bloco-${chave}">
     <div class="rasp-bloco-titulo">
       <span><i class="ti ti-tool" style="color:${chave.startsWith('p')?'#2E75B6':'#6B7280'};margin-right:4px;"></i>
         ${RASP_LABELS[chave]} ${ultData?'<span class="lbl-hint">(última: '+ultData+')</span>':''}
       </span>
     </div>
-    ${buildDescGroup('f-desc-'+chave,rU?.desc||'')}
     <div class="form-grupo">
-      <label>% Desgaste <span class="lbl-hint">${ultPct?'(último: '+ultPct+'%)':''}</span></label>
-      <input type="number" id="f-pct-${chave}" min="0" max="100" placeholder="0 a 100">
+      <label>% Desgaste <span class="lbl-hint">(lâminas)</span></label>
+      ${barraUlt}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#C62828;" id="pct-btn-${chave}-0" onclick="setPct('${chave}',15,this)" title="0–30%">🔴 0–30%</button>
+        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#E65100;" id="pct-btn-${chave}-1" onclick="setPct('${chave}',40,this)" title="31–50%">🟠 31–50%</button>
+        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#F9A825;" id="pct-btn-${chave}-2" onclick="setPct('${chave}',63,this)" title="51–75%">🟡 51–75%</button>
+        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#2E7D32;" id="pct-btn-${chave}-3" onclick="setPct('${chave}',88,this)" title="76–100%">🟢 76–100%</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="number" id="f-pct-${chave}" min="0" max="100" placeholder="Ou digitar %" style="width:110px;font-size:13px;padding:7px 10px;border:1px solid #D1D5DB;border-radius:8px;" oninput="atualizarBarraRasp('${chave}')">
+        <div id="barra-wrap-${chave}" style="flex:1;">
+          <div style="background:#E5E8ED;border-radius:6px;height:12px;overflow:hidden;">
+            <div id="barra-rasp-${chave}" style="height:100%;width:0%;background:#E5E8ED;border-radius:6px;transition:width .2s;"></div>
+          </div>
+          <div id="barra-label-${chave}" style="font-size:10px;color:#9CA3AF;margin-top:2px;"></div>
+        </div>
+      </div>
     </div>
-    <div class="form-grupo">
-      <label>Criticidade <span class="lbl-hint">${ultCrit?'(último: '+ultCrit+')':''}</span></label>
-      <select id="f-crit-${chave}">
-        <option value="">Sem alteração</option><option>Baixo</option><option>Médio</option><option>Alto</option>
-      </select>
+    <div class="form-grupo"><label>Criticidade</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="btn-opcao btn-opcao-verde" id="rcrit-${chave}-b" onclick="selecionarOpcao('rcrit-${chave}','Baixo',this)">Baixo</button>
+        <button type="button" class="btn-opcao btn-opcao-amarelo" id="rcrit-${chave}-m" onclick="selecionarOpcao('rcrit-${chave}','Médio',this)">Médio</button>
+        <button type="button" class="btn-opcao btn-opcao-vermelho" id="rcrit-${chave}-a" onclick="selecionarOpcao('rcrit-${chave}','Alto',this)">Alto</button>
+      </div>
+      <input type="hidden" id="rcrit-${chave}" value="">
+    </div>
+    ${buildDescGroup('f-desc-'+chave,rU?.desc||'','rasp')}
+    <div onclick="toggleAddAnotacao('rasp-${chave}')" style="display:flex;align-items:center;gap:8px;margin-top:4px;margin-bottom:10px;cursor:pointer;user-select:none;">
+      <span id="rasp-${chave}-anotacao-box" style="width:16px;height:16px;border:2px solid #1F3864;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;background:#fff;flex-shrink:0;"></span>
+      <input type="hidden" id="rasp-${chave}-add-anotacao" value="0">
+      <span style="font-size:13px;color:#374151;font-weight:500;">Inserir também em Anotações</span>
     </div>
     ${buildGaleriaField('gal-rasp-'+chave)}
   </div>`;
+}
+
+function desgasteCor(p){
+  const n=parseInt(p)||0;
+  if(n<=30)return{bg:'#C62828',label:'Crítico'};
+  if(n<=50)return{bg:'#E65100',label:'Alto'};
+  if(n<=75)return{bg:'#F9A825',label:'Médio'};
+  return{bg:'#2E7D32',label:'Bom'};
+}
+
+function setPct(chave, val, btn){
+  const inp=document.getElementById('f-pct-'+chave);
+  if(inp)inp.value=val;
+  // Desmarca outros botões da faixa
+  [0,1,2,3].forEach(i=>{const b=document.getElementById('pct-btn-'+chave+'-'+i);if(b)b.classList.remove('btn-opcao-ativo');});
+  if(btn)btn.classList.add('btn-opcao-ativo');
+  atualizarBarraRasp(chave);
+}
+
+function atualizarBarraRasp(chave){
+  const val=parseInt(document.getElementById('f-pct-'+chave)?.value)||0;
+  const barra=document.getElementById('barra-rasp-'+chave);
+  const label=document.getElementById('barra-label-'+chave);
+  if(!barra)return;
+  const cor=desgasteCor(val);
+  barra.style.width=Math.min(val,100)+'%';
+  barra.style.background=val>0?cor.bg:'#E5E8ED';
+  if(label)label.textContent=val>0?val+'% — '+cor.label:'';
 }
 
 function toggleRasp(chave){
@@ -1144,14 +1385,89 @@ function toggleRasp(chave){
   fotoB64=null;renderForm();
 }
 
-function buildDescGroup(id,ultimoRelato){
+// ── Mensagens Rápidas ──────────────────────────────────────────────────────
+// ── Mensagens Rápidas POR SEÇÃO ────────────────────────────────────────────
+// Cada seção tem sua própria lista no localStorage
+// Chaves: insp_msgs_rasp, insp_msgs_defeito, insp_msgs_interf,
+//         insp_msgs_desal, insp_msgs_contra, insp_msgs_anotacao, insp_msgs_upd
+const MAX_MSGS=5;
+function _msgsKey(secao){return 'insp_msgs_'+(secao||'geral');}
+function getMsgsRapidas(secao){
+  try{return JSON.parse(localStorage.getItem(_msgsKey(secao))||'[]');}catch{return[];}
+}
+function saveMsgsRapidas(arr,secao){
+  try{localStorage.setItem(_msgsKey(secao),JSON.stringify(arr));}catch{}
+}
+function buildMsgsRapidas(targetId,secao){
+  const uid='mr-'+targetId.replace(/[^a-z0-9]/gi,'-');
+  const sec=secao||'geral';
+  return `<div class="msgs-rapidas-wrap" id="${uid}-wrap" data-secao="${sec}">
+    ${_renderMsgsRows(targetId,uid,sec)}
+  </div>`;
+}
+function _renderMsgsRows(targetId,uid,secao){
+  const sec=secao||document.getElementById(uid+'-wrap')?.dataset?.secao||'geral';
+  const msgs=getMsgsRapidas(sec);
+  const pode=msgs.length<MAX_MSGS;
+  let h='<div class="msgs-rapidas-row">';
+  h+=`<button type="button" class="msg-rap-btn" onclick="usarMsgRapida('${targetId}','Sem relato')">Sem relato</button>`;
+  msgs.forEach((m,i)=>{
+    const esc=m.replace(/'/g,"\'");
+    h+=`<span style="display:inline-flex;align-items:center;gap:0px;border:1px solid #D1D5DB;border-radius:6px;background:#fff;overflow:hidden;">
+      <button type="button" class="msg-rap-btn" style="border:none;border-radius:0;" onclick="usarMsgRapida('${targetId}','${esc}')">${m}</button>
+      <button type="button" class="msg-rap-del" onclick="delMsgRapida(${i},'${targetId}','${uid}','${sec}')" title="Remover">✕</button>
+    </span>`;
+  });
+  if(pode) h+=`<button type="button" class="msg-rap-add" onclick="showAddMsg('${targetId}','${uid}','${sec}')"><i class="ti ti-plus" style="font-size:12px;"></i></button>`;
+  h+='</div>';
+  h+=`<div id="${uid}-addinput" style="display:none;" class="msg-rap-input-row">
+    <input type="text" id="${uid}-newinput" placeholder="Nova mensagem rápida..." maxlength="60" onkeydown="if(event.key==='Enter')confirmAddMsg('${targetId}','${uid}','${sec}')">
+    <button class="msg-rap-ok" onclick="confirmAddMsg('${targetId}','${uid}','${sec}')">OK</button>
+    <button class="msg-rap-cancel" onclick="cancelAddMsg('${uid}')">✕</button>
+  </div>`;
+  return h;
+}
+function usarMsgRapida(targetId,msg){
+  const el=document.getElementById(targetId);
+  if(!el)return;
+  el.value=msg;
+  el.style.color=msg==='Sem relato'?'#9CA3AF':'';
+}
+function delMsgRapida(idx,targetId,uid,secao){
+  const arr=getMsgsRapidas(secao);
+  arr.splice(idx,1);
+  saveMsgsRapidas(arr,secao);
+  const wrap=document.getElementById(uid+'-wrap');
+  if(wrap)wrap.innerHTML=_renderMsgsRows(targetId,uid,secao);
+}
+function showAddMsg(targetId,uid,secao){
+  const row=document.getElementById(uid+'-addinput');
+  if(row){row.style.display='flex';setTimeout(()=>document.getElementById(uid+'-newinput')?.focus(),50);}
+}
+function cancelAddMsg(uid){
+  const row=document.getElementById(uid+'-addinput');
+  if(row)row.style.display='none';
+}
+function confirmAddMsg(targetId,uid,secao){
+  const inp=document.getElementById(uid+'-newinput');
+  const val=(inp?.value||'').trim();
+  if(!val)return;
+  const arr=getMsgsRapidas(secao);
+  if(arr.length>=MAX_MSGS){cancelAddMsg(uid);return;}
+  arr.push(val);
+  saveMsgsRapidas(arr,secao);
+  const wrap=document.getElementById(uid+'-wrap');
+  if(wrap)wrap.innerHTML=_renderMsgsRows(targetId,uid,secao);
+}
+// ── buildDescGroup ──────────────────────────────────────────────────────────
+function buildDescGroup(id,ultimoRelato,secao){
   const tem=!!ultimoRelato;
+  const sec=secao||secaoSel||'geral';
+  const copiarBtn=tem?`<button type="button" class="desc-opt-btn blue" onclick="copiarRelato('${id}','${ultimoRelato.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ')}')">↩ Copiar último</button>`:'';
   return `<div class="form-grupo">
     <label>Descrição ${tem?'<span class="lbl-hint">(último: '+ultimoRelato.substring(0,25)+(ultimoRelato.length>25?'...':'')+')</span>':''}</label>
-    <div class="desc-opts">
-      <button type="button" class="desc-opt-btn" onclick="usarSemRelato('${id}')">Sem relato</button>
-      ${tem?`<button type="button" class="desc-opt-btn blue" onclick="copiarRelato('${id}','${ultimoRelato.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ')}')">↩ Copiar último</button>`:''}
-    </div>
+    ${buildMsgsRapidas(id,sec)}
+    ${copiarBtn?'<div class="desc-opts">'+copiarBtn+'</div>':''}
     <textarea id="${id}" placeholder="Descreva a condição..."></textarea>
   </div>`;
 }
@@ -1192,10 +1508,18 @@ function salvar(){
       if(!ativosR[k])return;
       const desc=(document.getElementById('f-desc-'+k)?.value||'').trim();
       const pct=document.getElementById('f-pct-'+k)?.value||'';
-      const crit=document.getElementById('f-crit-'+k)?.value||'';
+      const crit=document.getElementById('rcrit-'+k)?.value||'';
       const fotos=getGalFotos('gal-rasp-'+k);
       // Só cria registro se preencheu algo
       if(!desc&&!pct&&!crit&&!fotos.length) return;
+      // Inserir em anotações se marcado
+      const addAnot=document.getElementById('rasp-'+k+'-add-anotacao')?.value==='1';
+      if(addAnot&&desc&&desc!=='Sem relato'){
+        const partes=[];
+        if(pct)partes.push('%Desgaste: '+pct+'%');
+        if(crit)partes.push('Criticidade: '+crit);
+        DB.anotacoesGerais.unshift({ativo:ativoSel,data,desc:'[Raspador — '+RASP_LABELS[k]+(partes.length?' — '+partes.join(' / '):'')+']\n\nDescrição: '+desc,fotos:[...fotos]});
+      }
       // Busca registro ativo anterior deste componente e move para histórico
       const regs=DB.registros[ativoSel];
       const idxAtivo=regs.findIndex(r=>r.tipo==='rasp-'+k&&!r._hist);
@@ -1221,7 +1545,7 @@ function salvar(){
       if(addAnotacao && desc && desc!=='Sem relato'){
         const locLabel=document.getElementById(id+'-loc')?.value||'';
         const critLabel=document.getElementById(id+'-crit')?.value||'';
-        const statusLabel={em:'Em andamento',ac:'Acompanhando',co:'Concluído'}[document.getElementById(id+'-status')?.value||'em']||'';
+        const statusLabel={em:'Acompanhando',ac:'Acompanhando',co:'Concluído'}[document.getElementById(id+'-status')?.value||'ac']||'';
         const partes=[];
         if(locLabel)    partes.push('Local: '+locLabel);
         if(critLabel)   partes.push('Criticidade: '+critLabel);
@@ -1234,7 +1558,7 @@ function salvar(){
         loc:document.getElementById(id+'-loc')?.value||'',
         novo:document.getElementById(id+'-novo')?.checked||false,
         crit:document.getElementById(id+'-crit')?.value||'',
-        status:document.getElementById(id+'-status')?.value||'em',
+        status:document.getElementById(id+'-status')?.value||'ac',
         desc, fotos
       });
     });
@@ -1251,9 +1575,36 @@ function salvar(){
   if(secaoSel==='interf'){
     let tipo=document.getElementById('f-tipo-interf')?.value||'';
     if(tipo==='outros')tipo=document.getElementById('f-tipo-outros')?.value||'Outros';
-    reg.campos={tipo,bal:document.getElementById('f-bal')?.value||'',novo:document.getElementById('f-novo')?.checked||false,crit:document.getElementById('f-crit')?.value||'',status:document.getElementById('f-status')?.value||'em'};
+    const intCrit=document.getElementById('interf-crit')?.value||'';
+    const intStatus=document.getElementById('interf-status')?.value||'ac';
+    reg.campos={tipo,bal:document.getElementById('f-bal')?.value||'',crit:intCrit,status:intStatus};
+    // Inserir em anotações
+    if(document.getElementById('interf-add-anotacao')?.value==='1'&&desc&&desc!=='Sem relato'){
+      const partes=[];
+      if(tipo)partes.push('Tipo: '+tipo);
+      if(intCrit)partes.push('Criticidade: '+intCrit);
+      const stLbl={ac:'Acompanhando',co:'Concluído',em:'Em andamento'}[intStatus]||'';
+      if(stLbl)partes.push('Status: '+stLbl);
+      const bal=document.getElementById('f-bal')?.value||'';
+      if(bal)partes.push('Baliza: '+bal);
+      DB.anotacoesGerais.unshift({ativo:ativoSel,data,desc:'[Interferência'+(partes.length?' — '+partes.join(' / '):'')+']\n\nDescrição: '+desc,fotos:[...fotos]});
+    }
   }
-  if(secaoSel==='desal')reg.campos={local:document.getElementById('f-local')?.value||'',status:document.getElementById('f-status-desal')?.value||'em'};
+  if(secaoSel==='desal'){
+    const dsCrit=document.getElementById('desal-crit')?.value||'';
+    const dsStatus=document.getElementById('desal-status')?.value||'ac';
+    reg.campos={local:document.getElementById('f-local')?.value||'',crit:dsCrit,status:dsStatus};
+    // Inserir em anotações
+    if(document.getElementById('desal-add-anotacao')?.value==='1'&&desc&&desc!=='Sem relato'){
+      const partes=[];
+      if(dsCrit)partes.push('Criticidade: '+dsCrit);
+      const stLbl={ac:'Acompanhando',co:'Concluído',em:'Em andamento'}[dsStatus]||'';
+      if(stLbl)partes.push('Status: '+stLbl);
+      const bal=document.getElementById('f-local')?.value||'';
+      if(bal)partes.push('Local: '+bal);
+      DB.anotacoesGerais.unshift({ativo:ativoSel,data,desc:'[Desalinhamento'+(partes.length?' — '+partes.join(' / '):'')+']\n\nDescrição: '+desc,fotos:[...fotos]});
+    }
+  }
   if(secaoSel==='contra')reg.campos={pos:document.getElementById('f-pos')?.value||''};
 
   DB.registros[ativoSel].unshift(reg);
@@ -1299,7 +1650,9 @@ function renderRelatorio(){
   TODOS_TIPOS.forEach(t=>{ativos[t]=[];hist[t]=[];});
   DB.registros[ativoSel].forEach(r=>{
     if(!TODOS_TIPOS.includes(r.tipo))return;
-    const conc=r._hist||r.campos?.status==='co'||(r.tipo==='defeito'&&r.campos?.defeitos?.every(d=>d.status==='co'));
+    // Para defeitos: vai pro histórico só se TODOS estiverem encerrados (ou _encerrado geral)
+    const conc=r._hist||r._encerrado;
+    // Para defeitos com mistura ativo/encerrado, o registro fica nos ativos mas mostra os encerrados no hist inline
     if(conc)hist[r.tipo].push(r);else ativos[r.tipo].push(r);
   });
 
@@ -1390,26 +1743,75 @@ function renderRelatorio(){
     regsHtml+=buildSecaoRel('reg-'+tipo,SECAO_ICONS[tipo],SECAO_LABELS[tipo].toUpperCase(),body,false,'');
   });
 
-  // ── HISTÓRICO ──
+  // ── HISTÓRICO — subitens colapsáveis, limites, contagem e filtros ──
   let histHtml='';
+  const HIST_LIMITS={defeito:100,interf:100,desal:100,'rasp-prim':100,'rasp-p2':100,'rasp-s1':100,'rasp-s2':100,'rasp-s3':100,'rasp-s4':100,'rasp-s5':100};
   const temHist=[...TODOS_TIPOS].some(t=>hist[t].length);
   if(temHist){
-    let histBody='';
-    // Raspadores histórico
-    let temRaspHist=false;
-    RASP_CHAVES.forEach(k=>{
-      const tipo='rasp-'+k;
-      if(!hist[tipo].length)return;
-      temRaspHist=true;
-      histBody+=`<div class="hist-sep">${SECAO_LABELS[tipo]}</div>`;
-      hist[tipo].forEach(r=>{histBody+=buildRegCard(r,true);});
-    });
-    // Outros históricos
+    // Filtro geral (valores atuais — atualizados por aplicarFiltroHist)
+    const filtroGeral=buildFiltroGeralHist();
+    let histBody=filtroGeral;
+
+    // ── Raspadores: grupo com subitens ──
+    const raspHistKeys=RASP_CHAVES.filter(k=>hist['rasp-'+k].length);
+    if(raspHistKeys.length){
+      const raspSubId='hist-rasp-sub';
+      let raspSubBody='';
+      raspHistKeys.forEach(k=>{
+        const tipo='rasp-'+k;
+        const regs=hist[tipo];
+        const lim=HIST_LIMITS[tipo]||100;
+        const subId='hist-'+tipo.replace('-','_');
+        const filtroLocal=buildFiltroLocalHist(subId,'rasp',regs);
+        let cardsH=`<div id="${subId}-cards">`;
+        regs.slice(0,lim).forEach(r=>{cardsH+=buildRegCard(r,true);});
+        cardsH+='</div>';
+        raspSubBody+=`<div style="border-top:1px solid #F0F2F5;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#F8F9FB;">
+            <span style="font-size:12px;font-weight:700;color:#1F3864;cursor:pointer;flex:1;" onclick="toggleHistSub('${subId}')">${SECAO_LABELS[tipo]}</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:11px;color:#6B7280;background:#E5E8ED;padding:2px 7px;border-radius:10px;" id="${subId}-count">${Math.min(regs.length,lim)}/${lim}</span>
+              <button onclick="event.stopPropagation();toggleHistSub('${subId}');toggleFiltroLocal('${subId}')" style="background:#EBF3FF;border:none;color:#1F3864;width:26px;height:22px;border-radius:5px;font-size:11px;cursor:pointer;" title="Filtrar"><i class="ti ti-filter" style="font-size:11px;"></i></button>
+              <button class="rel-sec-toggle" id="${subId}-btn" style="width:22px;height:22px;font-size:13px;background:#E5E8ED;color:#374151;" onclick="toggleHistSub('${subId}')">+</button>
+            </div>
+          </div>
+          <div id="${subId}" style="display:none;">${filtroLocal}${cardsH}</div>
+        </div>`;
+      });
+      histBody+=`<div style="border:1px solid #E5E8ED;border-radius:8px;overflow:hidden;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#EBF3FF;cursor:pointer;" onclick="toggleHistSub('${raspSubId}')">
+          <span style="font-size:12px;font-weight:700;color:#1F3864;display:flex;align-items:center;gap:6px;"><i class="ti ti-tool"></i> RASPADORES</span>
+          <button class="rel-sec-toggle" id="${raspSubId}-btn" style="width:22px;height:22px;font-size:13px;background:#C5D8F0;color:#1F3864;">+</button>
+        </div>
+        <div id="${raspSubId}" style="display:none;">${raspSubBody}</div>
+      </div>`;
+    }
+
+    // ── Outros tipos com subitens ──
     TIPOS_BASE.forEach(tipo=>{
       if(!hist[tipo].length)return;
-      histBody+=`<div class="hist-sep">${SECAO_LABELS[tipo]}</div>`;
-      hist[tipo].forEach(r=>{histBody+=buildRegCard(r,true);});
+      const lim=HIST_LIMITS[tipo]||100;
+      const regs=hist[tipo];
+      const subId='hist-'+tipo;
+      const filtroLocal=buildFiltroLocalHist(subId,tipo,regs);
+      let cardsH=`<div id="${subId}-cards">`;
+      regs.slice(0,lim).forEach(r=>{cardsH+=buildRegCard(r,true);});
+      cardsH+='</div>';
+      histBody+=`<div style="border:1px solid #E5E8ED;border-radius:8px;overflow:hidden;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#F8F9FB;">
+          <span style="font-size:12px;font-weight:700;color:#1F3864;display:flex;align-items:center;gap:6px;cursor:pointer;flex:1;" onclick="toggleHistSub('${subId}')">
+            <i class="ti ${SECAO_ICONS[tipo]||'ti-file'}"></i> ${SECAO_LABELS[tipo].toUpperCase()}
+          </span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:11px;color:#6B7280;background:#E5E8ED;padding:2px 7px;border-radius:10px;" id="${subId}-count">${Math.min(regs.length,lim)}/${lim}</span>
+            <button onclick="event.stopPropagation();toggleHistSub('${subId}');toggleFiltroLocal('${subId}')" style="background:#EBF3FF;border:none;color:#1F3864;width:26px;height:22px;border-radius:5px;cursor:pointer;" title="Filtrar"><i class="ti ti-filter" style="font-size:11px;"></i></button>
+            <button class="rel-sec-toggle" id="${subId}-btn" style="width:22px;height:22px;font-size:13px;background:#E5E8ED;color:#374151;" onclick="toggleHistSub('${subId}')">+</button>
+          </div>
+        </div>
+        <div id="${subId}" style="display:none;">${filtroLocal}${cardsH}</div>
+      </div>`;
     });
+
     histHtml=buildSecaoRel('hist','ti-history','HISTÓRICO DE REGISTROS',histBody,true,'hist-hdr');
   }
 
@@ -1422,6 +1824,7 @@ function renderRelatorio(){
     ${raspHtml}${regsHtml}${histHtml}
     <button class="btn-sec no-print" onclick="renderMenu()"><i class="ti ti-arrow-left"></i> Menu do ativo</button>
     <div style="height:24px;"></div>`;
+
 }
 
 // Constrói uma seção recolhível com checkbox de impressão
@@ -1490,8 +1893,8 @@ function salvarUss(){
   if(msg){msg.textContent='✓ Salvo';setTimeout(()=>{if(msg)msg.textContent='';},1500);}
 }
 
-const stMap={em:'Em andamento',ac:'Acompanhando',co:'Concluído'};
-const stCls={em:'status-em',ac:'status-ac',co:'status-co'};
+const stMap={em:'Acompanhando',ac:'Acompanhando',co:'Concluído',enc:'Encerrado'};
+const stCls={em:'status-ac',ac:'status-ac',co:'status-co',enc:'status-enc'};
 
 function buildRegCard(r,isHist){
   let extras='';
@@ -1500,8 +1903,12 @@ function buildRegCard(r,isHist){
   if(isRaspK){
     const v=r.campos||{};
     if(v.pct||v.crit){
-      extras=`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;">
-        ${v.pct?`<span class="pill pill-neu">${v.pct}% desgaste</span>`:''}
+      const pn=parseInt(v.pct)||0;
+      const dcor=pn<=30?'#C62828':pn<=50?'#E65100':pn<=75?'#F9A825':'#2E7D32';
+      const dlbl=pn<=30?'Crítico':pn<=50?'Alto':pn<=75?'Médio':'Bom';
+      extras=`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;align-items:center;">
+        ${v.pct?`<span class="pill" style="background:${dcor}20;color:${dcor};border:1px solid ${dcor}40;">${v.pct}% — ${dlbl}</span>`:''}
+        ${v.pct?`<div style="flex:1;min-width:60px;background:#E5E8ED;border-radius:4px;height:8px;overflow:hidden;"><div style="height:100%;width:${Math.min(pn,100)}%;background:${dcor};border-radius:4px;"></div></div>`:''}
         ${v.crit?`<span class="pill pill-vn">${v.crit}</span>`:''}
       </div>`;
     }
@@ -1524,16 +1931,18 @@ function buildRegCard(r,isHist){
   }
   else if(r.tipo==='interf'){
     extras=`<div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
+      ${r._encerrado?'<span class="pill status-enc">Encerrado</span>':''}
       <span class="pill ${stCls[r.campos.status]||''}">${stMap[r.campos.status]||''}</span>
       ${r.campos.tipo?`<span class="pill pill-neu">${r.campos.tipo}</span>`:''}
       ${r.campos.crit?`<span class="pill pill-vn">${r.campos.crit}</span>`:''}
       ${r.campos.bal?`<span class="pill pill-neu">📍 ${r.campos.bal}</span>`:''}
-      ${r.campos.novo?`<span class="pill pill-at">Novo evento</span>`:''}
     </div>`+buildStatusBtns(r,isHist);
   }
   else if(r.tipo==='desal'){
     extras=`<div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
+      ${r._encerrado?'<span class="pill status-enc">Encerrado</span>':''}
       <span class="pill ${stCls[r.campos.status]||''}">${stMap[r.campos.status]||''}</span>
+      ${r.campos.crit?`<span class="pill pill-vn">${r.campos.crit}</span>`:''}
       ${r.campos.local?`<span class="pill pill-neu">📍 ${r.campos.local}</span>`:''}
     </div>`+buildStatusBtns(r,isHist);
   }
@@ -1543,22 +1952,69 @@ function buildRegCard(r,isHist){
   else if(r.tipo==='defeito'){
     extras='<div style="margin-top:7px;">';
     (r.campos.defeitos||[]).forEach((d,i)=>{
-      extras+=`<div style="background:#fff;border:1px solid #E5E8ED;border-radius:7px;padding:8px;margin-bottom:6px;">
-        <div style="font-size:11px;font-weight:700;color:#1F3864;margin-bottom:4px;">Defeito${i>0?' #'+(i+1):''}</div>
-        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px;">
-          <span class="pill ${stCls[d.status]||''}">${stMap[d.status]||''}</span>
-          ${(()=>{const tl={emenda:'Emenda',fora_emenda:'Fora de emenda',ambos:'Ambos'};const tLabel=d.tipo?tl[d.tipo]||d.tipo:'';return tLabel?`<span class="pill pill-neu">${tLabel}${d.tipo==='emenda'&&d.dataEmenda?' ('+d.dataEmenda+')':''}</span>`:'';})()} 
+      // Linha do tempo — atualizações do defeito
+      const tl={emenda:'Emenda',fora_emenda:'Fora de emenda',ambos:'Ambos'};
+      const tLabel=d.tipo?tl[d.tipo]||d.tipo:'';
+      const atualizacoes=d.atualizacoes||[];
+      // Monta timeline
+      let timelineH='';
+      if(atualizacoes.length){
+        timelineH='<div class="def-timeline">';
+        atualizacoes.forEach((u,ui)=>{
+          const stDot={em:'dot-em',ac:'dot-ac',co:'dot-co'}[u.status]||'dot-new';
+          const stLabel=stMap[u.status]||'Atualização';
+          timelineH+=`<div class="def-tl-item">
+            <div class="def-tl-dot ${stDot}"></div>
+            <div class="def-tl-meta"><i class="ti ti-calendar" style="font-size:10px;"></i>${fmtData(u.data)} — <span style="color:${stCls[u.status]?'inherit':'#6B7280'};font-weight:600;">${stLabel}</span>${u._origem==='Mesclado'?'<span style="background:#EDE7F6;color:#4527A0;font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:4px;">MESCLADO</span>':''}</div>
+            <div class="def-tl-body">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">
+                <div style="flex:1;">
+                  <div class="def-tl-tags">
+                    ${u.crit?`<span class="pill pill-vn" style="font-size:10px;">${u.crit}</span>`:''}
+                    ${u.loc?`<span class="pill pill-neu" style="font-size:10px;">${u.loc}</span>`:''}
+                  </div>
+                  ${u.desc&&u.desc!=='Sem relato'?`<div>${u.desc}</div>`:'<span style="color:#9CA3AF;font-style:italic;font-size:11px;">Sem relato</span>'}
+                  ${u.fotos&&u.fotos.length?buildGaleriaDisplay(u.fotos,'atu-'+r.id+'-'+i+'-'+ui):''}
+                </div>
+                ${!isHist?`<div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0;">
+                  ${u._origem==='Mesclado'?`<button class="btn-sm" style="font-size:9px;padding:3px 5px;background:#EDE7F6;color:#4527A0;border:none;border-radius:5px;cursor:pointer;white-space:nowrap;" onclick="separarMesclado('${r.id}',${i},${ui})" title="Separar este defeito mesclado em um registro independente"><i class="ti ti-git-branch" style="font-size:10px;"></i> Separar</button>`:''}
+                  <button class="btn-sm btn-sm-sec" style="font-size:10px;padding:3px 6px;" onclick="editarAtualizacao('${r.id}',${i},${ui})"><i class="ti ti-edit" style="font-size:10px;"></i></button>
+                  <button class="btn-sm btn-sm-danger" style="font-size:10px;padding:3px 6px;" onclick="excluirAtualizacao('${r.id}',${i},${ui})"><i class="ti ti-trash" style="font-size:10px;"></i></button>
+                </div>`:''}
+              </div>
+            </div>
+          </div>`;
+        });
+        timelineH+='</div>';
+      }
+      // Status toggle visual inline
+      const dSt=d.status==='co'?'co':'ac';
+      const stAcAtivo=dSt!=='co';
+      const stCoAtivo=dSt==='co';
+      extras+=`<div style="background:#fff;border:1px solid #E5E8ED;border-radius:10px;padding:10px;margin-bottom:8px;" id="def-bloco-${r.id}-${i}">
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+          <span style="font-size:12px;font-weight:700;color:#1F3864;">Defeito${i>0?' #'+(i+1):''}</span>
+          <span style="color:#D1D5DB;font-size:12px;">/</span>
+          ${!isHist&&!d._encerrado?`
+            <button style="background:none;border:none;padding:0;cursor:pointer;font-size:12px;font-weight:${stAcAtivo?700:400};color:${stAcAtivo?'#1565C0':'#9CA3AF'};opacity:${stAcAtivo?1:.45};" onclick="confirmarMudaStatusDefeito('${r.id}',${i},'ac')">Acompanhando</button>
+            <span style="color:#D1D5DB;font-size:12px;">·</span>
+            <button style="background:none;border:none;padding:0;cursor:pointer;font-size:12px;font-weight:${stCoAtivo?700:400};color:${stCoAtivo?'#2E7D32':'#9CA3AF'};opacity:${stCoAtivo?1:.45};" onclick="confirmarMudaStatusDefeito('${r.id}',${i},'co')">Concluído</button>
+          `:`<span class="pill ${d._encerrado?'status-enc':stCls[dSt]||''}">${d._encerrado?'Encerrado':stMap[dSt]||''}</span>`}
+          <span style="flex:1;"></span>
+          ${!isHist&&!d._encerrado?`<button class="btn-sm btn-sm-sec" style="font-size:10px;padding:3px 7px;" onclick="iniciarMesclar('${r.id}',${i})"><i class="ti ti-git-merge" style="font-size:10px;"></i> Mesclar</button>`:''}
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
+          ${tLabel?`<span class="pill pill-neu">${tLabel}${d.tipo==='emenda'&&d.dataEmenda?' ('+d.dataEmenda+')':''}</span>`:''}
           ${d.loc?`<span class="pill pill-neu">${d.loc}</span>`:''}
           ${d.crit?`<span class="pill pill-vn">${d.crit}</span>`:''}
-          ${d.novo?`<span class="pill pill-at">Novo evento</span>`:''}
         </div>
-        <div style="font-size:12px;color:#374151;">${d.desc==='Sem relato'?'<span style="color:#9CA3AF;font-style:italic;">Sem relato</span>':d.desc}</div>
-        ${d.fotos&&d.fotos.length?buildGaleriaDisplay(d.fotos,'rd-'+r.id+'-'+i):(d.foto?`<img src="${d.foto}" style="width:100%;border-radius:6px;margin-top:6px;">`:'')}<div style="margin-top:8px;">
-          ${!isHist
-            ? d.status==='co'
-              ? ''
-              : `<button class="btn-sm btn-sm-green" onclick="mudaStatusDefeito('${r.id}',${i},'co')">✓ Concluir</button>`
-            : `<button class="btn-sm btn-sm-danger" onclick="mudaStatusDefeito('${r.id}',${i},'em')">↩ Reabrir</button>`}
+        <div style="font-size:12px;color:#374151;line-height:1.5;">${d.desc==='Sem relato'?'<span style="color:#9CA3AF;font-style:italic;">Sem relato</span>':d.desc||''}</div>
+        ${d.fotos&&d.fotos.length?buildGaleriaDisplay(d.fotos,'rd-'+r.id+'-'+i):(d.foto?`<img src="${d.foto}" style="width:100%;border-radius:6px;margin-top:6px;">`:'')  }
+        ${timelineH}
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center;">
+          ${!isHist&&!d._encerrado?`<button class="btn-atualizar" onclick="abrirAtualizarDefeito('${r.id}',${i})"><i class="ti ti-pencil-plus"></i> Registrar atualização</button>`:''}
+          ${!isHist&&!d._encerrado?`<button class="btn-encerrar" onclick="encerrarDefeito('${r.id}',${i})" title="Encerra este defeito e move para histórico"><i class="ti ti-archive" style="font-size:11px;"></i> Encerrar</button>`:''}
+          ${isHist||d._encerrado?`<button class="btn-sm btn-sm-sec" onclick="reabrirDefeito('${r.id}',${i})">↩ Reabrir</button>`:''}
         </div>
       </div>`;
     });
@@ -1566,6 +2022,8 @@ function buildRegCard(r,isHist){
   }
 
   const showDesc=!isRaspK&&r.tipo!=='rasp'&&r.tipo!=='defeito';
+  // Para rasp-K mostra a descrição abaixo dos pills
+  const descRaspK=isRaspK?(r.desc&&r.desc!=='Sem relato'?r.desc:''):'';
   const desc=showDesc?(r.desc==='Sem relato'?'<span style="color:#9CA3AF;font-style:italic;">Sem relato</span>':r.desc||''):'';
   const titulo=isRaspK?SECAO_LABELS[r.tipo]||r.tipo:'';
 
@@ -1576,25 +2034,68 @@ function buildRegCard(r,isHist){
       <span style="flex:1;"></span>
       <input type="checkbox" class="item-print-chk no-print" checked title="Incluir na impressão" onclick="event.stopPropagation()">
       <button class="btn-sm btn-sm-sec no-print" onclick="abrirEdicao('${r.id}')"><i class="ti ti-edit"></i> Editar</button>
+      ${isHist?`<button class="btn-sm no-print" style="background:#FFEBEE;color:#C62828;padding:4px 7px;" onclick="excluirRegistroHist('${r.id}')" title="Excluir permanentemente"><i class="ti ti-trash"></i></button>`:''}
     </div>
     ${desc?`<div class="reg-card-body">${desc}</div>`:''}
+    ${descRaspK?`<div class="reg-card-body" style="font-size:12px;color:#374151;margin-top:4px;">${descRaspK}</div>`:''}
     ${extras}
     ${!isRaspK&&r.fotos&&r.fotos.length?buildGaleriaDisplay(r.fotos,'rg-'+r.id):(r.foto?`<img src="${r.foto}" style="width:100%;border-radius:6px;margin-top:8px;">`:'')}</div>`;
 }
 
 function buildStatusBtns(r,isHist){
-  if(!isHist)return`<div class="reg-card-footer">
-    ${r.campos.status!=='em'?`<button class="btn-sm btn-sm-danger" onclick="mudaStatus('${r.id}','em')">Em andamento</button>`:''}
-    ${r.campos.status!=='ac'?`<button class="btn-sm btn-sm-sec" onclick="mudaStatus('${r.id}','ac')">Acompanhando</button>`:''}
-    ${r.campos.status!=='co'?`<button class="btn-sm btn-sm-green" onclick="mudaStatus('${r.id}','co')">✓ Concluído</button>`:''}
-  </div>`;
+  if(!isHist&&!r._encerrado){
+    const st=r.campos.status==='co'?'co':'ac';
+    const stAcAtivo=st!=='co';
+    const stCoAtivo=st==='co';
+    return`<div style="border-top:1px solid #F0F2F5;margin-top:8px;padding-top:8px;">
+      <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+        <span style="font-size:11px;color:#9CA3AF;font-weight:500;">Status:</span>
+        <button style="background:none;border:none;padding:2px 6px;cursor:pointer;font-size:12px;font-weight:${stAcAtivo?700:400};color:${stAcAtivo?'#1565C0':'#9CA3AF'};opacity:${stAcAtivo?1:.45};border-radius:5px;" onclick="confirmarMudaStatus('${r.id}','ac')">Acompanhando</button>
+        <span style="color:#D1D5DB;font-size:12px;">·</span>
+        <button style="background:none;border:none;padding:2px 6px;cursor:pointer;font-size:12px;font-weight:${stCoAtivo?700:400};color:${stCoAtivo?'#2E7D32':'#9CA3AF'};opacity:${stCoAtivo?1:.45};border-radius:5px;" onclick="confirmarMudaStatus('${r.id}','co')">Concluído</button>
+        <span style="flex:1;"></span>
+        <button class="btn-encerrar" onclick="encerrarRegistro('${r.id}')" title="Encerra definitivamente e move para o histórico"><i class="ti ti-archive" style="font-size:11px;"></i> Encerrar</button>
+      </div>
+    </div>`;
+  }
   return`<div class="reg-card-footer">
-    <button class="btn-sm btn-sm-danger" onclick="mudaStatus('${r.id}','em')">↩ Reabrir (Em andamento)</button>
-    <button class="btn-sm btn-sm-sec" onclick="mudaStatus('${r.id}','ac')">↩ Reabrir (Acompanhando)</button>
+    <button class="btn-sm btn-sm-sec" onclick="reabrirRegistro('${r.id}')">↩ Reabrir</button>
   </div>`;
 }
-function mudaStatus(regId,s){const r=DB.registros[ativoSel].find(x=>x.id===regId);if(r)r.campos.status=s;renderRelatorio();}
-function mudaStatusDefeito(regId,idx,s){const r=DB.registros[ativoSel].find(x=>x.id===regId);if(r&&r.campos.defeitos&&r.campos.defeitos[idx])r.campos.defeitos[idx].status=s;renderRelatorio();}
+function confirmarMudaStatus(regId,novoStatus){
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  if(!r)return;
+  const atual=r.campos.status==='co'?'co':'ac';
+  if(atual===novoStatus)return;
+  const labels={ac:'Acompanhando',co:'Concluído'};
+  if(!confirm('Mudar status para "'+labels[novoStatus]+'"?'))return;
+  r.campos.status=novoStatus;
+  marcarMudanca();autoBackup();renderRelatorio();
+}
+function mudaStatus(regId,s){const r=DB.registros[ativoSel].find(x=>x.id===regId);if(r){r.campos.status=s;}marcarMudanca();autoBackup();renderRelatorio();}
+function mudaStatusDefeito(regId,idx,s){const r=DB.registros[ativoSel].find(x=>x.id===regId);if(r&&r.campos.defeitos&&r.campos.defeitos[idx]){r.campos.defeitos[idx].status=s;}marcarMudanca();autoBackup();renderRelatorio();}
+function confirmarMudaStatusDefeito(regId,idx,novoStatus){
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  const d=r?.campos?.defeitos?.[idx];
+  if(!d)return;
+  const atual=d.status==='co'?'co':'ac';
+  if(atual===novoStatus)return; // já está nesse status
+  const labels={ac:'Acompanhando',co:'Concluído'};
+  if(!confirm('Mudar status para "'+labels[novoStatus]+'"?'))return;
+  d.status=novoStatus;
+  marcarMudanca();autoBackup();renderRelatorio();
+}
+function encerrarRegistro(regId){
+  if(!confirm('Encerrar este registro definitivamente?\nEle será movido para o Histórico e não aparecerá mais nos registros ativos.'))return;
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  if(r){r._encerrado=true;r.campos.status=r.campos.status||'co';}
+  marcarMudanca();autoBackup();renderRelatorio();
+}
+function reabrirRegistro(regId){
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  if(r){r._encerrado=false;r._hist=false;r.campos.status='ac';}
+  marcarMudanca();autoBackup();renderRelatorio();
+}
 
 // ════════════════════════════════
 // EDIÇÃO MODAL
@@ -1604,13 +2105,53 @@ function abrirEdicao(regId){
   if(!r)return;
   editandoReg=regId;
   const ns='edit-'+regId;
+  const isRaspK=r.tipo&&r.tipo.startsWith('rasp-')&&r.tipo!=='rasp';
   // Copia fotos atuais para edição
   galFotos[ns]=[...(r.fotos||[])];
 
   let c=`<div class="form-grupo"><label>Data</label><input type="date" id="edit-data" value="${r.data}"></div>`;
 
-  // ── RASPADORES ──
-  if(r.tipo==='rasp'){
+  // ── RASPADORES (formato novo — tipo rasp-prim, rasp-s1 etc.) ──
+  if(isRaspK){
+    const chave=r.tipo.replace('rasp-','');
+    galFotos[ns]=[...(r.fotos||[])];
+    const pct=r.campos?.pct||'';
+    const crit=r.campos?.crit||'';
+    const pn=parseInt(pct)||0;
+    const dcor=pn<=30?'#C62828':pn<=50?'#E65100':pn<=75?'#F9A825':'#2E7D32';
+    const dlbl=pn<=30?'Crítico':pn<=50?'Alto':pn<=75?'Médio':'Bom';
+    c+=`<div class="form-grupo"><label>% Desgaste</label>
+      ${pct?`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span class="pill" style="background:${dcor}20;color:${dcor};border:1px solid ${dcor}40;">${pct}% — ${dlbl}</span>
+        <div style="flex:1;background:#E5E8ED;border-radius:4px;height:8px;overflow:hidden;"><div style="height:100%;width:${Math.min(pn,100)}%;background:${dcor};border-radius:4px;"></div></div>
+      </div>`:''}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#C62828;" id="edit-pct-btn-0" onclick="editSetPct(0,15,this)">🔴 0–30%</button>
+        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#E65100;" id="edit-pct-btn-1" onclick="editSetPct(1,40,this)">🟠 31–50%</button>
+        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#F9A825;" id="edit-pct-btn-2" onclick="editSetPct(2,63,this)">🟡 51–75%</button>
+        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#2E7D32;" id="edit-pct-btn-3" onclick="editSetPct(3,88,this)">🟢 76–100%</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="number" id="edit-pct" min="0" max="100" value="${pct}" placeholder="Ou digitar %" style="width:110px;font-size:13px;padding:7px 10px;border:1px solid #D1D5DB;border-radius:8px;" oninput="editAtualizarBarra()">
+        <div style="flex:1;"><div style="background:#E5E8ED;border-radius:6px;height:12px;overflow:hidden;"><div id="edit-barra-rasp" style="height:100%;width:${pct?Math.min(pn,100)+'%':'0%'};background:${pct?dcor:'#E5E8ED'};border-radius:6px;transition:width .2s;"></div></div>
+        <div id="edit-barra-label" style="font-size:10px;color:#9CA3AF;margin-top:2px;">${pct?pct+'% — '+dlbl:''}</div></div>
+      </div>
+    </div>
+    <div class="form-grupo"><label>Criticidade</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="btn-opcao btn-opcao-verde ${crit==='Baixo'?'btn-opcao-ativo':''}" id="edit-rcrit-b" onclick="selecionarOpcao('edit-rcrit','Baixo',this)">Baixo</button>
+        <button type="button" class="btn-opcao btn-opcao-amarelo ${crit==='Médio'?'btn-opcao-ativo':''}" id="edit-rcrit-m" onclick="selecionarOpcao('edit-rcrit','Médio',this)">Médio</button>
+        <button type="button" class="btn-opcao btn-opcao-vermelho ${crit==='Alto'?'btn-opcao-ativo':''}" id="edit-rcrit-a" onclick="selecionarOpcao('edit-rcrit','Alto',this)">Alto</button>
+      </div>
+      <input type="hidden" id="edit-rcrit" value="${crit}">
+    </div>
+    <div class="form-grupo"><label>Descrição</label>
+      <textarea id="edit-desc-rasp" rows="3" style="width:100%;font-size:13px;padding:8px;border:1px solid #D1D5DB;border-radius:8px;resize:vertical;">${r.desc&&r.desc!=='Sem relato'?r.desc:''}</textarea>
+    </div>
+    ${buildGaleriaField(ns)}`;
+  }
+  // ── RASPADORES (formato legado agrupado) ──
+  else if(r.tipo==='rasp'){
     Object.entries(r.campos).forEach(([k,v])=>{
       const nsK=ns+'-'+k;
       galFotos[nsK]=[...(v.fotos||[])];
@@ -1632,45 +2173,60 @@ function abrirEdicao(regId){
   // ── INTERFERÊNCIAS ──
   else if(r.tipo==='interf'){
     const isOu=r.campos.tipo&&!['Interferência','Interdição'].includes(r.campos.tipo);
-    c+=`<div class="form-grupo"><label>Descrição</label><textarea id="edit-desc">${r.desc||''}</textarea></div>
+    const ec=r.campos.crit||''; const es=r.campos.status||'ac';
+    c+=`
+    <div class="form-grupo"><label>Criticidade</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="btn-opcao btn-opcao-verde ${ec==='Baixo'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ei-crit','Baixo',this)">Baixo</button>
+        <button type="button" class="btn-opcao btn-opcao-amarelo ${ec==='Médio'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ei-crit','Médio',this)">Médio</button>
+        <button type="button" class="btn-opcao btn-opcao-vermelho ${ec==='Alto'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ei-crit','Alto',this)">Alto</button>
+      </div>
+      <input type="hidden" id="ei-crit" value="${ec}">
+    </div>
+    <div class="form-grupo"><label>Status</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="btn-opcao btn-opcao-azul ${es==='ac'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ei-status','ac',this)">Acompanhando</button>
+        <button type="button" class="btn-opcao btn-opcao-verde ${es==='co'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ei-status','co',this)">Concluído</button>
+      </div>
+      <input type="hidden" id="ei-status" value="${es}">
+    </div>
     <div class="form-grupo"><label>Tipo</label>
-      <select id="edit-tipo-interf" onchange="toggleEl('edit-tipo-interf','outros','edit-bloco-outros')">
-        <option value="">—</option>
-        <option ${r.campos.tipo==='Interferência'?'selected':''}>Interferência</option>
-        <option ${r.campos.tipo==='Interdição'?'selected':''}>Interdição</option>
-        <option value="outros" ${isOu?'selected':''}>Outros</option>
-      </select></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+        <button type="button" class="btn-opcao ${r.campos.tipo==='Interferência'?'btn-opcao-ativo':''}" id="ei-tipo-i" onclick="editSelecionaTipoInterf('Interferência',this)">Interferência</button>
+        <button type="button" class="btn-opcao ${r.campos.tipo==='Interdição'?'btn-opcao-ativo':''}" id="ei-tipo-in" onclick="editSelecionaTipoInterf('Interdição',this)">Interdição</button>
+        <button type="button" class="btn-opcao ${isOu?'btn-opcao-ativo':''}" id="ei-tipo-ou" onclick="editSelecionaTipoInterf('outros',this)">Outros</button>
+      </div>
+      <input type="hidden" id="edit-tipo-interf" value="${isOu?'outros':r.campos.tipo||''}">
+    </div>
     <div id="edit-bloco-outros" style="${isOu?'':'display:none'}">
       <div class="form-grupo"><label>Especificar</label><input type="text" id="edit-tipo-outros" value="${isOu?r.campos.tipo:''}"></div>
     </div>
     <div class="form-grupo"><label>Baliza / local</label><input type="text" id="edit-bal" value="${r.campos.bal||''}"></div>
-    <div class="check-row"><input type="checkbox" id="edit-novo" ${r.campos.novo?'checked':''}><label for="edit-novo">Novo evento</label></div>
-    <div class="form-grupo" style="margin-top:8px;"><label>Criticidade</label>
-      <select id="edit-crit-interf">
-        <option value="" ${!r.campos.crit?'selected':''}>—</option>
-        <option ${r.campos.crit==='Baixo'?'selected':''}>Baixo</option>
-        <option ${r.campos.crit==='Médio'?'selected':''}>Médio</option>
-        <option ${r.campos.crit==='Alto'?'selected':''}>Alto</option>
-      </select></div>
-    <div class="form-grupo"><label>Status</label>
-      <select id="edit-status">
-        <option value="em" ${r.campos.status==='em'?'selected':''}>Em andamento</option>
-        <option value="ac" ${r.campos.status==='ac'?'selected':''}>Acompanhando</option>
-        <option value="co" ${r.campos.status==='co'?'selected':''}>Concluído</option>
-      </select></div>
+    <div class="form-grupo"><label>Descrição</label><textarea id="edit-desc">${r.desc||''}</textarea></div>
     ${buildGaleriaField(ns)}`;
   }
 
   // ── DESALINHAMENTO ──
   else if(r.tipo==='desal'){
-    c+=`<div class="form-grupo"><label>Descrição</label><textarea id="edit-desc">${r.desc||''}</textarea></div>
-    <div class="form-grupo"><label>Local</label><input type="text" id="edit-local" value="${r.campos.local||''}"></div>
+    const dc=r.campos.crit||''; const ds=r.campos.status||'ac';
+    c+=`
+    <div class="form-grupo"><label>Criticidade</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="btn-opcao btn-opcao-verde ${dc==='Baixo'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ed-crit','Baixo',this)">Baixo</button>
+        <button type="button" class="btn-opcao btn-opcao-amarelo ${dc==='Médio'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ed-crit','Médio',this)">Médio</button>
+        <button type="button" class="btn-opcao btn-opcao-vermelho ${dc==='Alto'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ed-crit','Alto',this)">Alto</button>
+      </div>
+      <input type="hidden" id="ed-crit" value="${dc}">
+    </div>
     <div class="form-grupo"><label>Status</label>
-      <select id="edit-status-desal">
-        <option value="em" ${r.campos.status==='em'?'selected':''}>Em andamento</option>
-        <option value="ac" ${r.campos.status==='ac'?'selected':''}>Acompanhando</option>
-        <option value="co" ${r.campos.status==='co'?'selected':''}>Concluído</option>
-      </select></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="btn-opcao btn-opcao-azul ${ds==='ac'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ed-status','ac',this)">Acompanhando</button>
+        <button type="button" class="btn-opcao btn-opcao-verde ${ds==='co'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ed-status','co',this)">Concluído</button>
+      </div>
+      <input type="hidden" id="ed-status" value="${ds}">
+    </div>
+    <div class="form-grupo"><label>Baliza / local</label><input type="text" id="edit-local" value="${r.campos.local||''}"></div>
+    <div class="form-grupo"><label>Descrição</label><textarea id="edit-desc">${r.desc||''}</textarea></div>
     ${buildGaleriaField(ns)}`;
   }
 
@@ -1693,45 +2249,54 @@ function abrirEdicao(regId){
     defs.forEach((d,i)=>{
       const nsD=ns+'-d'+i;
       galFotos[nsD]=[...(d.fotos||[])];
+      const ddc=d.crit||''; const dds=d.status||'ac'; const ddloc=d.loc||''; const ddtipo=d.tipo||'';
       c+=`<div class="defeito-card">
         <div class="defeito-card-header">Defeito${i>0?' #'+(i+1):''}</div>
-        <div class="form-grupo"><label>Tipo</label>
-          <select id="edit-def-tipo-${i}" onchange="toggleEmendaEdit(${i})">
-            <option value="">—</option>
-            <option value="emenda" ${d.tipo==='emenda'?'selected':''}>Emenda</option>
-            <option value="fora_emenda" ${d.tipo==='fora_emenda'?'selected':''}>Fora de emenda</option>
-          </select></div>
-        <div id="edit-def-emenda-${i}" style="${d.tipo==='emenda'?'':'display:none'}">
+        <div class="form-grupo"><label>Defeito</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button type="button" class="btn-opcao ${ddtipo==='emenda'?'btn-opcao-ativo':''}" id="edt-tipo-${i}-em" onclick="editDefTipo(${i},'emenda',this)">Emenda</button>
+            <button type="button" class="btn-opcao ${ddtipo==='fora_emenda'?'btn-opcao-ativo':''}" id="edt-tipo-${i}-fo" onclick="editDefTipo(${i},'fora_emenda',this)">Fora de emenda</button>
+            <button type="button" class="btn-opcao ${ddtipo==='ambos'?'btn-opcao-ativo':''}" id="edt-tipo-${i}-am" onclick="editDefTipo(${i},'ambos',this)">Ambos</button>
+          </div>
+          <input type="hidden" id="edit-def-tipo-${i}" value="${ddtipo}">
+        </div>
+        <div id="edit-def-emenda-${i}" style="${(d.tipo==='emenda'||d.tipo==='ambos')?'':'display:none'}">
           <div class="form-grupo"><label>Data da emenda</label><input type="text" id="edit-def-data-emenda-${i}" value="${d.dataEmenda||''}" placeholder="dd/mm/aaaa"></div>
         </div>
         <div class="form-grupo"><label>Localização</label>
-          <select id="edit-def-loc-${i}">
-            <option value="">—</option>
-            <option ${d.loc==='Carga'?'selected':''}>Carga</option>
-            <option ${d.loc==='Retorno'?'selected':''}>Retorno</option>
-          </select></div>
-        <div class="check-row"><input type="checkbox" id="edit-def-novo-${i}" ${d.novo?'checked':''}><label for="edit-def-novo-${i}">Novo evento</label></div>
-        <div class="form-grupo" style="margin-top:6px;"><label>Criticidade</label>
-          <select id="edit-def-crit-${i}">
-            <option value="" ${!d.crit?'selected':''}>—</option>
-            <option ${d.crit==='Baixo'?'selected':''}>Baixo</option>
-            <option ${d.crit==='Médio'?'selected':''}>Médio</option>
-            <option ${d.crit==='Alto'?'selected':''}>Alto</option>
-          </select></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button type="button" class="btn-opcao ${ddloc==='Carga'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('edt-loc-${i}','Carga',this)">Carga</button>
+            <button type="button" class="btn-opcao ${ddloc==='Retorno'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('edt-loc-${i}','Retorno',this)">Retorno</button>
+            <button type="button" class="btn-opcao ${ddloc==='Ambos'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('edt-loc-${i}','Ambos',this)">Ambos</button>
+          </div>
+          <input type="hidden" id="edit-def-loc-${i}" value="${ddloc}">
+        </div>
+        <div class="form-grupo"><label>Criticidade</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button type="button" class="btn-opcao btn-opcao-verde ${ddc==='Baixo'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('edt-crit-${i}','Baixo',this)">Baixo</button>
+            <button type="button" class="btn-opcao btn-opcao-amarelo ${ddc==='Médio'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('edt-crit-${i}','Médio',this)">Médio</button>
+            <button type="button" class="btn-opcao btn-opcao-vermelho ${ddc==='Alto'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('edt-crit-${i}','Alto',this)">Alto</button>
+          </div>
+          <input type="hidden" id="edit-def-crit-${i}" value="${ddc}">
+        </div>
         <div class="form-grupo"><label>Status</label>
-          <select id="edit-def-status-${i}">
-            <option value="em" ${d.status==='em'?'selected':''}>Em andamento</option>
-            <option value="ac" ${d.status==='ac'?'selected':''}>Acompanhando</option>
-            <option value="co" ${d.status==='co'?'selected':''}>Concluído</option>
-          </select></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button type="button" class="btn-opcao btn-opcao-azul ${dds==='ac'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('edt-status-${i}','ac',this)">Acompanhando</button>
+            <button type="button" class="btn-opcao btn-opcao-verde ${dds==='co'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('edt-status-${i}','co',this)">Concluído</button>
+          </div>
+          <input type="hidden" id="edit-def-status-${i}" value="${dds}">
+        </div>
         <div class="form-grupo"><label>Descrição</label><textarea id="edit-def-desc-${i}">${d.desc||''}</textarea></div>
         ${buildGaleriaField(nsD)}
       </div>`;
     });
   }
 
-  c+=`<button class="btn-prim" onclick="salvarEdicao()">Salvar alterações</button>
-      <button class="btn-danger" onclick="excluirRegistro('${regId}')"><i class="ti ti-trash"></i> Excluir registro</button>`;
+  c+=`<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+    <button class="btn-prim" onclick="salvarEdicao()"><i class="ti ti-device-floppy"></i> Salvar alterações</button>
+    <button class="btn-sec" onclick="fecharModal()"><i class="ti ti-x"></i> Cancelar</button>
+    <button class="btn-danger" onclick="excluirRegistro('${regId}')"><i class="ti ti-trash"></i> Excluir registro</button>
+  </div>`;
 
   document.getElementById('modal-titulo-txt').textContent='Editar — '+SECAO_LABELS[r.tipo];
   document.getElementById('modal-corpo').innerHTML=c;
@@ -1743,8 +2308,43 @@ function abrirEdicao(regId){
     else if(r.tipo==='defeito') (r.campos.defeitos||[]).forEach((_,i)=>renderGaleriaGrid(ns+'-d'+i));
     else renderGaleriaGrid(ns);
   },0);
+  // Para rasp-K: iniciar barra se já tem % salvo
+  if(isRaspK) setTimeout(()=>editAtualizarBarra(),50);
 }
 
+function editSetPct(btnIdx, val, btn){
+  const inp=document.getElementById('edit-pct');
+  if(inp)inp.value=val;
+  [0,1,2,3].forEach(i=>{const b=document.getElementById('edit-pct-btn-'+i);if(b)b.classList.remove('btn-opcao-ativo');});
+  if(btn)btn.classList.add('btn-opcao-ativo');
+  editAtualizarBarra();
+}
+function editAtualizarBarra(){
+  const val=parseInt(document.getElementById('edit-pct')?.value)||0;
+  const barra=document.getElementById('edit-barra-rasp');
+  const label=document.getElementById('edit-barra-label');
+  if(!barra)return;
+  const dcor=val<=30?'#C62828':val<=50?'#E65100':val<=75?'#F9A825':'#2E7D32';
+  const dlbl=val<=30?'Crítico':val<=50?'Alto':val<=75?'Médio':'Bom';
+  barra.style.width=Math.min(val,100)+'%';
+  barra.style.background=val>0?dcor:'#E5E8ED';
+  if(label)label.textContent=val>0?val+'% — '+dlbl:'';
+}
+function editSelecionaTipoInterf(valor, btn){
+  document.querySelectorAll('#ei-tipo-i,#ei-tipo-in,#ei-tipo-ou').forEach(b=>b.classList.remove('btn-opcao-ativo'));
+  if(btn)btn.classList.add('btn-opcao-ativo');
+  document.getElementById('edit-tipo-interf').value=valor;
+  const bl=document.getElementById('edit-bloco-outros');
+  if(bl)bl.style.display=(valor==='outros'?'block':'none');
+}
+function editDefTipo(i,valor,btn){
+  ['edt-tipo-'+i+'-em','edt-tipo-'+i+'-fo','edt-tipo-'+i+'-am'].forEach(id=>{document.getElementById(id)?.classList.remove('btn-opcao-ativo');});
+  if(btn)btn.classList.add('btn-opcao-ativo');
+  const h=document.getElementById('edit-def-tipo-'+i);
+  if(h)h.value=valor;
+  const bl=document.getElementById('edit-def-emenda-'+i);
+  if(bl)bl.style.display=(valor==='emenda'||valor==='ambos'?'block':'none');
+}
 function toggleEmendaEdit(i){
   const v=document.getElementById('edit-def-tipo-'+i)?.value;
   const bl=document.getElementById('edit-def-emenda-'+i);
@@ -1753,13 +2353,412 @@ function toggleEmendaEdit(i){
 
 function fecharModal(){document.getElementById('modal-edit').classList.remove('vis');editandoReg=null;}
 
+// ════════════════════════════════════════════════════════════════
+// ATUALIZAÇÃO DE DEFEITO — linha do tempo
+// ════════════════════════════════════════════════════════════════
+let _updRegId=null, _updDefIdx=null;
+
+function abrirAtualizarDefeito(regId,defIdx){
+  _updRegId=regId; _updDefIdx=defIdx;
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  const d=r?.campos?.defeitos?.[defIdx];
+  if(!d)return;
+  const ns='upd-'+regId+'-'+defIdx;
+  galFotos[ns]=[];
+  const ds=(d.status==='co'?'co':'ac'); const dc=d.crit||''; const dl=d.loc||'';
+  const modal=document.createElement('div');
+  modal.id='modal-upd';
+  modal.className='upd-modal';
+  modal.innerHTML=`<div class="upd-modal-box">
+    <div class="upd-modal-titulo">
+      <span><i class="ti ti-pencil-plus" style="color:#2E75B6;"></i> Registrar Atualização</span>
+      <button onclick="fecharModalUpd()" style="background:none;border:none;font-size:20px;color:#6B7280;cursor:pointer;">✕</button>
+    </div>
+    <div class="form-grupo"><label>Data</label><input type="date" id="upd-data" value="${dataHojeISO()}"></div>
+    <div class="form-grupo"><label>Status</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="btn-opcao btn-opcao-azul ${ds==='ac'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-status','ac',this)">Acompanhando</button>
+        <button type="button" class="btn-opcao btn-opcao-verde ${ds==='co'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-status','co',this)">Concluído</button>
+      </div>
+      <input type="hidden" id="upd-status" value="${ds}">
+    </div>
+    <div class="form-grupo"><label>Criticidade</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="btn-opcao btn-opcao-verde ${dc==='Baixo'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-crit','Baixo',this)">Baixo</button>
+        <button type="button" class="btn-opcao btn-opcao-amarelo ${dc==='Médio'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-crit','Médio',this)">Médio</button>
+        <button type="button" class="btn-opcao btn-opcao-vermelho ${dc==='Alto'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-crit','Alto',this)">Alto</button>
+      </div>
+      <input type="hidden" id="upd-crit" value="${dc}">
+    </div>
+    <div class="form-grupo"><label>Localização</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="btn-opcao ${dl==='Carga'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-loc','Carga',this)">Carga</button>
+        <button type="button" class="btn-opcao ${dl==='Retorno'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-loc','Retorno',this)">Retorno</button>
+        <button type="button" class="btn-opcao ${dl==='Ambos'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-loc','Ambos',this)">Ambos</button>
+      </div>
+      <input type="hidden" id="upd-loc" value="${dl}">
+    </div>
+    ${buildMsgsRapidas('upd-desc','defeito')}
+    <div class="form-grupo"><label>Descrição da atualização</label>
+      <textarea id="upd-desc" rows="3" style="width:100%;font-size:13px;padding:8px;border:1px solid #D1D5DB;border-radius:8px;resize:vertical;" placeholder="O que foi feito? Qual a situação atual?"></textarea>
+    </div>
+    ${buildGaleriaField(ns)}
+    <button class="btn-prim" onclick="salvarAtualizacaoDefeito()" style="margin-top:4px;"><i class="ti ti-device-floppy"></i> Salvar atualização</button>
+    <button class="btn-sec" onclick="fecharModalUpd()" style="margin-top:8px;">Cancelar</button>
+  </div>`;
+  document.body.appendChild(modal);
+  setTimeout(()=>renderGaleriaGrid(ns),50);
+}
+
+function excluirAtualizacao(regId,defIdx,updIdx){
+  if(!confirm('Excluir esta entrada da linha do tempo?'))return;
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  if(!r?.campos?.defeitos?.[defIdx])return;
+  r.campos.defeitos[defIdx].atualizacoes?.splice(updIdx,1);
+  marcarMudanca();autoBackup();renderRelatorio();
+}
+function editarAtualizacao(regId,defIdx,updIdx){
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  const d=r?.campos?.defeitos?.[defIdx];
+  const u=d?.atualizacoes?.[updIdx];
+  if(!u)return;
+  _updRegId=regId;_updDefIdx=defIdx;
+  // Reutiliza o modal de atualização, mas carrega valores existentes e salva no índice
+  const ns='upd-'+regId+'-'+defIdx+'-edit';
+  galFotos[ns]=[...(u.fotos||[])];
+  const modal=document.createElement('div');
+  modal.id='modal-upd';
+  modal.className='upd-modal';
+  modal.innerHTML=`<div class="upd-modal-box">
+    <div class="upd-modal-titulo">
+      <span><i class="ti ti-edit" style="color:#2E75B6;"></i> Editar Atualização</span>
+      <button onclick="fecharModalUpd()" style="background:none;border:none;font-size:20px;color:#6B7280;cursor:pointer;">✕</button>
+    </div>
+    <div class="form-grupo"><label>Data</label><input type="date" id="upd-data" value="${u.data||dataHojeISO()}"></div>
+    <div class="form-grupo"><label>Status</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="btn-opcao btn-opcao-azul ${(u.status||'ac')==='ac'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-status','ac',this)">Acompanhando</button>
+        <button type="button" class="btn-opcao btn-opcao-verde ${u.status==='co'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-status','co',this)">Concluído</button>
+      </div>
+      <input type="hidden" id="upd-status" value="${u.status||'ac'}">
+    </div>
+    <div class="form-grupo"><label>Criticidade</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="btn-opcao btn-opcao-verde ${u.crit==='Baixo'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-crit','Baixo',this)">Baixo</button>
+        <button type="button" class="btn-opcao btn-opcao-amarelo ${u.crit==='Médio'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-crit','Médio',this)">Médio</button>
+        <button type="button" class="btn-opcao btn-opcao-vermelho ${u.crit==='Alto'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-crit','Alto',this)">Alto</button>
+      </div>
+      <input type="hidden" id="upd-crit" value="${u.crit||''}">
+    </div>
+    <div class="form-grupo"><label>Localização</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="btn-opcao ${u.loc==='Carga'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-loc','Carga',this)">Carga</button>
+        <button type="button" class="btn-opcao ${u.loc==='Retorno'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-loc','Retorno',this)">Retorno</button>
+        <button type="button" class="btn-opcao ${u.loc==='Ambos'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-loc','Ambos',this)">Ambos</button>
+      </div>
+      <input type="hidden" id="upd-loc" value="${u.loc||''}">
+    </div>
+    ${buildMsgsRapidas('upd-desc','defeito')}
+    <div class="form-grupo"><label>Descrição</label>
+      <textarea id="upd-desc" rows="3" style="width:100%;font-size:13px;padding:8px;border:1px solid #D1D5DB;border-radius:8px;resize:vertical;">${u.desc&&u.desc!=='Sem relato'?u.desc:''}</textarea>
+    </div>
+    ${buildGaleriaField(ns)}
+    <button class="btn-prim" onclick="salvarEdicaoAtualizacao('${regId}',${defIdx},${updIdx},'${ns}')" style="margin-top:4px;"><i class="ti ti-device-floppy"></i> Salvar alterações</button>
+    <button class="btn-sec" onclick="fecharModalUpd()" style="margin-top:8px;">Cancelar</button>
+  </div>`;
+  document.body.appendChild(modal);
+  setTimeout(()=>renderGaleriaGrid(ns),50);
+}
+function salvarEdicaoAtualizacao(regId,defIdx,updIdx,ns){
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  const d=r?.campos?.defeitos?.[defIdx];
+  if(!d?.atualizacoes?.[updIdx])return;
+  const u=d.atualizacoes[updIdx];
+  u.data=document.getElementById('upd-data')?.value||u.data;
+  u.status=document.getElementById('upd-status')?.value||u.status;
+  u.crit=document.getElementById('upd-crit')?.value||'';
+  u.loc=document.getElementById('upd-loc')?.value||'';
+  u.desc=(document.getElementById('upd-desc')?.value||'').trim()||'Sem relato';
+  u.fotos=getGalFotos(ns);
+  marcarMudanca();autoBackup();
+  fecharModalUpd();
+  mostrarToast('✓ Atualização editada','#2E7D32');
+  renderRelatorio();
+}
+function encerrarDefeito(regId,idx){
+  if(!confirm('Encerrar este defeito definitivamente?\nEle será movido para o Histórico.'))return;
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  if(!r||!r.campos.defeitos[idx])return;
+  r.campos.defeitos[idx]._encerrado=true;
+  // Se todos defeitos do registro estiverem encerrados, encerra o registro também
+  if(r.campos.defeitos.every(d=>d._encerrado))r._encerrado=true;
+  marcarMudanca();autoBackup();renderRelatorio();
+}
+function reabrirDefeito(regId,idx){
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  if(!r||!r.campos.defeitos[idx])return;
+  r.campos.defeitos[idx]._encerrado=false;
+  r.campos.defeitos[idx].status='ac';
+  r._encerrado=false;r._hist=false;
+  marcarMudanca();autoBackup();renderRelatorio();
+}
+function fecharModalUpd(){
+  document.getElementById('modal-upd')?.remove();
+  _updRegId=null; _updDefIdx=null;
+}
+
+function salvarAtualizacaoDefeito(){
+  if(_updRegId===null||_updDefIdx===null)return;
+  const r=DB.registros[ativoSel].find(x=>x.id===_updRegId);
+  const d=r?.campos?.defeitos?.[_updDefIdx];
+  if(!d)return;
+  const ns='upd-'+_updRegId+'-'+_updDefIdx;
+  const data=document.getElementById('upd-data')?.value||dataHojeISO();
+  const status=document.getElementById('upd-status')?.value||'ac';
+  const crit=document.getElementById('upd-crit')?.value||'';
+  const loc=document.getElementById('upd-loc')?.value||'';
+  const desc=(document.getElementById('upd-desc')?.value||'').trim()||'Sem relato';
+  const fotos=getGalFotos(ns);
+  if(!d.atualizacoes)d.atualizacoes=[];
+  d.atualizacoes.push({data,status,crit,loc,desc,fotos});
+  // Atualiza o status atual do defeito
+  d.status=status;
+  marcarMudanca(); autoBackup();
+  fecharModalUpd();
+  mostrarToast('✓ Atualização registrada na linha do tempo','#2E7D32');
+  renderRelatorio();
+}
+
+// ════════════════════════════════════════════════════════════════
+// MESCLAR DEFEITOS
+// ════════════════════════════════════════════════════════════════
+let _mesclarSel=[];  // [{regId, defIdx}]
+
+function iniciarMesclar(regId,defIdx){
+  const jaEsta=_mesclarSel.findIndex(s=>s.regId===regId&&s.defIdx===defIdx);
+  if(jaEsta>=0){
+    _mesclarSel.splice(jaEsta,1);
+  } else {
+    if(_mesclarSel.length>=2){mostrarToast('Selecione apenas 2 defeitos para mesclar','#E65100');return;}
+    _mesclarSel.push({regId,defIdx});
+  }
+  // Atualiza visual dos blocos
+  document.querySelectorAll('[id^="def-bloco-"]').forEach(el=>el.classList.remove('mesclar-sel'));
+  _mesclarSel.forEach(s=>{
+    const el=document.getElementById('def-bloco-'+s.regId+'-'+s.defIdx);
+    if(el)el.classList.add('mesclar-sel');
+  });
+  // Mostra/esconde banner
+  let banner=document.getElementById('mesclar-banner');
+  if(_mesclarSel.length===0){
+    banner?.remove();return;
+  }
+  if(!banner){
+    banner=document.createElement('div');
+    banner.id='mesclar-banner';
+    banner.className='mesclar-banner';
+    const rel=document.getElementById('sec-body-reg-defeito')||document.querySelector('.rel-sec-body');
+    if(rel)rel.insertBefore(banner,rel.firstChild);
+  }
+  if(_mesclarSel.length===1){
+    banner.innerHTML=`<i class="ti ti-git-merge" style="font-size:20px;opacity:.8;"></i>
+      <span style="flex:1;">Selecione mais 1 defeito para mesclar</span>
+      <button onclick="cancelarMesclar()">Cancelar</button>`;
+  } else {
+    banner.innerHTML=`<i class="ti ti-git-merge" style="font-size:20px;opacity:.8;"></i>
+      <span style="flex:1;">Mesclar os 2 defeitos selecionados?</span>
+      <button onclick="confirmarMesclar()" style="background:#2E7D32;margin-right:6px;">✓ Confirmar</button>
+      <button onclick="cancelarMesclar()">Cancelar</button>`;
+  }
+}
+
+function cancelarMesclar(){
+  _mesclarSel=[];
+  document.querySelectorAll('[id^="def-bloco-"]').forEach(el=>el.classList.remove('mesclar-sel'));
+  document.getElementById('mesclar-banner')?.remove();
+}
+
+function abrirDesfazerMescla(){
+  const snaps=_snapshotsMescla[ativoSel]||[];
+  if(!snaps.length){
+    mostrarToast('Nenhuma mesclagem recente para desfazer neste ativo','#E65100');
+    return;
+  }
+  const modal=document.createElement('div');
+  modal.id='modal-desfazer';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:400;display:flex;align-items:flex-end;justify-content:center;';
+  let itens='';
+  // Mostra do mais recente para o mais antigo
+  [...snaps].reverse().forEach((s,ri)=>{
+    const idx=snaps.length-1-ri; // índice real no array
+    const hora=new Date(s.ts).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    const data=new Date(s.ts).toLocaleDateString('pt-BR');
+    const descA=s.descA.length>30?s.descA.substring(0,30)+'…':s.descA;
+    const descB=s.descB.length>30?s.descB.substring(0,30)+'…':s.descB;
+    itens+=`<div style="background:#F8F9FB;border:1px solid #E5E8ED;border-radius:10px;padding:12px;margin-bottom:8px;">
+      <div style="font-size:11px;color:#9CA3AF;margin-bottom:6px;">${data} às ${hora}</div>
+      <div style="font-size:13px;color:#1F3864;font-weight:600;margin-bottom:4px;">Mesclagem:</div>
+      <div style="font-size:12px;color:#374151;margin-bottom:10px;">
+        <span style="background:#EBF3FF;padding:2px 7px;border-radius:5px;">"${descA}"</span>
+        <span style="color:#9CA3AF;margin:0 5px;">+</span>
+        <span style="background:#EBF3FF;padding:2px 7px;border-radius:5px;">"${descB}"</span>
+      </div>
+      <button onclick="confirmarDesfazer(${idx})" style="width:100%;padding:9px;background:#C62828;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">
+        ↩ Desfazer esta mesclagem
+      </button>
+    </div>`;
+  });
+  modal.innerHTML=`<div style="background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:18px 16px 30px;max-height:85vh;overflow-y:auto;">
+    <div style="font-size:15px;font-weight:700;color:#1F3864;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+      <span><i class="ti ti-history" style="color:#C62828;"></i> Desfazer Mesclagem</span>
+      <button onclick="document.getElementById('modal-desfazer').remove()" style="background:none;border:none;font-size:20px;color:#6B7280;cursor:pointer;">✕</button>
+    </div>
+    <p style="font-size:12px;color:#6B7280;margin-bottom:12px;">Selecione qual mesclagem deseja reverter. Os dados voltarão exatamente como estavam antes.</p>
+    ${itens}
+    <button onclick="document.getElementById('modal-desfazer').remove()" style="width:100%;padding:10px;background:#F3F4F6;color:#374151;border:none;border-radius:8px;font-size:13px;cursor:pointer;margin-top:4px;">Cancelar</button>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+function confirmarDesfazer(idx){
+  const snaps=_snapshotsMescla[ativoSel]||[];
+  const s=snaps[idx];
+  if(!s){mostrarToast('Snapshot não encontrado','#E65100');return;}
+  if(!confirm('Desfazer esta mesclagem?\nTodos os registros voltarão ao estado anterior à mesclagem.'))return;
+  // Restaura snapshot
+  DB.registros[ativoSel]=JSON.parse(JSON.stringify(s.snapshot));
+  // Remove este snapshot e os mais recentes (que dependiam do estado mesclado)
+  _snapshotsMescla[ativoSel].splice(idx);
+  document.getElementById('modal-desfazer')?.remove();
+  marcarMudanca(); autoBackup();
+  mostrarToast('✓ Mesclagem desfeita com sucesso','#2E7D32');
+  renderRelatorio();
+}
+
+// Pilha de snapshots para desfazer mesclagem — máx 5 por ativo
+const _snapshotsMescla={};
+
+function separarMesclado(regId, defIdx, updIdx){
+  if(!confirm('Separar este item mesclado em um defeito independente?\n\nEle será removido da linha do tempo e recriado como um novo registro de defeito.'))return;
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  const d=r?.campos?.defeitos?.[defIdx];
+  const u=d?.atualizacoes?.[updIdx];
+  if(!u)return;
+
+  // Remove o ' [Mesclado]' do final da desc se existir
+  const descLimpa=(u.desc||'').replace(/\s*\[Mesclado\]/g,'').replace(/\s*\[Mesclado de registro separado\]/g,'').trim();
+
+  // Cria novo registro de defeito com os dados da entrada mesclada
+  const novoDefeito={
+    tipo: d.tipo||'',
+    dataEmenda: d.dataEmenda||'',
+    loc: u.loc||d.loc||'',
+    crit: u.crit||d.crit||'',
+    status: u.status==='co'?'co':'ac',
+    desc: descLimpa||'Sem relato',
+    fotos: u.fotos||[],
+    atualizacoes: [],
+    _encerrado: false
+  };
+
+  // Coletar atualizações que também vieram desta mesclagem (mesmas _origem e posteriores)
+  const outrasDoMesclado=[];
+  (d.atualizacoes||[]).forEach((uu,uui)=>{
+    if(uui!==updIdx && uu._origem==='Mesclado'){
+      outrasDoMesclado.push({idx:uui, entrada:{...uu}});
+    }
+  });
+
+  // Remove a entrada da timeline (e as outras do mesmo mesclado)
+  const idxsRemover=[updIdx,...outrasDoMesclado.map(x=>x.idx)].sort((a,b)=>b-a);
+  idxsRemover.forEach(idx=>d.atualizacoes.splice(idx,1));
+
+  // Adiciona as outras entradas mescladas como atualizações do novo defeito
+  outrasDoMesclado.forEach(x=>{
+    const desc2=(x.entrada.desc||'').replace(/\s*\[Mesclado\]/g,'').replace(/\s*\[Mesclado de registro separado\]/g,'').trim();
+    novoDefeito.atualizacoes.push({...x.entrada, desc:desc2, _origem:undefined});
+  });
+
+  // Adiciona o novo defeito ao mesmo registro de data ou cria registro novo
+  const dataAlvo=u.data||r.data;
+  // Tenta usar um registro de defeito existente da mesma data, ou cria um novo
+  let regAlvo=DB.registros[ativoSel].find(x=>x.tipo==='defeito'&&x.data===dataAlvo&&!x._encerrado&&x.id!==regId);
+  if(!regAlvo){
+    regAlvo={id:newId(),tipo:'defeito',data:dataAlvo,desc:'Defeito separado',fotos:[],campos:{defeitos:[]},_hist:false,_encerrado:false};
+    DB.registros[ativoSel].unshift(regAlvo);
+  }
+  regAlvo.campos.defeitos.push(novoDefeito);
+
+  marcarMudanca();autoBackup();
+  mostrarToast('✓ Defeito separado com sucesso — veja na seção Defeitos/Reparos','#2E7D32');
+  renderRelatorio();
+}
+
+function confirmarMesclar(){
+  if(_mesclarSel.length!==2){return;}
+  const [a,b]=_mesclarSel;
+  const rA=DB.registros[ativoSel].find(x=>x.id===a.regId);
+  const rB=DB.registros[ativoSel].find(x=>x.id===b.regId);
+  if(!rA||!rB)return;
+  const dA=rA.campos.defeitos[a.defIdx];
+  const dB=rB.campos.defeitos[b.defIdx];
+  if(!dA||!dB)return;
+
+  // ── Salva snapshot ANTES de mesclar ──────────────────────────
+  if(!_snapshotsMescla[ativoSel])_snapshotsMescla[ativoSel]=[];
+  _snapshotsMescla[ativoSel].push({
+    ts: Date.now(),
+    descA: dA.desc||'Defeito A',
+    descB: dB.desc||'Defeito B',
+    snapshot: JSON.parse(JSON.stringify(DB.registros[ativoSel]))
+  });
+  // Mantém só os últimos 5 snapshots por ativo
+  if(_snapshotsMescla[ativoSel].length>5)_snapshotsMescla[ativoSel].shift();
+
+  // ── Mescla: dA absorve dB ─────────────────────────────────────
+  if(!dA.atualizacoes)dA.atualizacoes=[];
+  (dB.atualizacoes||[]).forEach(u=>dA.atualizacoes.push({...u,_origem:'Mesclado'}));
+  dA.atualizacoes.unshift({
+    data:rB.data,
+    status:dB.status,
+    crit:dB.crit,
+    loc:dB.loc,
+    desc:(dB.desc&&dB.desc!=='Sem relato'?dB.desc:'')+' [Mesclado]',
+    fotos:dB.fotos||[],
+    _origem:'Mesclado'
+  });
+  dA.atualizacoes.sort((x,y)=>x.data.localeCompare(y.data));
+  if(a.regId===b.regId){
+    rA.campos.defeitos.splice(b.defIdx,1);
+  } else {
+    rB.campos.defeitos.splice(b.defIdx,1);
+    if(rB.campos.defeitos.length===0){
+      DB.registros[ativoSel]=DB.registros[ativoSel].filter(x=>x.id!==b.regId);
+    }
+  }
+  cancelarMesclar();
+  marcarMudanca(); autoBackup();
+  mostrarToast('✓ Defeitos mesclados — use "Desfazer mesclagem" para reverter','#2E7D32');
+  renderRelatorio();
+}
+
 function salvarEdicao(){
   const r=DB.registros[ativoSel].find(x=>x.id===editandoReg);
   if(!r)return;
   const ns='edit-'+r.id;
   r.data=document.getElementById('edit-data')?.value||r.data;
 
-  if(r.tipo==='rasp'){
+  // rasp-K (formato novo individual)
+  if(r.tipo&&r.tipo.startsWith('rasp-')&&r.tipo!=='rasp'){
+    const p=document.getElementById('edit-pct')?.value||'';
+    const cr=document.getElementById('edit-rcrit')?.value||'';
+    const d=document.getElementById('edit-desc-rasp')?.value||'';
+    r.campos={pct:p,crit:cr};
+    r.desc=d||'Sem relato';
+    r.fotos=getGalFotos(ns);
+  }
+  // rasp legado agrupado
+  else if(r.tipo==='rasp'){
     Object.keys(r.campos).forEach(k=>{
       const nsK=ns+'-'+k;
       const d=document.getElementById('edit-desc-'+k)?.value;
@@ -1777,15 +2776,15 @@ function salvarEdicao(){
     if(tipo==='outros')tipo=document.getElementById('edit-tipo-outros')?.value||'Outros';
     r.campos.tipo=tipo;
     r.campos.bal=document.getElementById('edit-bal')?.value||'';
-    r.campos.novo=document.getElementById('edit-novo')?.checked||false;
-    r.campos.crit=document.getElementById('edit-crit-interf')?.value||'';
-    r.campos.status=document.getElementById('edit-status')?.value||'em';
+    r.campos.crit=document.getElementById('ei-crit')?.value||'';
+    r.campos.status=document.getElementById('ei-status')?.value||'ac';
     r.fotos=getGalFotos(ns);
   }
   else if(r.tipo==='desal'){
     r.desc=document.getElementById('edit-desc')?.value||r.desc;
     r.campos.local=document.getElementById('edit-local')?.value||'';
-    r.campos.status=document.getElementById('edit-status-desal')?.value||'em';
+    r.campos.crit=document.getElementById('ed-crit')?.value||'';
+    r.campos.status=document.getElementById('ed-status')?.value||'ac';
     r.fotos=getGalFotos(ns);
   }
   else if(r.tipo==='contra'){
@@ -1803,10 +2802,9 @@ function salvarEdicao(){
       let tipo=document.getElementById('edit-def-tipo-'+i)?.value||d.tipo;
       d.tipo=tipo;
       d.dataEmenda=tipo==='emenda'?(document.getElementById('edit-def-data-emenda-'+i)?.value||''):'';
-      d.loc=document.getElementById('edit-def-loc-'+i)?.value||d.loc;
-      d.novo=document.getElementById('edit-def-novo-'+i)?.checked||false;
-      d.crit=document.getElementById('edit-def-crit-'+i)?.value||d.crit;
-      d.status=document.getElementById('edit-def-status-'+i)?.value||d.status;
+      d.loc=document.getElementById('edt-loc-'+i)?.value||document.getElementById('edit-def-loc-'+i)?.value||d.loc;
+      d.crit=document.getElementById('edt-crit-'+i)?.value||document.getElementById('edit-def-crit-'+i)?.value||d.crit;
+      d.status=document.getElementById('edt-status-'+i)?.value||document.getElementById('edit-def-status-'+i)?.value||d.status;
       d.desc=document.getElementById('edit-def-desc-'+i)?.value||d.desc;
       d.fotos=getGalFotos(nsD);
     });
@@ -1821,6 +2819,298 @@ function excluirRegistro(regId){
   DB.registros[ativoSel]=DB.registros[ativoSel].filter(x=>x.id!==regId);
   marcarMudanca(); autoBackup();
   fecharModal();renderRelatorio();
+}
+function excluirRegistroHist(regId){
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  const label=r?SECAO_LABELS[r.tipo]||r.tipo:'registro';
+  if(!confirm('Excluir permanentemente este registro de "'+label+'"?\n\nEssa ação não pode ser desfeita.'))return;
+  DB.registros[ativoSel]=DB.registros[ativoSel].filter(x=>x.id!==regId);
+  marcarMudanca(); autoBackup();
+  renderRelatorio();
+}
+// ════════════════════════════════════════════════════════════════
+// FILTROS DO HISTÓRICO
+// ════════════════════════════════════════════════════════════════
+
+// Filtro geral — aparece no topo do bloco de histórico
+function buildFiltroGeralHist(){
+  return `<div class="hist-filtro-wrap" id="filtro-geral-hist" style="border-radius:8px;margin-bottom:8px;border:1px solid #C5D8F0;">
+    <button class="hist-filtro-toggle" onclick="toggleFiltroGeral()">
+      <i class="ti ti-filter" style="font-size:12px;"></i> Filtro geral do histórico
+      <i class="ti ti-chevron-down" id="filtro-geral-chevron" style="font-size:11px;"></i>
+    </button>
+    <div id="filtro-geral-corpo" style="display:none;">
+      <div class="hist-modo-data" style="margin-bottom:8px;">
+        <button class="hist-modo-btn ativo" id="fg-modo-periodo" onclick="trocarModoDataFG('periodo')">De / Até</button>
+        <button class="hist-modo-btn" id="fg-modo-mes" onclick="trocarModoDataFG('mes')">Mês/Ano</button>
+      </div>
+      <div id="fg-periodo" style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;">
+        <div class="hist-filtro-data-wrap"><label>De:</label><input type="date" id="fg-de" onchange="aplicarFiltroGeral()"></div>
+        <div class="hist-filtro-data-wrap"><label>Até:</label><input type="date" id="fg-ate" onchange="aplicarFiltroGeral()"></div>
+      </div>
+      <div id="fg-mes" style="display:none;margin-bottom:8px;">
+        <div class="hist-filtro-item"><label>Mês/Ano</label><input type="month" id="fg-mes-val" onchange="aplicarFiltroGeral()"></div>
+      </div>
+      <div class="hist-filtro-item" style="margin-bottom:8px;">
+        <label>Busca na descrição</label>
+        <input type="text" id="fg-busca" placeholder="Digite para buscar..." oninput="aplicarFiltroGeral()">
+      </div>
+      <div class="hist-filtro-item" style="margin-bottom:8px;">
+        <label>Criticidade</label>
+        <select id="fg-crit" onchange="aplicarFiltroGeral()">
+          <option value="">Todas</option>
+          <option>Baixo</option><option>Médio</option><option>Alto</option>
+        </select>
+      </div>
+      <div class="hist-filtro-btns">
+        <button class="hist-filtro-aplicar" onclick="aplicarFiltroGeral()"><i class="ti ti-filter"></i> Aplicar</button>
+        <button class="hist-filtro-limpar" onclick="limparFiltroGeral()">Limpar</button>
+      </div>
+      <div class="hist-filtro-resultado" id="fg-resultado"></div>
+    </div>
+  </div>`;
+}
+
+// Filtro local — dentro de cada subitem do histórico
+function buildFiltroLocalHist(subId,tipo,regs){
+  // Coleta opções únicas dos registros
+  const crits=new Set(), statuses=new Set(), locs=new Set(), tipos=new Set();
+  regs.forEach(r=>{
+    const c=r.campos||{};
+    if(c.crit)crits.add(c.crit);
+    if(c.status)statuses.add(c.status);
+    if(c.local)locs.add(c.local);
+    if(c.tipo)tipos.add(c.tipo);
+    if(tipo==='rasp'||tipo.startsWith('rasp')){if(c.pct){}; /* pct handled separately */}
+    (c.defeitos||[]).forEach(d=>{
+      if(d.crit)crits.add(d.crit);
+      if(d.status)statuses.add(d.status);
+      if(d.loc)locs.add(d.loc);
+    });
+  });
+  const stMap2={ac:'Acompanhando',co:'Concluído',enc:'Encerrado'};
+  let statusOpts='<option value="">Todos</option>';
+  statuses.forEach(s=>{statusOpts+=`<option value="${s}">${stMap2[s]||s}</option>`;});
+  let critOpts='<option value="">Todas</option>';
+  ['Baixo','Médio','Alto'].forEach(c=>{if(crits.has(c))critOpts+=`<option>${c}</option>`;});
+  let locOpts='<option value="">Todos</option>';
+  locs.forEach(l=>{locOpts+=`<option>${l}</option>`;});
+  let tipoOpts='<option value="">Todos</option>';
+  tipos.forEach(t=>{tipoOpts+=`<option>${t}</option>`;});
+
+  const isRasp=tipo==='rasp'||tipo.startsWith('rasp-');
+  const hasStatus=statuses.size>0&&!isRasp;
+  const hasLoc=locs.size>0;
+  const hasTipo=tipos.size>0;
+
+  return `<div class="hist-filtro-wrap" id="${subId}-filtro" style="display:none;">
+    <div class="hist-filtro-titulo">
+      <span><i class="ti ti-filter" style="font-size:10px;"></i> Filtrar registros</span>
+      <button onclick="limparFiltroLocal('${subId}')" style="font-size:10px;color:#C62828;background:none;border:none;cursor:pointer;">Limpar</button>
+    </div>
+    <div class="hist-modo-data">
+      <button class="hist-modo-btn ativo" id="${subId}-modo-periodo" onclick="trocarModoDataLocal('${subId}','periodo')">De / Até</button>
+      <button class="hist-modo-btn" id="${subId}-modo-mes" onclick="trocarModoDataLocal('${subId}','mes')">Mês/Ano</button>
+    </div>
+    <div id="${subId}-periodo" style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;">
+      <div class="hist-filtro-data-wrap"><label>De:</label><input type="date" id="${subId}-de" onchange="aplicarFiltroLocal('${subId}')"></div>
+      <div class="hist-filtro-data-wrap"><label>Até:</label><input type="date" id="${subId}-ate" onchange="aplicarFiltroLocal('${subId}')"></div>
+    </div>
+    <div id="${subId}-mes" style="display:none;margin-bottom:8px;">
+      <div class="hist-filtro-item"><label>Mês/Ano</label><input type="month" id="${subId}-mes-val" onchange="aplicarFiltroLocal('${subId}')"></div>
+    </div>
+    <div class="hist-filtro-item" style="margin-bottom:7px;">
+      <label>Busca na descrição</label>
+      <input type="text" id="${subId}-busca" placeholder="Palavras-chave..." oninput="aplicarFiltroLocal('${subId}')">
+    </div>
+    ${crits.size>0?`<div class="hist-filtro-item" style="margin-bottom:7px;"><label>Criticidade</label><select id="${subId}-crit" onchange="aplicarFiltroLocal('${subId}')">${critOpts}</select></div>`:''}
+    ${hasStatus?`<div class="hist-filtro-item" style="margin-bottom:7px;"><label>Status</label><select id="${subId}-status" onchange="aplicarFiltroLocal('${subId}')">${statusOpts}</select></div>`:''}
+    ${hasLoc?`<div class="hist-filtro-item" style="margin-bottom:7px;"><label>Localização</label><select id="${subId}-loc" onchange="aplicarFiltroLocal('${subId}')">${locOpts}</select></div>`:''}
+    ${hasTipo&&!isRasp?`<div class="hist-filtro-item" style="margin-bottom:7px;"><label>Tipo</label><select id="${subId}-tipo" onchange="aplicarFiltroLocal('${subId}')">${tipoOpts}</select></div>`:''}
+    ${isRasp?`<div class="hist-filtro-item" style="margin-bottom:7px;"><label>% Desgaste</label><select id="${subId}-pct" onchange="aplicarFiltroLocal('${subId}')"><option value="">Qualquer</option><option value="0-30">🔴 0–30% (Crítico)</option><option value="31-50">🟠 31–50% (Alto)</option><option value="51-75">🟡 51–75% (Médio)</option><option value="76-100">🟢 76–100% (Bom)</option></select></div>`:''}
+    <div class="hist-filtro-resultado" id="${subId}-resultado" style="display:none;"></div>
+  </div>`;
+}
+
+// Toggle filtro geral
+function toggleFiltroGeral(){
+  const corpo=document.getElementById('filtro-geral-corpo');
+  const chev=document.getElementById('filtro-geral-chevron');
+  if(!corpo)return;
+  const open=corpo.style.display==='none';
+  corpo.style.display=open?'block':'none';
+  if(chev)chev.className='ti '+(open?'ti-chevron-up':'ti-chevron-down')+' ';
+}
+
+// Toggle filtro local de um subitem
+function toggleFiltroLocal(subId){
+  const f=document.getElementById(subId+'-filtro');
+  if(!f)return;
+  f.style.display=f.style.display==='none'?'block':'none';
+}
+
+// Troca modo de data (período ou mês)
+function trocarModoDataFG(modo){
+  document.getElementById('fg-periodo').style.display=modo==='periodo'?'flex':'none';
+  document.getElementById('fg-mes').style.display=modo==='mes'?'block':'none';
+  document.getElementById('fg-modo-periodo').className='hist-modo-btn'+(modo==='periodo'?' ativo':'');
+  document.getElementById('fg-modo-mes').className='hist-modo-btn'+(modo==='mes'?' ativo':'');
+  aplicarFiltroGeral();
+}
+function trocarModoDataLocal(subId,modo){
+  document.getElementById(subId+'-periodo').style.display=modo==='periodo'?'flex':'none';
+  document.getElementById(subId+'-mes').style.display=modo==='mes'?'block':'none';
+  document.getElementById(subId+'-modo-periodo').className='hist-modo-btn'+(modo==='periodo'?' ativo':'');
+  document.getElementById(subId+'-modo-mes').className='hist-modo-btn'+(modo==='mes'?' ativo':'');
+  aplicarFiltroLocal(subId);
+}
+
+// Verifica se um registro passa pelo filtro de data
+function _passaFiltroData(rData,de,ate,mes){
+  if(!rData)return true;
+  if(mes){const [y,m]=mes.split('-');return rData.startsWith(y+'-'+m);}
+  if(de&&rData<de)return false;
+  if(ate&&rData>ate)return false;
+  return true;
+}
+
+// Verifica se o texto da busca bate no registro
+function _passaBusca(r,busca){
+  if(!busca)return true;
+  const b=busca.toLowerCase();
+  const textos=[r.desc||''];
+  const c=r.campos||{};
+  if(c.tipo)textos.push(c.tipo);
+  if(c.bal)textos.push(c.bal);
+  if(c.local)textos.push(c.local);
+  (c.defeitos||[]).forEach(d=>{textos.push(d.desc||'');textos.push(d.loc||'');});
+  return textos.some(t=>t.toLowerCase().includes(b));
+}
+
+// Verifica criticidade
+function _passaCrit(r,crit){
+  if(!crit)return true;
+  const c=r.campos||{};
+  if(c.crit===crit)return true;
+  if((c.defeitos||[]).some(d=>d.crit===crit))return true;
+  return false;
+}
+
+// Verifica status
+function _passaStatus(r,status){
+  if(!status)return true;
+  return r.campos?.status===status||(r.campos?.defeitos||[]).some(d=>d.status===status);
+}
+
+// Verifica localização
+function _passaLoc(r,loc){
+  if(!loc)return true;
+  return r.campos?.local===loc||(r.campos?.defeitos||[]).some(d=>d.loc===loc);
+}
+
+// Verifica tipo
+function _passaTipo(r,tipo){
+  if(!tipo)return true;
+  return r.campos?.tipo===tipo;
+}
+
+// Verifica faixa de % desgaste
+function _passaPct(r,faixa){
+  if(!faixa)return true;
+  const pn=parseInt(r.campos?.pct)||0;
+  const [min,max]=faixa.split('-').map(Number);
+  return pn>=min&&pn<=max;
+}
+
+// Aplica filtro geral em TODOS os subitens
+function aplicarFiltroGeral(){
+  const modoMes=document.getElementById('fg-modo-mes')?.classList.contains('ativo');
+  const de=document.getElementById('fg-de')?.value||'';
+  const ate=document.getElementById('fg-ate')?.value||'';
+  const mes=document.getElementById('fg-mes-val')?.value||'';
+  const busca=document.getElementById('fg-busca')?.value||'';
+  const crit=document.getElementById('fg-crit')?.value||'';
+  const temFiltro=de||ate||mes||busca||crit;
+  // Aplica em todos os containers de cards visíveis
+  document.querySelectorAll('[id$="-cards"]').forEach(container=>{
+    const subId=container.id.replace('-cards','');
+    filtrarContainer(container,subId,{de,ate,mes:modoMes?mes:'',busca,crit,status:'',loc:'',tipo:'',pct:''});
+  });
+  const res=document.getElementById('fg-resultado');
+  if(res){
+    if(temFiltro){res.style.display='block';res.textContent='Filtro geral ativo';}
+    else{res.style.display='none';}
+  }
+}
+
+// Aplica filtro local em um subitem específico
+function aplicarFiltroLocal(subId){
+  const container=document.getElementById(subId+'-cards');
+  if(!container)return;
+  const modoMes=document.getElementById(subId+'-modo-mes')?.classList.contains('ativo');
+  const de=document.getElementById(subId+'-de')?.value||'';
+  const ate=document.getElementById(subId+'-ate')?.value||'';
+  const mes=document.getElementById(subId+'-mes-val')?.value||'';
+  const busca=document.getElementById(subId+'-busca')?.value||'';
+  const crit=document.getElementById(subId+'-crit')?.value||'';
+  const status=document.getElementById(subId+'-status')?.value||'';
+  const loc=document.getElementById(subId+'-loc')?.value||'';
+  const tipo=document.getElementById(subId+'-tipo')?.value||'';
+  const pct=document.getElementById(subId+'-pct')?.value||'';
+  filtrarContainer(container,subId,{de,ate,mes:modoMes?mes:'',busca,crit,status,loc,tipo,pct});
+}
+
+// Filtra os cards dentro de um container
+function filtrarContainer(container,subId,f){
+  let visiveis=0,total=0;
+  container.querySelectorAll('.reg-card').forEach(card=>{
+    const regId=card.id.replace('card-','');
+    // Busca o registro no DB para filtrar
+    const r=DB.registros[ativoSel]?.find(x=>x.id===regId);
+    if(!r){card.style.display='';visiveis++;total++;return;}
+    total++;
+    const passa=_passaFiltroData(r.data,f.de,f.ate,f.mes)
+      &&_passaBusca(r,f.busca)
+      &&_passaCrit(r,f.crit)
+      &&_passaStatus(r,f.status)
+      &&_passaLoc(r,f.loc)
+      &&_passaTipo(r,f.tipo)
+      &&_passaPct(r,f.pct);
+    card.style.display=passa?'':'none';
+    if(passa)visiveis++;
+  });
+  // Atualiza contador e resultado
+  const counter=document.getElementById(subId+'-count');
+  if(counter)counter.textContent=visiveis+'/'+total;
+  const res=document.getElementById(subId+'-resultado');
+  if(res){
+    const temFiltro=f.de||f.ate||f.mes||f.busca||f.crit||f.status||f.loc||f.tipo||f.pct;
+    if(temFiltro){res.style.display='block';res.textContent=visiveis+' de '+total+' registro(s) encontrado(s)';}
+    else{res.style.display='none';}
+  }
+}
+
+// Limpar filtros
+function limparFiltroGeral(){
+  ['fg-de','fg-ate','fg-mes-val','fg-busca','fg-crit'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  aplicarFiltroGeral();
+}
+function limparFiltroLocal(subId){
+  ['-de','-ate','-mes-val','-busca','-crit','-status','-loc','-tipo','-pct'].forEach(s=>{
+    const el=document.getElementById(subId+s);if(el)el.value='';
+  });
+  aplicarFiltroLocal(subId);
+}
+
+function toggleHistSub(id){
+  const el=document.getElementById(id);
+  const btn=document.getElementById(id+'-btn');
+  if(!el)return;
+  const open=el.style.display==='none';
+  el.style.display=open?'block':'none';
+  if(btn)btn.textContent=open?'−':'+';
 }
 
 // ════════════════════════════════
@@ -1939,16 +3229,21 @@ function toggleUnica(i){
   }
 }
 {const isCabo=document.querySelector('input[name="fc-tipo-lona"]:checked')?.value==='cabo';const w=document.getElementById('breaker-wrap');if(w)w.style.display=isCabo?'':'none';}
-function buildUssGrid(vals,trechoIdx){let h='';for(let j=0;j<21;j++){const n=String(j+1).padStart(2,'0');const pv=(vals&&vals[j])||'';h+=`<div class="uss-cell"><div class="uss-num">${n}</div><input type="text" id="fc-uss-${trechoIdx}-${j}" value="" placeholder="${pv||'—'}" inputmode="decimal"><div class="uss-prev">${pv?'↑'+pv:''}</div></div>`;}return h;}
+function buildUssGrid(vals,trechoIdx){let h='';for(let j=0;j<21;j++){const n=String(j+1).padStart(2,'0');const pv=(vals&&vals[j])||'';h+=`<div class="uss-cell"><div class="uss-num">${n}</div><input type="text" id="fc-uss-${trechoIdx}-${j}" value="" placeholder="—" inputmode="decimal"><div class="uss-prev">${pv?`<span style="font-size:9px;color:#9CA3AF;cursor:pointer;" title="Última: ${pv}">${pv}</span>`:''}</div></div>`;}return h;}
 function buildUssSecao(ficha){
   const trechos=ficha.trechos||[];
   let th='';
   trechos.forEach((t,i)=>{
     const l=LETRAS[i]||String(i+1);
-    const vals=t.uss||Array(21).fill('');
+    const vals=t.uss_hist||t.uss||Array(21).fill(''); // usa histórico como referência
+    const temAnterior=(t.uss_hist||t.uss||[]).some(v=>v&&v!=='');
     const remBtn=i>0?'<button type="button" class="btn-sm btn-sm-danger" onclick="removerTrechoUss('+i+')">Remover</button>':'';
-    th+='<div class="uss-trecho-hdr">Trecho '+l+' '+remBtn+'</div>'
-      +'<div class="uss-grid">'+buildUssGrid(vals,i)+'</div>';
+    const copiarBtn=temAnterior?'<button type="button" class="btn-sm btn-sm-sec" onclick="copiarUltimasMedidas('+i+')" title="Preenche os campos com os valores da última medição salva"><i class="ti ti-copy" style="font-size:11px;"></i> Copiar última</button>':'';
+    const limparBtn='<button type="button" class="btn-sm" style="background:#FFF3E0;color:#E65100;" onclick="limparMedidasTrecho('+i+')" title="Limpa todos os campos deste trecho"><i class="ti ti-eraser" style="font-size:11px;"></i> Limpar</button>';
+    th+='<div class="uss-trecho-hdr">Trecho '+l
+      +'<div style="display:flex;gap:5px;">'+copiarBtn+limparBtn+remBtn+'</div>'
+      +'</div>'
+      +'<div class="uss-grid" id="uss-grid-'+i+'">'+buildUssGrid(vals,i)+'</div>';
   });
   const addBtn=trechos.length<8?'<button type="button" class="btn-sec" style="margin-top:10px;" onclick="adicionarTrechoUss()"><i class="ti ti-plus"></i> Adicionar Trecho '+(LETRAS[trechos.length]||'')+'</button>':'';
   return '<div class="uss-sec-wrap">'
@@ -1960,6 +3255,26 @@ function buildUssSecao(ficha){
     +'<div class="uss-sec-body" id="uss-sec-body">'+th+addBtn+'</div>'
     +'</div>';
 }
+
+function limparMedidasTrecho(i){
+  for(let j=0;j<21;j++){
+    const inp=document.getElementById('fc-uss-'+i+'-'+j);
+    if(inp)inp.value='';
+  }
+}
+
+function copiarUltimasMedidas(i){
+  // Pega os valores do uss_hist (exibidos no uss-prev abaixo de cada célula)
+  const ficha=DB.fichas[ativoSel];
+  const hist=ficha.trechos[i]?.uss_hist||ficha.trechos[i]?.uss||[];
+  let copiou=false;
+  for(let j=0;j<21;j++){
+    const inp=document.getElementById('fc-uss-'+i+'-'+j);
+    const v=hist[j]||'';
+    if(inp&&v){inp.value=v;copiou=true;}
+  }
+  mostrarToast(copiou?'Última medição copiada para o Trecho '+(LETRAS[i]||String(i+1)):'Sem medida anterior para copiar','#1565C0');
+}
 function toggleUssSecao(){const b=document.getElementById('uss-sec-body');const btn=document.getElementById('uss-sec-btn');if(!b)return;const open=b.style.display!=='block';b.style.display=open?'block':'none';if(btn)btn.textContent=open?'−':'+';}
 function lerFichaAtual(){
   const ficha=DB.fichas[ativoSel];
@@ -1967,8 +3282,12 @@ function lerFichaAtual(){
   ficha.comprimento_total=document.getElementById('fc-comp-total')?.value||ficha.comprimento_total;
   ficha.trechos.forEach((_,i)=>{
     const t=ficha.trechos[i];
-    const ussAtual=[...(t.uss||Array(21).fill(''))];
-    for(let j=0;j<21;j++){const v=document.getElementById(`fc-uss-${i}-${j}`)?.value||'';if(v)ussAtual[j]=v;}
+    // Lê os valores digitados agora nos campos
+    const ussDigitado=Array(21).fill('');
+    for(let j=0;j<21;j++){ussDigitado[j]=document.getElementById(`fc-uss-${i}-${j}`)?.value||'';}
+    // Mescla: se digitou algo novo usa, senão mantém o histórico anterior
+    const ussHist=[...(t.uss_hist||t.uss||Array(21).fill(''))];
+    for(let j=0;j<21;j++){if(ussDigitado[j])ussHist[j]=ussDigitado[j];}
     const unicaVal=document.getElementById('fc-unica-'+i)?.value==='1';
     ficha.trechos[i]={
       l:LETRAS[i]||'',
@@ -1979,7 +3298,8 @@ function lerFichaAtual(){
       op:document.getElementById('fc-op-'+i)?.value??t.op,
       spec:document.getElementById('fc-spec-'+i)?.value??t.spec,
       unica:unicaVal,
-      uss:ussAtual
+      uss:Array(21).fill(''),      // sempre em branco para próxima digitação
+      uss_hist:ussHist              // guarda o histórico da última medição
     };
   });
   ficha.largura=document.getElementById('fc-largura')?.value||ficha.largura;
@@ -2403,7 +3723,164 @@ function carregarLS(){
 }
 
 // Sobrescreve autoBackup para salvar no localStorage (sem download automático)
-function autoBackup(){ salvarLS(); }
+function autoBackup(){ salvarLS(); contarAlteracaoDrive(); }
+
+// ════════════════════════════════════════════════════════════════
+// INTEGRAÇÃO GOOGLE DRIVE — Backup 1 toque
+// ════════════════════════════════════════════════════════════════
+let _driveAlteracoes = 0;          // alterações desde última sincronização Drive
+let _driveUltimaSync = null;       // timestamp da última sincronização
+let _driveLembreteAtivo = false;   // lembrete visível?
+const DRIVE_LEMBRETE_APOS = 5;     // mostrar lembrete após X alterações
+const DRIVE_LS_KEY = 'insp_drive_ultima_sync';
+
+// Carrega última sync do localStorage
+(function(){
+  try{
+    const s=localStorage.getItem(DRIVE_LS_KEY);
+    if(s)_driveUltimaSync=parseInt(s);
+  }catch{}
+})();
+
+function contarAlteracaoDrive(){
+  _driveAlteracoes++;
+  atualizarFabDrive();
+  if(_driveAlteracoes>=DRIVE_LEMBRETE_APOS&&!_driveLembreteAtivo){
+    mostrarLembreteDrive();
+  }
+}
+
+function atualizarFabDrive(){
+  const fab=document.getElementById('drive-fab');
+  const btn=document.getElementById('drive-fab-btn');
+  const status=document.getElementById('drive-fab-status');
+  if(!fab)return;
+  fab.style.display='flex';
+  if(_driveAlteracoes===0&&_driveUltimaSync){
+    btn.className='drive-fab-btn drive-fab-main sincronizado';
+    const mins=Math.round((Date.now()-_driveUltimaSync)/60000);
+    const label=mins<1?'agora mesmo':mins===1?'há 1 min':'há '+mins+' min';
+    status.textContent='✓ Drive sincronizado '+label;
+    status.style.display='block';
+  } else if(_driveAlteracoes>0){
+    btn.className='drive-fab-btn drive-fab-main pendente';
+    status.textContent=_driveAlteracoes+' alteração(ões) não sincronizada(s)';
+    status.style.display='block';
+  } else {
+    btn.className='drive-fab-btn drive-fab-main';
+    status.style.display='none';
+  }
+}
+
+function mostrarLembreteDrive(){
+  _driveLembreteAtivo=true;
+  const sub=document.getElementById('drive-lembrete-sub');
+  if(sub)sub.textContent='Você tem '+_driveAlteracoes+' alteração(ões) não sincronizadas com o Drive.';
+  const el=document.getElementById('drive-lembrete');
+  if(el)el.style.display='block';
+}
+
+function fecharLembrete(){
+  _driveLembreteAtivo=false;
+  const el=document.getElementById('drive-lembrete');
+  if(el)el.style.display='none';
+}
+
+async function salvarNoDrive(viaLembrete){
+  fecharLembrete();
+  const btn=document.getElementById('drive-fab-btn');
+  const status=document.getElementById('drive-fab-status');
+  if(btn){btn.innerHTML='<i class="ti ti-loader" style="animation:spin 1s linear infinite;"></i> Salvando...';btn.disabled=true;}
+  if(status)status.textContent='Conectando ao Drive...';
+
+  try{
+    // Gera o JSON do backup
+    const payload=_gerarPayload();
+    const json=JSON.stringify(payload,null,2);
+    const blob=new Blob([json],{type:'application/json'});
+
+    // Nome do arquivo com data/hora
+    const agora=new Date();
+    const pad=n=>String(n).padStart(2,'0');
+    const nomeArq=`backup_inspecao_${agora.getFullYear()}${pad(agora.getMonth()+1)}${pad(agora.getDate())}_${pad(agora.getHours())}${pad(agora.getMinutes())}.json`;
+
+    // Celular: tenta compartilhar direto (abre menu com Google Drive, WhatsApp etc.)
+    const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if(isMobile && navigator.share){
+      try{
+        const file=new File([blob],nomeArq,{type:'application/json'});
+        const canShareFile=navigator.canShare&&navigator.canShare({files:[file]});
+        if(canShareFile){
+          await navigator.share({
+            title:'Backup Inspeção — '+agora.toLocaleDateString('pt-BR'),
+            text:'Backup do app de inspeção de correia',
+            files:[file]
+          });
+        } else {
+          // Share sem arquivo (link/texto)
+          const url=URL.createObjectURL(blob);
+          const a=document.createElement('a');a.href=url;a.download=nomeArq;a.click();
+          setTimeout(()=>URL.revokeObjectURL(url),1000);
+        }
+        _driveAlteracoes=0;_driveUltimaSync=Date.now();
+        try{localStorage.setItem(DRIVE_LS_KEY,String(_driveUltimaSync));}catch{}
+        atualizarFabDrive();
+        mostrarToast('✓ Arquivo pronto — escolha Google Drive para salvar','#2E7D32');
+        if(btn){btn.disabled=false;_atualizarBotaoDrive();}
+        return;
+      }catch(shareErr){
+        if(shareErr.name==='AbortError'){
+          mostrarToast('Cancelado','#6B7280');
+          if(btn){btn.disabled=false;_atualizarBotaoDrive();}
+          return;
+        }
+        // Se falhou no share, cai no download abaixo
+      }
+    }
+
+    // Desktop ou fallback: download direto do arquivo
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=nomeArq;
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+    _driveAlteracoes=0;_driveUltimaSync=Date.now();
+    try{localStorage.setItem(DRIVE_LS_KEY,String(_driveUltimaSync));}catch{}
+    atualizarFabDrive();
+    mostrarToast('✓ Backup baixado — arraste para sua pasta do Drive','#1565C0');
+  }catch(e){
+    if(e.name!=='AbortError'){
+      // Último recurso: exportar via blob URL manual
+      try{
+        const url2=URL.createObjectURL(blob);
+        window.open(url2,'_blank');
+        setTimeout(()=>URL.revokeObjectURL(url2),3000);
+        mostrarToast('Backup aberto em nova aba — salve o arquivo','#1565C0');
+      }catch{
+        mostrarToast('Erro ao salvar. Use o botão ⬇ para exportar manualmente.','#C62828');
+      }
+    }
+  }finally{
+    if(btn){btn.disabled=false;_atualizarBotaoDrive();}
+  }
+}
+
+function _atualizarBotaoDrive(){
+  const btn=document.getElementById('drive-fab-btn');
+  if(!btn)return;
+  btn.innerHTML=`<svg width="18" height="16" viewBox="0 0 87.3 78" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5z" fill="#fff" opacity=".9"/>
+    <path d="M43.65 25L29.9 1.2C28.55 2 27.4 3.1 26.6 4.5L1.2 48.4A9 9 0 000 52.9h27.5z" fill="#fff" opacity=".9"/>
+    <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8l5.85 11.5z" fill="#fff" opacity=".9"/>
+    <path d="M43.65 25L57.4 1.2A9.06 9.06 0 0053.9 0H33.4c-1.3 0-2.6.35-3.75 1.1z" fill="#fff"/>
+    <path d="M59.8 52.9h27.5c0-1.55-.4-3.1-1.2-4.5L60.7 4.5c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25z" fill="#fff" opacity=".9"/>
+    <path d="M27.45 52.9l-13.7 23.8c1.35.8 2.9 1.2 4.5 1.2h51c1.6 0 3.1-.45 4.5-1.2L59.8 52.9z" fill="#fff"/>
+  </svg> Drive`;
+  atualizarFabDrive();
+}
+
+// Atualiza o status do FAB a cada minuto (para "há X min")
+setInterval(()=>{if(_driveUltimaSync&&_driveAlteracoes===0)atualizarFabDrive();},60000);
 
 // Hooks de salvamento — chamados após cada operação
 const _ls_hooks = ['renderSucesso','salvarFicha','salvarEdicao','salvarEdicaoAnotacao','excluirRegistro','excluirAnotacaoGeralModal','mudaStatus','mudaStatusDefeito','toggleFavorito','novoAtivo','editarAtivo','excluirAtivo','salvarAnotacaoGeral'];
