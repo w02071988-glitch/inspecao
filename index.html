@@ -226,26 +226,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .empty-state i{font-size:30px;display:block;margin-bottom:5px;opacity:.4;}
 
 /* ── FILTROS DO HISTÓRICO ── */
-.hist-filtro-wrap{background:#F0F4FA;border-top:1px solid #E5E8ED;padding:10px 12px;}
-.hist-filtro-titulo{font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
-.hist-filtro-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;}
-.hist-filtro-grid.cols3{grid-template-columns:1fr 1fr 1fr;}
-.hist-filtro-item label{font-size:11px;color:#6B7280;font-weight:500;display:block;margin-bottom:3px;}
-.hist-filtro-item select,.hist-filtro-item input{width:100%;font-size:12px;padding:6px 8px;border:1px solid #D1D5DB;border-radius:7px;background:#fff;color:#111827;-webkit-appearance:none;}
-.hist-filtro-item input[type=month]{font-size:12px;}
-.hist-filtro-data-wrap{display:flex;gap:5px;align-items:center;margin-bottom:7px;}
-.hist-filtro-data-wrap label{font-size:11px;color:#6B7280;font-weight:500;white-space:nowrap;}
-.hist-filtro-data-wrap input{flex:1;font-size:12px;padding:5px 7px;border:1px solid #D1D5DB;border-radius:7px;background:#fff;}
-.hist-filtro-btns{display:flex;gap:6px;margin-top:4px;}
-.hist-filtro-aplicar{flex:1;padding:7px;background:#1F3864;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;}
-.hist-filtro-limpar{padding:7px 12px;background:#EEF0F3;color:#374151;border:none;border-radius:8px;font-size:12px;cursor:pointer;}
-.hist-filtro-resultado{font-size:11px;color:#2E75B6;font-weight:600;margin-top:6px;display:none;}
-.hist-filtro-toggle{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#2E75B6;cursor:pointer;padding:4px 8px;border-radius:6px;background:#EBF3FF;border:none;margin-bottom:6px;}
-.hist-filtro-toggle:active{background:#D0E8FF;}
-.hist-modo-data{display:flex;gap:4px;margin-bottom:8px;}
-.hist-modo-btn{flex:1;padding:5px;font-size:11px;font-weight:600;border-radius:6px;border:1px solid #D1D5DB;background:#fff;color:#6B7280;cursor:pointer;}
-.hist-modo-btn.ativo{background:#1F3864;color:#fff;border-color:#1F3864;}
-.hist-tag-ativo{display:inline-flex;align-items:center;gap:3px;background:#EBF3FF;color:#1F3864;border-radius:10px;padding:2px 7px;font-size:10px;font-weight:600;margin:1px;}
+/* ── FILTRO ÁRVORE ANO/MÊS ── */
+.hf-wrap{background:#F0F4FA;border-top:1px solid #E5E8ED;padding:8px 10px;display:none;}
+.hf-ano-row{display:flex;align-items:center;gap:6px;padding:5px 4px;cursor:pointer;border-radius:6px;user-select:none;}
+.hf-ano-row:active{background:#E5E8ED;}
+.hf-chk{width:15px;height:15px;border:1.5px solid #9CA3AF;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff;transition:all .15s;}
+.hf-chk.sel{background:#1F3864;border-color:#1F3864;}
+.hf-chk.sel::after{content:'✓';font-size:9px;color:#fff;font-weight:900;}
+.hf-chk.parcial{background:#EBF3FF;border-color:#2E75B6;}
+.hf-chk.parcial::after{content:'−';font-size:11px;color:#1F3864;font-weight:900;}
+.hf-ano-label{font-size:13px;font-weight:700;color:#1F3864;flex:1;}
+.hf-count{font-size:10px;color:#9CA3AF;background:#E5E8ED;padding:1px 6px;border-radius:8px;}
+.hf-chevron{font-size:11px;color:#9CA3AF;transition:transform .2s;}
+.hf-chevron.open{transform:rotate(90deg);}
+.hf-meses{padding-left:20px;display:none;}
+.hf-mes-row{display:flex;align-items:center;gap:6px;padding:4px 4px;cursor:pointer;border-radius:6px;user-select:none;}
+.hf-mes-row:active{background:#E5E8ED;}
+.hf-mes-label{font-size:12px;color:#374151;flex:1;}
+.hf-limpar{font-size:10px;color:#C62828;background:none;border:none;cursor:pointer;padding:2px 6px;float:right;}
+.hf-resultado{font-size:11px;color:#2E75B6;font-weight:600;margin-top:4px;display:none;padding:0 4px;}
+.hf-busca-wrap{margin-top:8px;border-top:1px solid #E5E8ED;padding-top:8px;}
+.hf-busca-label{font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;display:flex;align-items:center;gap:4px;}
+.hf-busca-input{width:100%;font-size:13px;padding:7px 10px;border:1px solid #D1D5DB;border-radius:8px;background:#fff;color:#111827;box-sizing:border-box;}
+.hf-busca-input:focus{outline:none;border-color:#2E75B6;box-shadow:0 0 0 3px rgba(46,117,182,.1);}
 
 /* ── LINHA DO TEMPO DE DEFEITO ── */
 .def-timeline{margin-top:8px;border-left:2px solid #E5E8ED;padding-left:12px;}
@@ -1875,15 +1878,37 @@ function renderRelatorio(){
 function buildSecaoRel(uid,icon,titulo,body,isHist,extraHdrClass){
   const bodyId='sec-body-'+uid;
   const chkId='sec-chk-'+uid;
+  const filtroBtnHtml=isHist?`<button class="rel-sec-toggle no-print" id="sec-filtro-${uid}" onclick="event.stopPropagation();toggleFiltroGeralPainel('${uid}')" title="Filtrar por data" style="background:rgba(255,255,255,.15);margin-right:2px;"><i class="ti ti-filter" style="font-size:12px;"></i></button>`:'';
   return `<div class="rel-sec-wrap" id="sec-wrap-${uid}">
     <div class="rel-sec-hdr ${extraHdrClass||''}" onclick="toggleSecao('${bodyId}','${uid}')">
       <i class="ti ${icon} rsh-icon"></i>
       <span class="rsh-label">${titulo}</span>
+      ${filtroBtnHtml}
       <input type="checkbox" class="rel-sec-chk no-print" id="${chkId}" checked onclick="event.stopPropagation();toggleChkSecao('${uid}')" title="Incluir na impressão">
       <button class="rel-sec-toggle no-print" id="sec-btn-${uid}">−</button>
     </div>
     <div class="rel-sec-body" id="${bodyId}">${body}</div>
   </div>`;
+}
+
+function toggleFiltroGeralPainel(uid){
+  // Abre o painel do histórico se estiver fechado, e mostra/esconde o filtro geral
+  const bodyId='sec-body-'+uid;
+  const body=document.getElementById(bodyId);
+  const btn=document.getElementById('sec-btn-'+uid);
+  // Garante que o histórico está aberto
+  if(body&&body.classList.contains('recolhido')){
+    body.classList.remove('recolhido');
+    if(btn)btn.textContent='−';
+  }
+  // Mostra/esconde o painel de filtro geral (primeiro filho do body)
+  const filtro=document.getElementById('filtro-geral-hist');
+  if(filtro){
+    const open=filtro.style.display==='none'||filtro.style.display==='';
+    filtro.style.display=open?'block':'none';
+    const fBtn=document.getElementById('sec-filtro-'+uid);
+    if(fBtn)fBtn.style.background=open?'rgba(255,255,255,.35)':'rgba(255,255,255,.15)';
+  }
 }
 
 function toggleUssRelFicha(){
@@ -2877,276 +2902,281 @@ function excluirRegistroHist(regId){
 // ════════════════════════════════════════════════════════════════
 
 // Filtro geral — aparece no topo do bloco de histórico
-function buildFiltroGeralHist(){
-  return `<div class="hist-filtro-wrap" id="filtro-geral-hist" style="border-radius:8px;margin-bottom:8px;border:1px solid #C5D8F0;">
-    <button class="hist-filtro-toggle" onclick="toggleFiltroGeral()">
-      <i class="ti ti-filter" style="font-size:12px;"></i> Filtro geral do histórico
-      <i class="ti ti-chevron-down" id="filtro-geral-chevron" style="font-size:11px;"></i>
-    </button>
-    <div id="filtro-geral-corpo" style="display:none;">
-      <div class="hist-modo-data" style="margin-bottom:8px;">
-        <button class="hist-modo-btn ativo" id="fg-modo-periodo" onclick="trocarModoDataFG('periodo')">De / Até</button>
-        <button class="hist-modo-btn" id="fg-modo-mes" onclick="trocarModoDataFG('mes')">Mês/Ano</button>
-      </div>
-      <div id="fg-periodo" style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;">
-        <div class="hist-filtro-data-wrap"><label>De:</label><input type="date" id="fg-de" onchange="aplicarFiltroGeral()"></div>
-        <div class="hist-filtro-data-wrap"><label>Até:</label><input type="date" id="fg-ate" onchange="aplicarFiltroGeral()"></div>
-      </div>
-      <div id="fg-mes" style="display:none;margin-bottom:8px;">
-        <div class="hist-filtro-item"><label>Mês/Ano</label><input type="month" id="fg-mes-val" onchange="aplicarFiltroGeral()"></div>
-      </div>
-      <div class="hist-filtro-item" style="margin-bottom:8px;">
-        <label>Busca na descrição</label>
-        <input type="text" id="fg-busca" placeholder="Digite para buscar..." oninput="aplicarFiltroGeral()">
-      </div>
-      <div class="hist-filtro-item" style="margin-bottom:8px;">
-        <label>Criticidade</label>
-        <select id="fg-crit" onchange="aplicarFiltroGeral()">
-          <option value="">Todas</option>
-          <option>Baixo</option><option>Médio</option><option>Alto</option>
-        </select>
-      </div>
-      <div class="hist-filtro-btns">
-        <button class="hist-filtro-aplicar" onclick="aplicarFiltroGeral()"><i class="ti ti-filter"></i> Aplicar</button>
-        <button class="hist-filtro-limpar" onclick="limparFiltroGeral()">Limpar</button>
-      </div>
-      <div class="hist-filtro-resultado" id="fg-resultado"></div>
-    </div>
-  </div>`;
-}
-
-// Filtro local — dentro de cada subitem do histórico
-function buildFiltroLocalHist(subId,tipo,regs){
-  // Coleta opções únicas dos registros
-  const crits=new Set(), statuses=new Set(), locs=new Set(), tipos=new Set();
+// ── Coleta anos e meses únicos de uma lista de registros ──────────────────
+function _extrairAnos(regs){
+  const mapa={};
   regs.forEach(r=>{
-    const c=r.campos||{};
-    if(c.crit)crits.add(c.crit);
-    if(c.status)statuses.add(c.status);
-    if(c.local)locs.add(c.local);
-    if(c.tipo)tipos.add(c.tipo);
-    if(tipo==='rasp'||tipo.startsWith('rasp')){if(c.pct){}; /* pct handled separately */}
-    (c.defeitos||[]).forEach(d=>{
-      if(d.crit)crits.add(d.crit);
-      if(d.status)statuses.add(d.status);
-      if(d.loc)locs.add(d.loc);
-    });
+    if(!r.data)return;
+    const [ano,mes]=r.data.split('-');
+    if(!mapa[ano])mapa[ano]={};
+    if(!mapa[ano][mes])mapa[ano][mes]=0;
+    mapa[ano][mes]++;
   });
-  const stMap2={ac:'Acompanhando',co:'Concluído',enc:'Encerrado'};
-  let statusOpts='<option value="">Todos</option>';
-  statuses.forEach(s=>{statusOpts+=`<option value="${s}">${stMap2[s]||s}</option>`;});
-  let critOpts='<option value="">Todas</option>';
-  ['Baixo','Médio','Alto'].forEach(c=>{if(crits.has(c))critOpts+=`<option>${c}</option>`;});
-  let locOpts='<option value="">Todos</option>';
-  locs.forEach(l=>{locOpts+=`<option>${l}</option>`;});
-  let tipoOpts='<option value="">Todos</option>';
-  tipos.forEach(t=>{tipoOpts+=`<option>${t}</option>`;});
+  return mapa;
+}
 
-  const isRasp=tipo==='rasp'||tipo.startsWith('rasp-');
-  const hasStatus=statuses.size>0&&!isRasp;
-  const hasLoc=locs.size>0;
-  const hasTipo=tipos.size>0;
+// ── Monta HTML da árvore ano/mês para um subId ────────────────────────────
+function buildArvoreAnos(subId, mapa){
+  const MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const anos=Object.keys(mapa).sort((a,b)=>b-a); // mais recente primeiro
+  if(!anos.length)return '';
+  let h='';
+  anos.forEach(ano=>{
+    const meses=mapa[ano];
+    const total=Object.values(meses).reduce((s,c)=>s+c,0);
+    const uid=subId+'-ano-'+ano;
+    h+=`<div>
+      <div class="hf-ano-row" onclick="toggleAnoFiltro('${uid}','${subId}','${ano}')">
+        <span class="hf-chk" id="${uid}-chk"></span>
+        <span class="hf-ano-label">${ano}</span>
+        <span class="hf-count">${total}</span>
+        <i class="ti ti-chevron-right hf-chevron" id="${uid}-chev"></i>
+      </div>
+      <div class="hf-meses" id="${uid}-meses">`;
+    Object.keys(meses).sort().forEach(mes=>{
+      const mid=uid+'-m'+mes;
+      const mesNome=MESES[parseInt(mes)-1]||mes;
+      h+=`<div class="hf-mes-row" onclick="toggleMesFiltro('${mid}','${subId}','${ano}','${mes}')">
+        <span class="hf-chk" id="${mid}-chk"></span>
+        <span class="hf-mes-label">${mesNome} <span style="color:#9CA3AF;font-size:10px;">(${meses[mes]})</span></span>
+      </div>`;
+    });
+    h+=`</div></div>`;
+  });
+  return h;
+}
 
-  return `<div class="hist-filtro-wrap" id="${subId}-filtro" style="display:none;">
-    <div class="hist-filtro-titulo">
-      <span><i class="ti ti-filter" style="font-size:10px;"></i> Filtrar registros</span>
-      <button onclick="limparFiltroLocal('${subId}')" style="font-size:10px;color:#C62828;background:none;border:none;cursor:pointer;">Limpar</button>
+function buildFiltroGeralHist(){
+  const todosRegs=[];
+  Object.values(DB.registros).forEach(regs=>regs.forEach(r=>todosRegs.push(r)));
+  const mapa=_extrairAnos(todosRegs);
+  const arvore=buildArvoreAnos('fg',mapa);
+  return `<div class="hf-wrap" id="filtro-geral-hist" style="display:none;border-radius:8px;margin-bottom:8px;border:1px solid #C5D8F0;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;"><i class="ti ti-filter" style="font-size:10px;"></i> Filtrar por data</span>
+      <button class="hf-limpar" onclick="limparFiltroGeral()">Limpar tudo</button>
     </div>
-    <div class="hist-modo-data">
-      <button class="hist-modo-btn ativo" id="${subId}-modo-periodo" onclick="trocarModoDataLocal('${subId}','periodo')">De / Até</button>
-      <button class="hist-modo-btn" id="${subId}-modo-mes" onclick="trocarModoDataLocal('${subId}','mes')">Mês/Ano</button>
+    ${arvore||'<span style="font-size:12px;color:#9CA3AF;">Nenhum registro no histórico</span>'}
+    <div class="hf-busca-wrap">
+      <div class="hf-busca-label"><i class="ti ti-search" style="font-size:10px;"></i> Buscar na descrição</div>
+      <div style="display:flex;gap:6px;">
+        <input class="hf-busca-input" type="text" id="fg-busca-livre" placeholder="Digite qualquer palavra..." onkeydown="if(event.key==='Enter')aplicarBuscaLivre('fg')" style="flex:1;">
+        <button onclick="aplicarBuscaLivre('fg')" style="padding:7px 12px;background:#1F3864;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;"><i class="ti ti-search" style="font-size:12px;"></i></button>
+      </div>
     </div>
-    <div id="${subId}-periodo" style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;">
-      <div class="hist-filtro-data-wrap"><label>De:</label><input type="date" id="${subId}-de" onchange="aplicarFiltroLocal('${subId}')"></div>
-      <div class="hist-filtro-data-wrap"><label>Até:</label><input type="date" id="${subId}-ate" onchange="aplicarFiltroLocal('${subId}')"></div>
-    </div>
-    <div id="${subId}-mes" style="display:none;margin-bottom:8px;">
-      <div class="hist-filtro-item"><label>Mês/Ano</label><input type="month" id="${subId}-mes-val" onchange="aplicarFiltroLocal('${subId}')"></div>
-    </div>
-    <div class="hist-filtro-item" style="margin-bottom:7px;">
-      <label>Busca na descrição</label>
-      <input type="text" id="${subId}-busca" placeholder="Palavras-chave..." oninput="aplicarFiltroLocal('${subId}')">
-    </div>
-    ${crits.size>0?`<div class="hist-filtro-item" style="margin-bottom:7px;"><label>Criticidade</label><select id="${subId}-crit" onchange="aplicarFiltroLocal('${subId}')">${critOpts}</select></div>`:''}
-    ${hasStatus?`<div class="hist-filtro-item" style="margin-bottom:7px;"><label>Status</label><select id="${subId}-status" onchange="aplicarFiltroLocal('${subId}')">${statusOpts}</select></div>`:''}
-    ${hasLoc?`<div class="hist-filtro-item" style="margin-bottom:7px;"><label>Localização</label><select id="${subId}-loc" onchange="aplicarFiltroLocal('${subId}')">${locOpts}</select></div>`:''}
-    ${hasTipo&&!isRasp?`<div class="hist-filtro-item" style="margin-bottom:7px;"><label>Tipo</label><select id="${subId}-tipo" onchange="aplicarFiltroLocal('${subId}')">${tipoOpts}</select></div>`:''}
-    ${isRasp?`<div class="hist-filtro-item" style="margin-bottom:7px;"><label>% Desgaste</label><select id="${subId}-pct" onchange="aplicarFiltroLocal('${subId}')"><option value="">Qualquer</option><option value="0-30">🔴 0–30% (Crítico)</option><option value="31-50">🟠 31–50% (Alto)</option><option value="51-75">🟡 51–75% (Médio)</option><option value="76-100">🟢 76–100% (Bom)</option></select></div>`:''}
-    <div class="hist-filtro-resultado" id="${subId}-resultado" style="display:none;"></div>
+    <div class="hf-resultado" id="fg-resultado"></div>
   </div>`;
 }
 
-// Toggle filtro geral
-function toggleFiltroGeral(){
-  const corpo=document.getElementById('filtro-geral-corpo');
-  const chev=document.getElementById('filtro-geral-chevron');
-  if(!corpo)return;
-  const open=corpo.style.display==='none';
-  corpo.style.display=open?'block':'none';
-  if(chev)chev.className='ti '+(open?'ti-chevron-up':'ti-chevron-down')+' ';
+// Filtro local — árvore ano/mês + busca por subitem
+function buildFiltroLocalHist(subId,tipo,regs){
+  const mapa=_extrairAnos(regs);
+  const arvore=buildArvoreAnos(subId,mapa);
+  return `<div class="hf-wrap" id="${subId}-filtro" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;"><i class="ti ti-filter" style="font-size:10px;"></i> Filtrar por data</span>
+      <button class="hf-limpar" onclick="limparFiltroLocal('${subId}')">Limpar tudo</button>
+    </div>
+    ${arvore||'<span style="font-size:12px;color:#9CA3AF;">Sem registros</span>'}
+    <div class="hf-busca-wrap">
+      <div class="hf-busca-label"><i class="ti ti-search" style="font-size:10px;"></i> Buscar na descrição</div>
+      <div style="display:flex;gap:6px;">
+        <input class="hf-busca-input" type="text" id="${subId}-busca-livre" placeholder="Digite qualquer palavra..." onkeydown="if(event.key==='Enter')aplicarBuscaLivre('${subId}')" style="flex:1;">
+        <button onclick="aplicarBuscaLivre('${subId}')" style="padding:7px 12px;background:#1F3864;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;"><i class="ti ti-search" style="font-size:12px;"></i></button>
+      </div>
+    </div>
+    <div class="hf-resultado" id="${subId}-resultado"></div>
+  </div>`;
 }
 
-// Toggle filtro local de um subitem
-function toggleFiltroLocal(subId){
-  const f=document.getElementById(subId+'-filtro');
-  if(!f)return;
-  f.style.display=f.style.display==='none'?'block':'none';
+// ── Estado dos filtros de árvore por subId ───────────────────────────────
+const _filtroAnos={};  // {subId: {anosSel:Set, mesesSel:{ano:Set}}}
+
+function _getFiltroState(subId){
+  if(!_filtroAnos[subId])_filtroAnos[subId]={anosSel:new Set(),mesesSel:{}};
+  return _filtroAnos[subId];
 }
 
-// Troca modo de data (período ou mês)
-function trocarModoDataFG(modo){
-  document.getElementById('fg-periodo').style.display=modo==='periodo'?'flex':'none';
-  document.getElementById('fg-mes').style.display=modo==='mes'?'block':'none';
-  document.getElementById('fg-modo-periodo').className='hist-modo-btn'+(modo==='periodo'?' ativo':'');
-  document.getElementById('fg-modo-mes').className='hist-modo-btn'+(modo==='mes'?' ativo':'');
-  aplicarFiltroGeral();
-}
-function trocarModoDataLocal(subId,modo){
-  document.getElementById(subId+'-periodo').style.display=modo==='periodo'?'flex':'none';
-  document.getElementById(subId+'-mes').style.display=modo==='mes'?'block':'none';
-  document.getElementById(subId+'-modo-periodo').className='hist-modo-btn'+(modo==='periodo'?' ativo':'');
-  document.getElementById(subId+'-modo-mes').className='hist-modo-btn'+(modo==='mes'?' ativo':'');
-  aplicarFiltroLocal(subId);
-}
-
-// Verifica se um registro passa pelo filtro de data
-function _passaFiltroData(rData,de,ate,mes){
-  if(!rData)return true;
-  if(mes){const [y,m]=mes.split('-');return rData.startsWith(y+'-'+m);}
-  if(de&&rData<de)return false;
-  if(ate&&rData>ate)return false;
-  return true;
+function toggleAnoFiltro(uid,subId,ano){
+  const st=_getFiltroState(subId);
+  const chevEl=document.getElementById(uid+'-chev');
+  const mesesEl=document.getElementById(uid+'-meses');
+  // Abre/fecha meses
+  const estaAberto=mesesEl&&mesesEl.style.display==='block';
+  if(mesesEl)mesesEl.style.display=estaAberto?'none':'block';
+  if(chevEl)chevEl.classList.toggle('open',!estaAberto);
+  // Toggle seleção do ano inteiro
+  const chkEl=document.getElementById(uid+'-chk');
+  const anoSel=st.anosSel.has(ano);
+  if(anoSel){
+    st.anosSel.delete(ano);
+    delete st.mesesSel[ano];
+    if(chkEl){chkEl.className='hf-chk';}
+    // Desmarca todos meses
+    document.querySelectorAll(`[id^="${uid}-m"][id$="-chk"]`).forEach(el=>el.className='hf-chk');
+  } else {
+    // Não seleciona o ano inteiro ao abrir — só ao clicar no checkbox
+  }
+  _aplicarFiltroArvore(subId);
 }
 
-// Verifica se o texto da busca bate no registro
-function _passaBusca(r,busca){
+function toggleMesFiltro(mid,subId,ano,mes){
+  const st=_getFiltroState(subId);
+  if(!st.mesesSel[ano])st.mesesSel[ano]=new Set();
+  const chkEl=document.getElementById(mid+'-chk');
+  const uid=subId+'-ano-'+ano;
+  const anoChk=document.getElementById(uid+'-chk');
+  if(st.mesesSel[ano].has(mes)){
+    st.mesesSel[ano].delete(mes);
+    if(chkEl)chkEl.className='hf-chk';
+    // Se nenhum mês selecionado, remove o ano
+    if(st.mesesSel[ano].size===0){
+      delete st.mesesSel[ano];
+      st.anosSel.delete(ano);
+      if(anoChk)anoChk.className='hf-chk';
+    } else {
+      if(anoChk)anoChk.className='hf-chk parcial';
+    }
+  } else {
+    st.mesesSel[ano].add(mes);
+    if(chkEl)chkEl.className='hf-chk sel';
+    if(anoChk)anoChk.className='hf-chk parcial';
+  }
+  _aplicarFiltroArvore(subId);
+}
+
+// Coleta texto de busca livre para um subId
+function _getBuscaLivre(subId){
+  const id=subId==='fg'?'fg-busca-livre':subId+'-busca-livre';
+  return (document.getElementById(id)?.value||'').trim().toLowerCase();
+}
+
+// Verifica se um registro contém o texto buscado
+function _passaBuscaLivre(r,busca){
   if(!busca)return true;
-  const b=busca.toLowerCase();
   const textos=[r.desc||''];
   const c=r.campos||{};
   if(c.tipo)textos.push(c.tipo);
   if(c.bal)textos.push(c.bal);
   if(c.local)textos.push(c.local);
-  (c.defeitos||[]).forEach(d=>{textos.push(d.desc||'');textos.push(d.loc||'');});
-  return textos.some(t=>t.toLowerCase().includes(b));
-}
-
-// Verifica criticidade
-function _passaCrit(r,crit){
-  if(!crit)return true;
-  const c=r.campos||{};
-  if(c.crit===crit)return true;
-  if((c.defeitos||[]).some(d=>d.crit===crit))return true;
-  return false;
-}
-
-// Verifica status
-function _passaStatus(r,status){
-  if(!status)return true;
-  return r.campos?.status===status||(r.campos?.defeitos||[]).some(d=>d.status===status);
-}
-
-// Verifica localização
-function _passaLoc(r,loc){
-  if(!loc)return true;
-  return r.campos?.local===loc||(r.campos?.defeitos||[]).some(d=>d.loc===loc);
-}
-
-// Verifica tipo
-function _passaTipo(r,tipo){
-  if(!tipo)return true;
-  return r.campos?.tipo===tipo;
-}
-
-// Verifica faixa de % desgaste
-function _passaPct(r,faixa){
-  if(!faixa)return true;
-  const pn=parseInt(r.campos?.pct)||0;
-  const [min,max]=faixa.split('-').map(Number);
-  return pn>=min&&pn<=max;
-}
-
-// Aplica filtro geral em TODOS os subitens
-function aplicarFiltroGeral(){
-  const modoMes=document.getElementById('fg-modo-mes')?.classList.contains('ativo');
-  const de=document.getElementById('fg-de')?.value||'';
-  const ate=document.getElementById('fg-ate')?.value||'';
-  const mes=document.getElementById('fg-mes-val')?.value||'';
-  const busca=document.getElementById('fg-busca')?.value||'';
-  const crit=document.getElementById('fg-crit')?.value||'';
-  const temFiltro=de||ate||mes||busca||crit;
-  // Aplica em todos os containers de cards visíveis
-  document.querySelectorAll('[id$="-cards"]').forEach(container=>{
-    const subId=container.id.replace('-cards','');
-    filtrarContainer(container,subId,{de,ate,mes:modoMes?mes:'',busca,crit,status:'',loc:'',tipo:'',pct:''});
+  if(c.crit)textos.push(c.crit);
+  (c.defeitos||[]).forEach(d=>{
+    textos.push(d.desc||'');
+    textos.push(d.loc||'');
+    textos.push(d.crit||'');
+    (d.atualizacoes||[]).forEach(u=>textos.push(u.desc||''));
   });
-  const res=document.getElementById('fg-resultado');
-  if(res){
-    if(temFiltro){res.style.display='block';res.textContent='Filtro geral ativo';}
-    else{res.style.display='none';}
-  }
+  (r.campos?.pct)?textos.push(String(r.campos.pct)):'';
+  return textos.some(t=>t.toLowerCase().includes(busca));
 }
 
-// Aplica filtro local em um subitem específico
-function aplicarFiltroLocal(subId){
+function aplicarBuscaLivre(subId){_aplicarFiltroArvore(subId);}
+
+function _aplicarFiltroArvore(subId){
   const container=document.getElementById(subId+'-cards');
+  const res=document.getElementById(subId+'-resultado');
   if(!container)return;
-  const modoMes=document.getElementById(subId+'-modo-mes')?.classList.contains('ativo');
-  const de=document.getElementById(subId+'-de')?.value||'';
-  const ate=document.getElementById(subId+'-ate')?.value||'';
-  const mes=document.getElementById(subId+'-mes-val')?.value||'';
-  const busca=document.getElementById(subId+'-busca')?.value||'';
-  const crit=document.getElementById(subId+'-crit')?.value||'';
-  const status=document.getElementById(subId+'-status')?.value||'';
-  const loc=document.getElementById(subId+'-loc')?.value||'';
-  const tipo=document.getElementById(subId+'-tipo')?.value||'';
-  const pct=document.getElementById(subId+'-pct')?.value||'';
-  filtrarContainer(container,subId,{de,ate,mes:modoMes?mes:'',busca,crit,status,loc,tipo,pct});
-}
-
-// Filtra os cards dentro de um container
-function filtrarContainer(container,subId,f){
+  const st=_getFiltroState(subId);
+  const busca=_getBuscaLivre(subId);
+  // Monta set de ano-mes selecionados
+  const filtros=new Set();
+  Object.entries(st.mesesSel).forEach(([ano,meses])=>{
+    meses.forEach(m=>filtros.add(ano+'-'+m.padStart(2,'0')));
+  });
+  const temDataFiltro=filtros.size>0;
+  const temBusca=busca.length>0;
+  const temFiltro=temDataFiltro||temBusca;
   let visiveis=0,total=0;
   container.querySelectorAll('.reg-card').forEach(card=>{
     const regId=card.id.replace('card-','');
-    // Busca o registro no DB para filtrar
     const r=DB.registros[ativoSel]?.find(x=>x.id===regId);
-    if(!r){card.style.display='';visiveis++;total++;return;}
     total++;
-    const passa=_passaFiltroData(r.data,f.de,f.ate,f.mes)
-      &&_passaBusca(r,f.busca)
-      &&_passaCrit(r,f.crit)
-      &&_passaStatus(r,f.status)
-      &&_passaLoc(r,f.loc)
-      &&_passaTipo(r,f.tipo)
-      &&_passaPct(r,f.pct);
+    if(!temFiltro){card.style.display='';visiveis++;return;}
+    if(!r){card.style.display='none';return;}
+    // Filtro de data
+    let passaData=true;
+    if(temDataFiltro){
+      const anoMes=(r.data||'').substring(0,7);
+      passaData=filtros.has(anoMes);
+    }
+    // Filtro de busca livre
+    const passaBusca=_passaBuscaLivre(r,busca);
+    const passa=passaData&&passaBusca;
     card.style.display=passa?'':'none';
     if(passa)visiveis++;
   });
-  // Atualiza contador e resultado
   const counter=document.getElementById(subId+'-count');
   if(counter)counter.textContent=visiveis+'/'+total;
-  const res=document.getElementById(subId+'-resultado');
   if(res){
-    const temFiltro=f.de||f.ate||f.mes||f.busca||f.crit||f.status||f.loc||f.tipo||f.pct;
-    if(temFiltro){res.style.display='block';res.textContent=visiveis+' de '+total+' registro(s) encontrado(s)';}
-    else{res.style.display='none';}
+    if(temFiltro){
+      let txt=visiveis+' de '+total+' registro(s)';
+      if(temBusca)txt+=' — "'+busca+'"';
+      res.style.display='block';res.textContent=txt;
+    } else {res.style.display='none';}
   }
 }
 
-// Limpar filtros
+function aplicarFiltroGeral(){
+  // Aplica filtro geral em todos os subitens visíveis
+  document.querySelectorAll('[id$="-cards"]').forEach(container=>{
+    const subId=container.id.replace('-cards','');
+    _aplicarFiltroArvore(subId);
+  });
+}
+
+function aplicarFiltroLocal(subId){_aplicarFiltroArvore(subId);}
+
+function toggleFiltroLocal(subId){
+  const f=document.getElementById(subId+'-filtro');
+  if(!f)return;
+  const open=f.style.display==='none'||f.style.display==='';
+  f.style.display=open?'block':'none';
+}
+
+function filtrarContainer(container,subId){_aplicarFiltroArvore(subId);}
+
 function limparFiltroGeral(){
-  ['fg-de','fg-ate','fg-mes-val','fg-busca','fg-crit'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.value='';
+  Object.keys(_filtroAnos).forEach(k=>delete _filtroAnos[k]);
+  document.querySelectorAll('.hf-chk').forEach(el=>el.className='hf-chk');
+  document.querySelectorAll('.hf-meses').forEach(el=>el.style.display='none');
+  document.querySelectorAll('.hf-chevron').forEach(el=>el.classList.remove('open'));
+  document.querySelectorAll('.hf-busca-input').forEach(el=>el.value='');
+  document.querySelectorAll('[id$="-cards"] .reg-card').forEach(el=>el.style.display='');
+  document.querySelectorAll('.hf-resultado').forEach(el=>el.style.display='none');
+  document.querySelectorAll('[id$="-count"]').forEach(el=>{
+    const cards=document.getElementById(el.id.replace('-count','-cards'));
+    if(cards){const n=cards.querySelectorAll('.reg-card').length;el.textContent=n+'/'+n;}
   });
-  aplicarFiltroGeral();
 }
+
 function limparFiltroLocal(subId){
-  ['-de','-ate','-mes-val','-busca','-crit','-status','-loc','-tipo','-pct'].forEach(s=>{
-    const el=document.getElementById(subId+s);if(el)el.value='';
-  });
-  aplicarFiltroLocal(subId);
+  delete _filtroAnos[subId];
+  document.querySelectorAll(`[id^="${subId}-ano-"] .hf-chk, [id^="${subId}-ano-"][id$="-chk"]`).forEach(el=>el.className='hf-chk');
+  document.querySelectorAll(`[id^="${subId}-ano-"][id$="-meses"]`).forEach(el=>el.style.display='none');
+  document.querySelectorAll(`[id^="${subId}-ano-"][id$="-chev"]`).forEach(el=>el.classList.remove('open'));
+  const bl=document.getElementById(subId+'-busca-livre');if(bl)bl.value='';
+  const container=document.getElementById(subId+'-cards');
+  if(container)container.querySelectorAll('.reg-card').forEach(el=>el.style.display='');
+  const res=document.getElementById(subId+'-resultado');
+  if(res)res.style.display='none';
+  const counter=document.getElementById(subId+'-count');
+  if(counter&&container){const n=container.querySelectorAll('.reg-card').length;counter.textContent=n+'/'+n;}
 }
+
+// Funções legadas — mantidas para compatibilidade
+function toggleFiltroGeral(){
+  const f=document.getElementById('filtro-geral-hist');
+  if(!f)return;
+}
+function _passaFiltroData(d,de,ate,mes){return true;}
+function _passaBusca(r,b){return true;}
+function _passaCrit(r,c){return true;}
+function _passaStatus(r,s){return true;}
+function _passaLoc(r,l){return true;}
+function _passaTipo(r,t){return true;}
+function _passaPct(r,f){return true;}
+function trocarModoDataFG(){}
+function trocarModoDataLocal(){}
 
 function toggleHistSub(id){
   const el=document.getElementById(id);
