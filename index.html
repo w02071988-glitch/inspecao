@@ -22,12 +22,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .topbar-home:active{background:rgba(255,255,255,.3);}
 
 /* ── BOTÃO FLUTUANTE DRIVE ── */
-.drive-fab{position:fixed;bottom:22px;right:16px;z-index:200;display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+.drive-fab{position:fixed;bottom:22px;right:16px;z-index:200;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
 .drive-fab-btn{display:flex;align-items:center;gap:8px;padding:11px 16px;border-radius:50px;border:none;cursor:pointer;font-size:13px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,.18);transition:transform .15s,box-shadow .15s;}
 .drive-fab-btn:active{transform:scale(.96);}
 .drive-fab-main{background:#1F3864;color:#fff;}
 .drive-fab-main.sincronizado{background:#2E7D32;}
 .drive-fab-main.pendente{background:#E65100;animation:pulse-fab 2s infinite;}
+/* Indicador de memória — estilo bateria */
+/* drive-mem: círculo SVG inline */
 @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 @keyframes pulse-fab{0%,100%{box-shadow:0 4px 16px rgba(230,81,0,.3);}50%{box-shadow:0 4px 24px rgba(230,81,0,.6);}}
 .drive-fab-status{font-size:10px;color:#fff;background:rgba(0,0,0,.45);padding:3px 9px;border-radius:10px;text-align:right;pointer-events:none;}
@@ -355,6 +357,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <button class="topbar-home" id="btn-home" onclick="renderLista()" title="Ir para início" style="display:none;">
     <i class="ti ti-home"></i><span>Início</span>
   </button>
+  <div id="drive-mem-wrap" style="display:none;align-items:center;margin-right:2px;" title="Uso de armazenamento do app">
+    <svg width="32" height="32" viewBox="0 0 32 32" style="cursor:default;">
+      <!-- Anel de fundo -->
+      <circle cx="16" cy="16" r="12" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="3"/>
+      <!-- Anel de progresso -->
+      <circle id="drive-mem-ring" cx="16" cy="16" r="12" fill="none"
+        stroke="#2E7D32" stroke-width="3"
+        stroke-linecap="round"
+        stroke-dasharray="75.4" stroke-dashoffset="75.4"
+        transform="rotate(-90 16 16)"
+        style="transition:stroke-dashoffset .5s,stroke .4s;"/>
+      <!-- Texto % dentro -->
+      <text id="drive-mem-pct" x="16" y="20" text-anchor="middle"
+        font-family="system-ui,sans-serif" font-size="8.5" font-weight="700"
+        fill="#fff">0%</text>
+    </svg>
+  </div>
   <div class="topbar-actions" id="topbar-actions" style="display:none;">
     <button class="topbar-icon-btn" id="btn-print" title="Imprimir" onclick="imprimirRelatorio()" style="display:none;"><i class="ti ti-printer"></i></button>
     <button class="topbar-icon-btn" id="btn-share-pdf" title="Compartilhar relatório PDF" onclick="compartilharPDF()" style="display:none;"><i class="ti ti-share"></i></button>
@@ -533,6 +552,7 @@ function setTopbar(titulo,sub,back,showPrint){
   const btnHome=document.getElementById('btn-home');
   if(btnHome)btnHome.style.display=(passo&&passo!=='lista')?'flex':'none';
   document.getElementById('topbar-actions').style.display='flex';
+  const dmw=document.getElementById('drive-mem-wrap');if(dmw)dmw.style.display='flex';
   const btnP=document.getElementById('btn-print');
   if(btnP)btnP.style.display=showPrint?'flex':'none';
   const btnS=document.getElementById('btn-share-pdf');
@@ -947,6 +967,32 @@ function renderGaleriaGrid(ns){
   if(btn) btn.style.display=fotos.length>=6?'none':'block';
 }
 
+// Redimensiona foto para máx 1920x1080 mantendo proporção, JPEG 90%
+function _redimensionarFoto(file, callback){
+  const MAX_W=1920, MAX_H=1080, QUALIDADE=0.90;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      let w=img.width, h=img.height;
+      // Calcula novo tamanho mantendo proporção
+      if(w>MAX_W||h>MAX_H){
+        const ratio=Math.min(MAX_W/w, MAX_H/h);
+        w=Math.round(w*ratio);
+        h=Math.round(h*ratio);
+      }
+      // Se já está dentro do limite, só converte para JPEG com qualidade reduzida
+      const canvas=document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,w,h);
+      callback(canvas.toDataURL('image/jpeg', QUALIDADE));
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 function adicionarFotos(ns,input){
   if(!galFotos[ns])galFotos[ns]=[];
   const files=Array.from(input.files);
@@ -954,13 +1000,11 @@ function adicionarFotos(ns,input){
   const toAdd=files.slice(0,restante);
   let loaded=0;
   toAdd.forEach(file=>{
-    const reader=new FileReader();
-    reader.onload=e=>{
-      galFotos[ns].push(e.target.result);
+    _redimensionarFoto(file, b64=>{
+      galFotos[ns].push(b64);
       loaded++;
       if(loaded===toAdd.length) renderGaleriaGrid(ns);
-    };
-    reader.readAsDataURL(file);
+    });
   });
   input.value='';
 }
@@ -3680,32 +3724,93 @@ function voltar(){
 
 
 // ══════════════════════════════════════
-// LOCALSTORAGE — SALVA AUTOMATICAMENTE
+// INDEXEDDB — ARMAZENAMENTO PRINCIPAL
+// Sem limite de tamanho, não afeta cache do Chrome
+// Fotos em tamanho original suportadas
 // ══════════════════════════════════════
-const LS_KEY = 'inspecao_v3';
+const IDB_NAME = 'inspecao_db';
+const IDB_VER  = 1;
+const IDB_STORE = 'dados';
+const IDB_KEY   = 'principal';
+const LS_KEY_FALLBACK = 'inspecao_v3'; // fallback para migração
 
-function salvarLS(){
+let _idb = null;
+
+function abrirIDB(){
+  return new Promise((resolve, reject) => {
+    if(_idb){ resolve(_idb); return; }
+    const req = indexedDB.open(IDB_NAME, IDB_VER);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains(IDB_STORE)){
+        db.createObjectStore(IDB_STORE);
+      }
+    };
+    req.onsuccess = e => { _idb = e.target.result; resolve(_idb); };
+    req.onerror   = () => reject(req.error);
+  });
+}
+
+async function salvarLS(){
+  const payload = {
+    ativos: ATIVOS,
+    registros: DB.registros,
+    fichas: DB.fichas,
+    raspAtivos: DB.raspAtivos,
+    anotacoesGerais: DB.anotacoesGerais,
+    favoritos: [...DB.favoritos],
+    rc: regCounter
+  };
   try{
-    localStorage.setItem(LS_KEY, JSON.stringify({
-      ativos: ATIVOS,
-      registros: DB.registros,
-      fichas: DB.fichas,
-      raspAtivos: DB.raspAtivos,
-      anotacoesGerais: DB.anotacoesGerais,
-      favoritos: [...DB.favoritos],
-      rc: regCounter
-    }));
+    const db = await abrirIDB();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).put(payload, IDB_KEY);
+      tx.oncomplete = resolve;
+      tx.onerror    = () => reject(tx.error);
+    });
   }catch(e){
-    if(e.name==='QuotaExceededError')
-      mostrarToast('⚠ Armazenamento cheio!','#C62828');
+    // Fallback para localStorage se IndexedDB falhar
+    try{
+      localStorage.setItem(LS_KEY_FALLBACK, JSON.stringify(payload));
+    }catch(e2){
+      if(e2.name==='QuotaExceededError')
+        mostrarToast('⚠ Armazenamento cheio! Faça backup agora.','#C62828');
+    }
   }
 }
 
-function carregarLS(){
+async function carregarLS(){
+  // 1. Tenta carregar do IndexedDB
   try{
-    const raw = localStorage.getItem(LS_KEY);
+    const db = await abrirIDB();
+    const d = await new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, 'readonly');
+      const req = tx.objectStore(IDB_STORE).get(IDB_KEY);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror   = () => reject(req.error);
+    });
+    if(d && _aplicarDados(d)) return true;
+  }catch(e){}
+
+  // 2. Fallback: migra do localStorage para o IndexedDB
+  try{
+    const raw = localStorage.getItem(LS_KEY_FALLBACK);
     if(!raw) return false;
     const d = JSON.parse(raw);
+    if(_aplicarDados(d)){
+      // Migra para IndexedDB e limpa localStorage
+      await salvarLS();
+      try{ localStorage.removeItem(LS_KEY_FALLBACK); }catch{}
+      mostrarToast('✓ Dados migrados para armazenamento expandido','#2E7D32');
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+function _aplicarDados(d){
+  try{
     if(Array.isArray(d.ativos) && d.ativos.length){
       ATIVOS.length = 0;
       d.ativos.forEach(a=>{ ATIVOS.push(a); _initAtivo(a.id); });
@@ -3722,7 +3827,7 @@ function carregarLS(){
   }catch(e){ return false; }
 }
 
-// Sobrescreve autoBackup para salvar no localStorage (sem download automático)
+// autoBackup agora usa IndexedDB
 function autoBackup(){ salvarLS(); contarAlteracaoDrive(); }
 
 // ════════════════════════════════════════════════════════════════
@@ -3759,12 +3864,19 @@ function atualizarFabDrive(){
   if(_driveAlteracoes===0&&_driveUltimaSync){
     btn.className='drive-fab-btn drive-fab-main sincronizado';
     const mins=Math.round((Date.now()-_driveUltimaSync)/60000);
-    const label=mins<1?'agora mesmo':mins===1?'há 1 min':'há '+mins+' min';
-    status.textContent='✓ Drive sincronizado '+label;
-    status.style.display='block';
+    if(mins<1){
+      // "agora mesmo" — mostra por 4s e some
+      status.textContent='✓ Sincronizado!';
+      status.style.display='block';
+      clearTimeout(window._driveStatusTimer);
+      window._driveStatusTimer=setTimeout(()=>{if(status)status.style.display='none';},4000);
+    } else {
+      // Após 1+ min não mostra nada — o botão verde já indica sincronizado
+      status.style.display='none';
+    }
   } else if(_driveAlteracoes>0){
     btn.className='drive-fab-btn drive-fab-main pendente';
-    status.textContent=_driveAlteracoes+' alteração(ões) não sincronizada(s)';
+    status.textContent=_driveAlteracoes+' não sincronizada(s)';
     status.style.display='block';
   } else {
     btn.className='drive-fab-btn drive-fab-main';
@@ -3882,6 +3994,50 @@ function _atualizarBotaoDrive(){
 // Atualiza o status do FAB a cada minuto (para "há X min")
 setInterval(()=>{if(_driveUltimaSync&&_driveAlteracoes===0)atualizarFabDrive();},60000);
 
+// Atualiza indicador de memória a cada 30s e ao iniciar
+async function atualizarMemoriaDrive(){
+  const wrap=document.getElementById('drive-mem-wrap');
+  const pct=document.getElementById('drive-mem-pct');
+  if(!wrap)return;
+
+  try{
+    if('storage' in navigator && 'estimate' in navigator.storage){
+      const est=await navigator.storage.estimate();
+      const usado=est.usage||0;
+      const total=est.quota||0;
+      if(total===0){wrap.style.display='none';return;}
+      const perc=Math.min(Math.round((usado/total)*100),100);
+      const usadoMB=(usado/1024/1024).toFixed(0);
+      const totalMB=total>1073741824
+        ?(total/1073741824).toFixed(1)+' GB'
+        :(total/1024/1024).toFixed(0)+' MB';
+
+      // Cor da bateria por nível
+      let cor='#2E7D32';   // verde — ok
+      if(perc>=50) cor='#F9A825';  // amarelo
+      if(perc>=75) cor='#E65100';  // laranja
+      if(perc>=90) cor='#C62828';  // vermelho crítico
+
+      // Anel SVG: circunferência = 2π×12 ≈ 75.4
+      const circ=75.4;
+      const ring=document.getElementById('drive-mem-ring');
+      if(ring){
+        ring.style.strokeDashoffset=circ-(circ*perc/100);
+        ring.style.stroke=cor;
+      }
+      if(pct){pct.textContent=perc+'%';pct.style.fill=perc>=75?'#FFD54F':'#fff';}
+      wrap.title='Armazenamento: '+usadoMB+'MB de '+totalMB+' usados';
+      wrap.style.display='flex';
+    } else {
+      wrap.style.display='none';
+    }
+  }catch{wrap.style.display='none';}
+}
+
+// Atualiza memória ao carregar e a cada 30s
+atualizarMemoriaDrive();
+setInterval(atualizarMemoriaDrive, 30000);
+
 // Hooks de salvamento — chamados após cada operação
 const _ls_hooks = ['renderSucesso','salvarFicha','salvarEdicao','salvarEdicaoAnotacao','excluirRegistro','excluirAnotacaoGeralModal','mudaStatus','mudaStatusDefeito','toggleFavorito','novoAtivo','editarAtivo','excluirAtivo','salvarAnotacaoGeral'];
 
@@ -3894,23 +4050,32 @@ window.marcarMudanca = function(){
 // Também garante que marcarMudanca global aponta para a nova versão
 // (necessário pois funções já declaradas referenciam o nome global)
 
-// Carrega dados salvos
-const _lsOk = carregarLS();
-
-// Service Worker
+// Registra Service Worker (PWA)
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+    navigator.serviceWorker.register('./sw.js')
+      .then(()=>console.log('SW registrado'))
+      .catch(()=>{});
   });
 }
 
-// Re-renderiza com dados carregados
-renderLista();
-if(_lsOk) mostrarToast('✓ Dados restaurados!','#2E7D32');
-marcarSalvo();
+// Carrega dados salvos (async — IndexedDB) e inicia o app
+(async function iniciarApp(){
+  renderLista(); // mostra tela inicial imediatamente (sem dados)
+  const ok = await carregarLS();
+  if(ok){
+    renderLista(); // re-renderiza com os dados carregados
+    mostrarToast('✓ Dados carregados!','#2E7D32');
+  }
+  marcarSalvo();
+  // Migração: avisa se veio do localStorage
+  if(ok && !localStorage.getItem('inspecao_v3')){
+    // dados já estavam no IDB, tudo normal
+  }
+})();
 
-// Salva a cada 5 segundos como segurança extra
-setInterval(salvarLS, 5000);
+// Salva a cada 30 segundos como segurança extra
+setInterval(salvarLS, 30000);
 
 </script>
 </body>
