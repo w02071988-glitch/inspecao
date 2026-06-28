@@ -166,7 +166,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-prim{width:100%;padding:13px;background:#1F3864;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px;}
 .btn-prim:active{opacity:.85;}
 .btn-sec{width:100%;padding:11px;background:#fff;color:#374151;border:1px solid #D1D5DB;border-radius:10px;font-size:13px;cursor:pointer;margin-top:8px;}
-.btn-danger{width:100%;padding:11px;background:#fff;color:#C62828;border:1px solid #FFCDD2;border-radius:10px;font-size:13px;cursor:pointer;margin-top:8px;}
+.btn-danger{width:100%;padding:14px 11px;background:#fff;color:#C62828;border:1px solid #FFCDD2;border-radius:10px;font-size:13px;cursor:pointer;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;-webkit-tap-highlight-color:rgba(198,40,40,.15);}
 .btn-sm{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;}
 .btn-sm-sec{background:#EEF0F3;color:#374151;}
 .btn-sm-danger{background:#FFEBEE;color:#C62828;}
@@ -224,6 +224,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .uss-trecho-hdr:first-child{margin-top:0;}
 .empty-state{text-align:center;padding:18px;color:#9CA3AF;font-size:13px;}
 .empty-state i{font-size:30px;display:block;margin-bottom:5px;opacity:.4;}
+
+/* ── BADGE VERSÃO + MODAL NOVIDADES ── */
+.app-version-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.15);color:#BDD9F8;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;cursor:pointer;letter-spacing:.03em;border:1px solid rgba(255,255,255,.2);}
+.app-version-badge:active{background:rgba(255,255,255,.25);}
+.novidades-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:flex;align-items:flex-end;justify-content:center;}
+.novidades-box{background:#fff;border-radius:18px 18px 0 0;width:100%;max-width:520px;padding:20px 18px 36px;max-height:80vh;overflow-y:auto;}
+.novidades-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.novidades-titulo{font-size:16px;font-weight:800;color:#1F3864;display:flex;align-items:center;gap:8px;}
+.novidades-versao{background:#1F3864;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;}
+.novidades-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #F0F2F5;}
+.novidades-item:last-child{border-bottom:none;}
+.novidades-dot{width:8px;height:8px;border-radius:50%;background:#2E75B6;flex-shrink:0;margin-top:5px;}
+.novidades-text{font-size:13px;color:#374151;line-height:1.5;}
+.novidades-fechar{width:100%;padding:13px;background:#1F3864;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-top:16px;}
 
 /* ── FILTROS DO HISTÓRICO ── */
 /* ── FILTRO ÁRVORE ANO/MÊS ── */
@@ -578,7 +592,19 @@ function setStepBar(show,step){
 // ════════════════════════════════
 function renderLista(){
   passo='lista';
-  setTopbar('Inspeção de Correia — Washington Sales',hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}),false,false);
+  setTopbar('Inspeção de Correia',hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}),false,false);
+  // Badge versão na topbar
+  setTimeout(()=>{
+    const sub=document.getElementById('topbar-sub');
+    if(sub&&!document.getElementById('version-badge')){
+      const badge=document.createElement('span');
+      badge.id='version-badge';
+      badge.className='app-version-badge no-print';
+      badge.innerHTML='Washington Sales &nbsp;<span style="opacity:.6;">v0.1</span>';
+      badge.onclick=()=>mostrarNovidades();
+      sub.parentNode.insertBefore(badge,sub.nextSibling);
+    }
+  },50);
   setStepBar(true,1);
   const favCount=DB.favoritos.size;
   let h=`
@@ -3014,6 +3040,63 @@ function salvarEdicao(){
   marcarMudanca(); autoBackup();
   fecharModal();renderRelatorio();
 }
+// ════════════════════════════════════════════════════════════════
+// SISTEMA DE NOVIDADES
+// ════════════════════════════════════════════════════════════════
+const APP_VERSION='v0.1';
+const APP_CHANGELOG=[
+    'Área de clique do botão Excluir normalizada',
+    'Sistema de novidades por versão implementado',
+    'Importação de backup direto no IndexedDB (sem erro de memória)',
+    'Formulários resetam completamente após salvar',
+    'Raspadores: só salva o que foi preenchido',
+    'Filtro de histórico por ano/mês com busca livre',
+    'Extrator de Sucatas com relatório e histórico próprios',
+    'Botão Drive com anel de memória na topbar',
+    'Câmera e Galeria separados em todas as seções',
+    'PWA instalável — armazenamento sem limite de cache'
+];
+const NOVIDADES_LS_KEY='insp_novidades_visto';
+
+function verificarNovidades(){
+  try{
+    const visto=localStorage.getItem(NOVIDADES_LS_KEY);
+    if(visto!==APP_VERSION){
+      setTimeout(()=>mostrarNovidades(),800);
+    }
+  }catch{}
+}
+
+function mostrarNovidades(){
+  if(document.getElementById('novidades-overlay'))return;
+  const overlay=document.createElement('div');
+  overlay.id='novidades-overlay';
+  overlay.className='novidades-overlay';
+  const itens=APP_CHANGELOG.map(item=>`
+    <div class="novidades-item">
+      <div class="novidades-dot"></div>
+      <div class="novidades-text">${item}</div>
+    </div>`).join('');
+  overlay.innerHTML=`<div class="novidades-box">
+    <div class="novidades-header">
+      <div class="novidades-titulo">
+        <i class="ti ti-sparkles" style="color:#2E75B6;font-size:20px;"></i>
+        O que há de novo
+      </div>
+      <span class="novidades-versao">${APP_VERSION}</span>
+    </div>
+    <div style="font-size:12px;color:#9CA3AF;margin-bottom:12px;font-weight:500;">Washington Sales · Inspeção de Correia</div>
+    ${itens}
+    <button class="novidades-fechar" onclick="fecharNovidades()">✓ Entendido!</button>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+function fecharNovidades(){
+  try{localStorage.setItem(NOVIDADES_LS_KEY,APP_VERSION);}catch{}
+  document.getElementById('novidades-overlay')?.remove();
+}
+
 function excluirRegistro(regId){
   if(!confirm('Excluir este registro?'))return;
   DB.registros[ativoSel]=DB.registros[ativoSel].filter(x=>x.id!==regId);
@@ -4106,6 +4189,7 @@ const DRIVE_LS_KEY = 'insp_drive_ultima_sync';
 function contarAlteracaoDrive(){
   _driveAlteracoes++;
   atualizarFabDrive();
+  verificarNovidades();
   if(_driveAlteracoes>=DRIVE_LEMBRETE_APOS&&!_driveLembreteAtivo){
     mostrarLembreteDrive();
   }
