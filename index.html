@@ -376,23 +376,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <button class="topbar-home" id="btn-home" onclick="renderLista()" title="Ir para início" style="display:none;">
     <i class="ti ti-home"></i><span>Início</span>
   </button>
-  <div id="drive-mem-wrap" style="display:none;align-items:center;margin-right:2px;" title="Uso de armazenamento do app">
-    <svg width="32" height="32" viewBox="0 0 32 32" style="cursor:default;">
-      <!-- Anel de fundo -->
-      <circle cx="16" cy="16" r="12" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="3"/>
-      <!-- Anel de progresso -->
-      <circle id="drive-mem-ring" cx="16" cy="16" r="12" fill="none"
-        stroke="#2E7D32" stroke-width="3"
-        stroke-linecap="round"
-        stroke-dasharray="75.4" stroke-dashoffset="75.4"
-        transform="rotate(-90 16 16)"
-        style="transition:stroke-dashoffset .5s,stroke .4s;"/>
-      <!-- Texto % dentro -->
-      <text id="drive-mem-pct" x="16" y="20" text-anchor="middle"
-        font-family="system-ui,sans-serif" font-size="8.5" font-weight="700"
-        fill="#fff">0%</text>
-    </svg>
-  </div>
+
   <div class="topbar-actions" id="topbar-actions" style="display:none;">
     <button class="topbar-icon-btn" id="btn-print" title="Imprimir" onclick="imprimirRelatorio()" style="display:none;"><i class="ti ti-printer"></i></button>
     <button class="topbar-icon-btn" id="btn-share-pdf" title="Compartilhar relatório PDF" onclick="compartilharPDF()" style="display:none;"><i class="ti ti-share"></i></button>
