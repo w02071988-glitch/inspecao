@@ -63,6 +63,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* LISTA DE ATIVOS — GRID */
 .ativo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
+.ativo-grid.cols2{grid-template-columns:1fr 1fr;}
+.layout-toggle-btn{background:#EEF0F3;border:none;border-radius:8px;padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:4px;color:#374151;font-size:12px;font-weight:600;}
+.layout-toggle-btn:active{background:#E0E3E8;}
+.layout-toggle-btn.ativo{background:#1F3864;color:#fff;}
 .ativo-card{background:#fff;border:1px solid #E5E8ED;border-radius:10px;padding:10px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;transition:border-color .15s;}
 .ativo-card:active{background:#F5F7FA;border-color:#2E75B6;}
 .ativo-card .ac-icon{font-size:24px;color:#2E75B6;margin-bottom:2px;}
@@ -723,9 +727,19 @@ function renderLista(){
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
       <span class="bloco-titulo" style="margin-bottom:0;">Ativos (${ATIVOS.length}/50)</span>
-      ${ATIVOS.length<50?`<button onclick="novoAtivo()" style="background:#1F3864;color:#fff;border:none;border-radius:8px;padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;"><i class="ti ti-plus"></i> Novo ativo</button>`:"<span style='font-size:11px;color:#9CA3AF;'>Limite atingido</span>"}
+      <div style="display:flex;gap:6px;align-items:center;">
+        <div style="display:flex;border:1px solid #E5E8ED;border-radius:8px;overflow:hidden;">
+          <button id="btn-layout-2" class="layout-toggle-btn${_layoutAtivos===2?' ativo':''}" onclick="setLayoutAtivos(2)" title="2 por linha">
+            <i class="ti ti-layout-columns" style="font-size:14px;"></i>
+          </button>
+          <button id="btn-layout-3" class="layout-toggle-btn${_layoutAtivos===3?' ativo':''}" onclick="setLayoutAtivos(3)" title="3 por linha" style="border-left:1px solid #E5E8ED;">
+            <i class="ti ti-layout-grid" style="font-size:14px;"></i>
+          </button>
+        </div>
+        ${ATIVOS.length<50?`<button onclick="novoAtivo()" style="background:#1F3864;color:#fff;border:none;border-radius:8px;padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;"><i class="ti ti-plus"></i> Novo ativo</button>`:"<span style='font-size:11px;color:#9CA3AF;'>Limite atingido</span>"}
+      </div>
     </div>
-    <div class="ativo-grid">`;
+    <div class="ativo-grid${_layoutAtivos===2?' cols2':''}">`;
   const sorted=[...ATIVOS].sort((a,b)=>a.id.localeCompare(b.id));
   sorted.forEach(a=>{
     const{cls,txt}=pillUltima(a.id);
@@ -760,6 +774,24 @@ function toggleAtivoMenu(id){
   if(m)m.style.display='block';
   setTimeout(()=>document.addEventListener('click',fecharMenusAtivo,{once:true,capture:true}),50);
 }
+// Layout da grid de ativos (2 ou 3 colunas)
+let _layoutAtivos = (() => { try { return parseInt(localStorage.getItem('insp_layout_ativos')||'3'); } catch { return 3; } })();
+
+function setLayoutAtivos(n){
+  _layoutAtivos = n;
+  try { localStorage.setItem('insp_layout_ativos', String(n)); } catch {}
+  // Atualiza grid sem re-renderizar tudo
+  const grid = document.querySelector('.ativo-grid');
+  if(grid){
+    grid.className = n===2 ? 'ativo-grid cols2' : 'ativo-grid';
+  }
+  // Atualiza botões
+  const b2=document.getElementById('btn-layout-2');
+  const b3=document.getElementById('btn-layout-3');
+  if(b2)b2.className='layout-toggle-btn'+(n===2?' ativo':'');
+  if(b3)b3.className='layout-toggle-btn'+(n===3?' ativo':'');
+}
+
 function novoAtivo(){
   if(ATIVOS.length>=50){mostrarToast('Limite de 50 ativos atingido','#C62828');return;}
   const nome=(prompt('Nome do novo ativo (ex: TRH99):')||'').trim().toUpperCase();
