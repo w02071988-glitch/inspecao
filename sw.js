@@ -3,7 +3,7 @@
 // Versão: 1.0
 // ══════════════════════════════════════════════════
 
-const CACHE_NAME = 'inspecao-v1';
+const CACHE_NAME = 'inspecao-v3'; // atualizado para forçar refresh
 
 // Arquivos que ficam disponíveis offline
 const ARQUIVOS_CACHE = [
