@@ -646,7 +646,20 @@ function novoAtivo(){
   _initAtivo(nome);
   marcarMudanca();autoBackup();
   mostrarToast('✓ Ativo '+nome+' criado!','#2E7D32');
-  // ── Migração: status 'em' → 'ac' em todos os registros ──
+  // ── Limpa localStorage antigo para liberar espaço ──
+(function limparLSAntigo(){
+  try{
+    const keys=['inspecao_v3','inspecao_v2','inspecao_v1','insp_db'];
+    keys.forEach(k=>{
+      if(localStorage.getItem(k)){
+        localStorage.removeItem(k);
+        console.log('localStorage limpo: '+k);
+      }
+    });
+  }catch{}
+})();
+
+// ── Migração: status 'em' → 'ac' em todos os registros ──
 (function migrarStatusEm(){
   Object.values(DB.registros).forEach(regs=>{
     regs.forEach(r=>{
@@ -1583,9 +1596,10 @@ function salvar(){
       const pct=document.getElementById('f-pct-'+k)?.value||'';
       const crit=document.getElementById('rcrit-'+k)?.value||'';
       const fotos=getGalFotos('gal-rasp-'+k);
-      // Só cria registro se preencheu algo (ignora se só tem fotos antigas não modificadas)
-      const fotosNovas=fotos.filter(f=>f); // fotos presentes no formulário
-      if(!desc&&!pct&&!crit&&!fotosNovas.length) return;
+      // Só cria registro se preencheu algo
+      const fotosNovas=fotos.filter(f=>f);
+      if(!desc&&!pct&&!crit&&!fotosNovas.length) return; // nada preenchido → mantém o registro ativo anterior intacto
+
       // Inserir em anotações se marcado
       const addAnot=document.getElementById('rasp-'+k+'-add-anotacao')?.value==='1';
       if(addAnot&&desc&&desc!=='Sem relato'){
@@ -1594,10 +1608,10 @@ function salvar(){
         if(crit)partes.push('Criticidade: '+crit);
         DB.anotacoesGerais.unshift({ativo:ativoSel,data,desc:'[Raspador — '+RASP_LABELS[k]+(partes.length?' — '+partes.join(' / '):'')+']\n\nDescrição: '+desc,fotos:[...fotos]});
       }
-      // Busca registro ativo anterior deste componente e move para histórico
+      // Só move para histórico APÓS confirmar que há dados novos para criar registro
       const regs=DB.registros[ativoSel];
-      const idxAtivo=regs.findIndex(r=>r.tipo==='rasp-'+k&&!r._hist);
-      if(idxAtivo>=0) regs[idxAtivo]._hist=true; // marca como histórico
+      const idxAtivo=regs.findIndex(r=>r.tipo==='rasp-'+k&&!r._hist&&!r._encerrado);
+      if(idxAtivo>=0) regs[idxAtivo]._hist=true;
       // Cria novo registro individual por componente
       const reg={id:newId(),tipo:'rasp-'+k,data,desc:desc||'Sem relato',fotos,campos:{pct,crit},_hist:false};
       DB.registros[ativoSel].unshift(reg);
@@ -3729,9 +3743,14 @@ function importarBackup(input){
       if(Array.isArray(payload.DB_anotacoesGerais)) DB.anotacoesGerais=payload.DB_anotacoesGerais;
       if(Array.isArray(payload.DB_favoritos)) DB.favoritos=new Set(payload.DB_favoritos);
       if(payload.regCounter) regCounter=payload.regCounter+1;
-      mostrarToast('✓ Backup importado! Dados restaurados.','#1565C0');
-      marcarSalvo();
-      renderLista();
+      // Salva direto no IndexedDB sem passar pelo localStorage
+      salvarLS().then(()=>{
+        mostrarToast('✓ Backup importado com sucesso!','#1565C0');
+        marcarSalvo(); renderLista();
+      }).catch(()=>{
+        mostrarToast('✓ Backup importado!','#1565C0');
+        marcarSalvo(); renderLista();
+      });
     }catch(err){
       alert('Erro ao ler o backup: '+err.message);
     }
@@ -4008,12 +4027,12 @@ async function salvarLS(){
       tx.onerror    = () => reject(tx.error);
     });
   }catch(e){
-    // Fallback para localStorage se IndexedDB falhar
-    try{
-      localStorage.setItem(LS_KEY_FALLBACK, JSON.stringify(payload));
-    }catch(e2){
-      if(e2.name==='QuotaExceededError')
-        mostrarToast('⚠ Armazenamento cheio! Faça backup agora.','#C62828');
+    // IndexedDB falhou — não tenta localStorage (pode estar cheio)
+    // Avisa só se não avisou nos últimos 30s
+    const agora=Date.now();
+    if(!window._ultimoToastStorage||agora-window._ultimoToastStorage>30000){
+      window._ultimoToastStorage=agora;
+      mostrarToast('⚠ Erro ao salvar — faça backup manual!','#C62828');
     }
   }
 }
