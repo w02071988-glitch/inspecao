@@ -882,12 +882,17 @@ function renderMenu(){
 // ════════════════════════════════
 // FORMULÁRIO
 // ════════════════════════════════
-function selSecao(key){secaoSel=key;fotoB64=null;_defIdx=0;renderForm();}
+function selSecao(key){secaoSel=key;fotoB64=null;_defIdx=0;_limparFormCompleto();renderForm();}
 
 function galNs(sec){return 'gal-'+sec;}
 
 function renderForm(){
   passo='form';
+  // Limpa todas as fotos do formulário anterior
+  Object.keys(galFotos).forEach(k=>{
+    // Não limpa fotos de modais de edição (prefix 'edit-')
+    if(!k.startsWith('edit-')&&!k.startsWith('upd-'))delete galFotos[k];
+  });
   setTopbar(ativoSel,SECAO_LABELS[secaoSel],true,false);
   setStepBar(true,3);
   const rU=ultimoReg(ativoSel,secaoSel);
@@ -1545,6 +1550,7 @@ function salvar(){
     if(!desc){alert('Preencha a descrição ou use "Sem relato".');return;}
     const fotos=getGalFotos('gal-anotacao');
     DB.anotacoesGerais.unshift({ativo:ativoSel,data,desc,fotos});
+    galFotos['gal-anotacao']=[];
     renderSucesso({id:newId(),tipo:'anotacao',data,desc,fotos,campos:{}});
     return;
   }
@@ -1557,8 +1563,9 @@ function salvar(){
       const pct=document.getElementById('f-pct-'+k)?.value||'';
       const crit=document.getElementById('rcrit-'+k)?.value||'';
       const fotos=getGalFotos('gal-rasp-'+k);
-      // Só cria registro se preencheu algo
-      if(!desc&&!pct&&!crit&&!fotos.length) return;
+      // Só cria registro se preencheu algo (ignora se só tem fotos antigas não modificadas)
+      const fotosNovas=fotos.filter(f=>f); // fotos presentes no formulário
+      if(!desc&&!pct&&!crit&&!fotosNovas.length) return;
       // Inserir em anotações se marcado
       const addAnot=document.getElementById('rasp-'+k+'-add-anotacao')?.value==='1';
       if(addAnot&&desc&&desc!=='Sem relato'){
@@ -1658,7 +1665,25 @@ function salvar(){
   renderSucesso(reg);
 }
 
+function _limparFormCompleto(){
+  // Limpa todos os galFotos do formulário (não de edição)
+  Object.keys(galFotos).forEach(k=>{
+    if(!k.startsWith('edit-')&&!k.startsWith('upd-'))delete galFotos[k];
+  });
+  // Limpa campos de texto, selects e hidden
+  document.querySelectorAll(
+    '#content textarea, #content input[type=text], #content input[type=number], #content input[type=date]'
+  ).forEach(el=>{ if(!el.closest('.modal-edit'))el.value=''; });
+  // Limpa botões de opção selecionados
+  document.querySelectorAll('#content .btn-opcao-ativo').forEach(el=>el.classList.remove('btn-opcao-ativo'));
+  // Limpa hidden values de status/criticidade/etc
+  document.querySelectorAll('#content input[type=hidden]').forEach(el=>{
+    if(!el.closest('.modal-edit'))el.value='';
+  });
+}
+
 function renderSucesso(reg){
+  _limparFormCompleto();
   marcarMudanca(); autoBackup();
   passo='sucesso';
   setTopbar('Registro salvo!',ativoSel,false,false);
