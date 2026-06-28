@@ -535,6 +535,117 @@ function fmtData(iso){if(!iso)return'—';const[y,m,d]=iso.split('-');return d+'
 function dataHojeISO(){return hoje.toISOString().split('T')[0];}
 function diasDesde(iso){if(!iso)return null;return Math.round((hoje-new Date(iso+'T00:00:00'))/86400000);}
 function iconeAtivo(t){return t==='Empilhadeira'?'ti-forklift':t==='Recuperadora'?'ti-refresh':'ti-engine';}
+
+// SVGs personalizados por tipo de ativo
+const _SVG_ATIVOS={
+  'Empilhadeira': `<svg width="52" height="52" viewBox="0 0 372 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+<line x1="20" y1="75" x2="160" y2="75" stroke="#2E4A7A" stroke-width="5" stroke-linecap="round"/>
+<line x1="20" y1="93" x2="160" y2="93" stroke="#2E4A7A" stroke-width="5" stroke-linecap="round"/>
+<line x1="20" y1="75" x2="20" y2="93" stroke="#2E4A7A" stroke-width="5" stroke-linecap="round"/>
+<line x1="40" y1="75" x2="58" y2="93" stroke="#2E4A7A" stroke-width="2.2" opacity=".8"/>
+<line x1="58" y1="75" x2="40" y2="93" stroke="#2E4A7A" stroke-width="2.2" opacity=".8"/>
+<line x1="78" y1="75" x2="96" y2="93" stroke="#2E4A7A" stroke-width="2.2" opacity=".8"/>
+<line x1="96" y1="75" x2="78" y2="93" stroke="#2E4A7A" stroke-width="2.2" opacity=".8"/>
+<line x1="116" y1="75" x2="134" y2="93" stroke="#2E4A7A" stroke-width="2.2" opacity=".8"/>
+<line x1="134" y1="75" x2="116" y2="93" stroke="#2E4A7A" stroke-width="2.2" opacity=".8"/>
+<path d="M20,75 Q90,38 160,75" fill="none" stroke="#2E4A7A" stroke-width="2.5" stroke-dasharray="6,4" opacity=".9"/>
+<circle cx="160" cy="84" r="13" fill="none" stroke="#2E4A7A" stroke-width="3"/>
+<circle cx="160" cy="84" r="5" fill="#2E4A7A"/>
+<ellipse cx="160" cy="122" rx="16" ry="7" fill="#8B6914" opacity=".9"/>
+<ellipse cx="160" cy="148" rx="15" ry="7" fill="#A07820" opacity=".85"/>
+<ellipse cx="160" cy="174" rx="16" ry="7" fill="#8B6914" opacity=".85"/>
+<ellipse cx="160" cy="198" rx="14" ry="6" fill="#A07820" opacity=".8"/>
+<circle cx="140" cy="132" r="4" fill="#8B6914" opacity=".7"/>
+<circle cx="178" cy="150" r="3" fill="#A07820" opacity=".6"/>
+<circle cx="138" cy="170" r="3" fill="#8B6914" opacity=".7"/>
+<circle cx="180" cy="185" r="4" fill="#A07820" opacity=".6"/>
+<path d="M100,218 Q160,180 220,218" fill="none" stroke="#8B6914" stroke-width="2.5"/>
+<line x1="0" y1="218" x2="290" y2="218" stroke="#8B6914" stroke-width="2.5"/>
+<path d="M118,218 Q138,202 160,206 Q182,198 202,218" fill="none" stroke="#8B6914" stroke-width="1.5" opacity=".5"/>
+</svg>`,
+  'Recuperadora': `<svg width="52" height="52" viewBox="0 0 372 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+<line x1="258" y1="22" x2="96" y2="96" stroke="#2E4A7A" stroke-width="2.8" stroke-linecap="round"/>
+<line x1="258" y1="34" x2="96" y2="108" stroke="#2E4A7A" stroke-width="2.8" stroke-linecap="round"/>
+<line x1="230" y1="27" x2="220" y2="38" stroke="#2E4A7A" stroke-width="1.5" opacity=".7"/>
+<line x1="200" y1="41" x2="212" y2="52" stroke="#2E4A7A" stroke-width="1.5" opacity=".7"/>
+<line x1="212" y1="52" x2="172" y2="61" stroke="#2E4A7A" stroke-width="1.5" opacity=".7"/>
+<line x1="172" y1="48" x2="184" y2="64" stroke="#2E4A7A" stroke-width="1.5" opacity=".7"/>
+<line x1="184" y1="64" x2="144" y2="73" stroke="#2E4A7A" stroke-width="1.5" opacity=".7"/>
+<line x1="144" y1="60" x2="156" y2="78" stroke="#2E4A7A" stroke-width="1.5" opacity=".7"/>
+<line x1="156" y1="78" x2="116" y2="87" stroke="#2E4A7A" stroke-width="1.5" opacity=".7"/>
+<line x1="116" y1="74" x2="128" y2="90" stroke="#2E4A7A" stroke-width="1.5" opacity=".7"/>
+<path d="M258,22 Q180,0 96,96" fill="none" stroke="#2E4A7A" stroke-width="1.4" stroke-dasharray="5,3" opacity=".8"/>
+<circle cx="96" cy="102" r="5" fill="#2E4A7A"/>
+<circle cx="72" cy="124" r="44" fill="none" stroke="#2E4A7A" stroke-width="2.5"/>
+<circle cx="72" cy="124" r="14" fill="none" stroke="#2E4A7A" stroke-width="2"/>
+<circle cx="72" cy="124" r="5" fill="#2E4A7A"/>
+<line x1="72" y1="110" x2="72" y2="80" stroke="#2E4A7A" stroke-width="2"/>
+<line x1="72" y1="138" x2="72" y2="168" stroke="#2E4A7A" stroke-width="2"/>
+<line x1="58" y1="124" x2="28" y2="124" stroke="#2E4A7A" stroke-width="2"/>
+<line x1="86" y1="124" x2="116" y2="124" stroke="#2E4A7A" stroke-width="2"/>
+<line x1="82" y1="114" x2="103" y2="93" stroke="#2E4A7A" stroke-width="2"/>
+<line x1="62" y1="134" x2="41" y2="155" stroke="#2E4A7A" stroke-width="2"/>
+<line x1="62" y1="114" x2="41" y2="93" stroke="#2E4A7A" stroke-width="2"/>
+<line x1="82" y1="134" x2="103" y2="155" stroke="#2E4A7A" stroke-width="2"/>
+<rect x="66" y="73" width="12" height="9" rx="2" fill="none" stroke="#2E4A7A" stroke-width="2"/>
+<rect x="66" y="160" width="12" height="9" rx="2" fill="none" stroke="#2E4A7A" stroke-width="2"/>
+<rect x="21" y="119" width="9" height="11" rx="2" fill="none" stroke="#2E4A7A" stroke-width="2"/>
+<rect x="114" y="119" width="9" height="11" rx="2" fill="none" stroke="#2E4A7A" stroke-width="2"/>
+<rect x="98" y="86" width="11" height="9" rx="2" fill="none" stroke="#2E4A7A" stroke-width="2" transform="rotate(-45 103 90)"/>
+<rect x="34" y="148" width="11" height="9" rx="2" fill="none" stroke="#2E4A7A" stroke-width="2" transform="rotate(-45 39 152)"/>
+<rect x="34" y="86" width="11" height="9" rx="2" fill="none" stroke="#2E4A7A" stroke-width="2" transform="rotate(45 39 90)"/>
+<rect x="98" y="148" width="11" height="9" rx="2" fill="none" stroke="#2E4A7A" stroke-width="2" transform="rotate(45 103 152)"/>
+<path d="M0,210 Q72,158 144,210" fill="none" stroke="#8B6914" stroke-width="2.2"/>
+<line x1="0" y1="210" x2="280" y2="210" stroke="#8B6914" stroke-width="2.2"/>
+<circle cx="36" cy="156" r="3" fill="#8B6914" opacity=".9"/>
+<circle cx="26" cy="146" r="2" fill="#8B6914" opacity=".7"/>
+<circle cx="44" cy="166" r="2" fill="#A07820" opacity=".8"/>
+<circle cx="32" cy="172" r="3" fill="#A07820" opacity=".7"/>
+<path d="M116,102 A48,48 0 0,0 100,78" fill="none" stroke="#2E4A7A" stroke-width="1.8" stroke-dasharray="4,3"/>
+<polygon points="100,72 95,83 105,81" fill="#2E4A7A"/>
+</svg>`,
+  'Transportador': `<svg width="52" height="52" viewBox="0 0 290 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="26" cy="100" r="38" fill="none" stroke="#2E4A7A" stroke-width="3.5"/>
+<circle cx="26" cy="100" r="13" fill="none" stroke="#2E4A7A" stroke-width="2.5"/>
+<circle cx="26" cy="100" r="5" fill="#2E4A7A"/>
+<circle cx="264" cy="100" r="38" fill="none" stroke="#2E4A7A" stroke-width="3.5"/>
+<circle cx="264" cy="100" r="13" fill="none" stroke="#2E4A7A" stroke-width="2.5"/>
+<circle cx="264" cy="100" r="5" fill="#2E4A7A"/>
+<line x1="26" y1="62" x2="264" y2="62" stroke="#2E4A7A" stroke-width="3.5"/>
+<line x1="26" y1="138" x2="264" y2="138" stroke="#2E4A7A" stroke-width="3"/>
+<ellipse cx="90" cy="58" rx="18" ry="8" fill="#8B6914" opacity=".9"/>
+<ellipse cx="145" cy="54" rx="20" ry="9" fill="#A07820" opacity=".85"/>
+<ellipse cx="200" cy="57" rx="18" ry="8" fill="#8B6914" opacity=".85"/>
+<circle cx="112" cy="50" r="5" fill="#C09030" opacity=".9"/>
+<circle cx="168" cy="47" r="6" fill="#8B6914" opacity=".8"/>
+<circle cx="222" cy="51" r="5" fill="#A07820" opacity=".9"/>
+</svg>`,
+  'Extrator': `<svg width="32" height="32" viewBox="0 0 148 148" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <line x1="8" y1="38" x2="8" y2="104" stroke="#4a4a4a" stroke-width="3" stroke-linecap="round"/>
+  <line x1="140" y1="38" x2="140" y2="104" stroke="#4a4a4a" stroke-width="3" stroke-linecap="round"/>
+  <line x1="4" y1="38" x2="144" y2="38" stroke="#4a4a4a" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="14" y1="38" x2="14" y2="22" stroke="#6a6a6a" stroke-width="2" stroke-dasharray="4,3"/>
+  <line x1="134" y1="38" x2="134" y2="22" stroke="#6a6a6a" stroke-width="2" stroke-dasharray="4,3"/>
+  <rect x="6" y="14" width="16" height="10" rx="2" fill="#4a4a4a"/>
+  <rect x="126" y="14" width="16" height="10" rx="2" fill="#4a4a4a"/>
+  <rect x="8" y="96" width="132" height="10" rx="5" fill="#2a2a2a"/>
+  <rect x="8" y="118" width="132" height="7" rx="3" fill="#2a2a2a" opacity=".5"/>
+  <circle cx="12" cy="101" r="14" fill="#3a3a3a" stroke="#1a1a1a" stroke-width="2"/>
+  <circle cx="12" cy="101" r="5" fill="#1a1a1a"/>
+  <circle cx="136" cy="101" r="14" fill="#3a3a3a" stroke="#1a1a1a" stroke-width="2"/>
+  <circle cx="136" cy="101" r="5" fill="#1a1a1a"/>
+  <polygon points="8,106 140,106 148,120 0,120" fill="#E65100" stroke="#CC4400" stroke-width="2"/>
+  <rect x="68" y="120" width="12" height="14" rx="2" fill="#CC4400"/>
+  <ellipse cx="74" cy="138" rx="12" ry="6" fill="#CC4400"/>
+  <rect x="24" y="84" width="12" height="8" rx="1" fill="#9E9E9E" transform="rotate(-15 24 84)"/>
+  <rect x="54" y="82" width="16" height="7" rx="1" fill="#757575" transform="rotate(10 54 82)"/>
+  <rect x="84" y="83" width="11" height="8" rx="1" fill="#BDBDBD" transform="rotate(-8 84 83)"/>
+  <rect x="112" y="84" width="13" height="7" rx="1" fill="#9E9E9E" transform="rotate(12 112 84)"/>
+</svg>`
+};
+function svgAtivo(t){
+  return _SVG_ATIVOS[t]||_SVG_ATIVOS['Transportador'];
+}
 function newId(){return 'r'+(regCounter++);}
 function ultimaAlteracao(id){const r=DB.registros[id];if(!r.length)return null;return r.map(x=>x.data).sort().reverse()[0];}
 function pillUltima(id){
@@ -622,7 +733,7 @@ function renderLista(){
     h+=`<div class="ativo-card-wrap" id="wrap-${a.id}" style="position:relative;">
       ${isFav?'<span class="ativo-fav-star"><i class="ti ti-star-filled"></i></span>':''}
       <div class="ativo-card" onclick="selAtivo('${a.id}')">
-        <i class="ti ${iconeAtivo(a.tipo)} ac-icon"></i>
+        <span class="ac-icon" style="display:flex;align-items:center;justify-content:center;">${svgAtivo(a.tipo)}</span>
         <div class="ac-id">${a.id}</div>
         <div class="ac-tipo">${a.tipo}</div>
         <span class="pill ${cls}" style="margin-top:3px;">${txt}</span>
@@ -745,7 +856,7 @@ function renderFavoritos(){
       h+=`<div class="ativo-card-wrap" style="position:relative;">
         <span class="ativo-fav-star"><i class="ti ti-star-filled"></i></span>
         <div class="ativo-card" onclick="selAtivo('${a.id}')">
-          <i class="ti ${iconeAtivo(a.tipo)} ac-icon"></i>
+          <span class="ac-icon" style="display:flex;align-items:center;justify-content:center;">${svgAtivo(a.tipo)}</span>
           <div class="ac-id">${a.id}</div>
           <div class="ac-tipo">${a.tipo}</div>
           <span class="pill ${cls}" style="margin-top:3px;">${txt}</span>
@@ -908,7 +1019,7 @@ function renderMenu(){
 
   document.getElementById('content').innerHTML=`
     <div class="ativo-banner">
-      <i class="ti ${iconeAtivo(a.tipo)}"></i>
+      <span style="display:flex;align-items:center;justify-content:center;">${svgAtivo(a.tipo)}</span>
       <div><div class="ab-id">${a.id}</div><div class="ab-nome">${a.tipo}</div></div>
       <span class="pill ${cls}" style="margin-left:auto;">${txt}</span>
     </div>
