@@ -44,7 +44,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .drive-btn-sim{background:#fff;color:#1F3864;}
 .drive-btn-depois{background:rgba(255,255,255,.2);color:#fff;}
 .topbar-home span{font-size:11px;font-weight:600;letter-spacing:.02em;}
-.topbar-info{flex:1;}
+.topbar-info{flex:1;min-width:0;}
+.topbar-info h1{font-size:14px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.topbar-info p{font-size:11px!important;opacity:.8;white-space:nowrap;}
 .topbar h1{font-size:15px;font-weight:600;}
 .topbar p{font-size:11px;opacity:.65;margin-top:1px;}
 .step-bar{display:flex;align-items:center;padding:12px 16px;background:#fff;border-bottom:1px solid #E5E8ED;}
@@ -396,6 +398,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <button class="topbar-icon-btn" id="btn-share-pdf" title="Compartilhar relatório PDF" onclick="compartilharPDF()" style="display:none;"><i class="ti ti-share"></i></button>
     <button class="topbar-icon-btn" title="Exportar backup" onclick="exportarBackup()"><i class="ti ti-download"></i></button>
     <button class="topbar-icon-btn" title="Importar backup" onclick="document.getElementById('import-input').click()"><i class="ti ti-upload"></i></button>
+    <button class="topbar-icon-btn" id="btn-check-versao" title="Verificar versão" onclick="verificarVersaoAtual()" style="background:rgba(255,200,0,.25);font-size:9px;font-weight:700;color:#FFD54F;padding:4px 6px;border-radius:6px;letter-spacing:.02em;">VER</button>
     <input type="file" id="import-input" accept=".json" style="display:none" onchange="importarBackup(this)">
   </div>
 </div>
@@ -592,19 +595,10 @@ function setStepBar(show,step){
 // ════════════════════════════════
 function renderLista(){
   passo='lista';
-  setTopbar('Inspeção de Correia',hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}),false,false);
-  // Badge versão na topbar
-  setTimeout(()=>{
-    const sub=document.getElementById('topbar-sub');
-    if(sub&&!document.getElementById('version-badge')){
-      const badge=document.createElement('span');
-      badge.id='version-badge';
-      badge.className='app-version-badge no-print';
-      badge.innerHTML='Washington Sales &nbsp;<span style="opacity:.6;">v0.1</span>';
-      badge.onclick=()=>mostrarNovidades();
-      sub.parentNode.insertBefore(badge,sub.nextSibling);
-    }
-  },50);
+  setTopbar('Inspeção de Correia','Washington Sales · '+APP_VERSION,false,false);
+  // Salva a data para exibir na lista
+  window._dataHoje=hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});
+
   setStepBar(true,1);
   const favCount=DB.favoritos.size;
   let h=`
@@ -620,6 +614,7 @@ function renderLista(){
         <div class="ag-sub">${favCount} ativo(s)</div></div>
       </div>
     </div>
+    <div style="text-align:center;font-size:11px;color:#9CA3AF;margin:0 0 10px;font-weight:500;">${window._dataHoje||''}</div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
       <span class="bloco-titulo" style="margin-bottom:0;">Ativos (${ATIVOS.length}/50)</span>
       ${ATIVOS.length<50?`<button onclick="novoAtivo()" style="background:#1F3864;color:#fff;border:none;border-radius:8px;padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;"><i class="ti ti-plus"></i> Novo ativo</button>`:"<span style='font-size:11px;color:#9CA3AF;'>Limite atingido</span>"}
@@ -3057,6 +3052,13 @@ const APP_CHANGELOG=[
     'PWA instalável — armazenamento sem limite de cache'
 ];
 const NOVIDADES_LS_KEY='insp_novidades_visto';
+
+function verificarVersaoAtual(){
+  // Mostra versão atual em execução — para confirmar se o celular atualizou
+  const agora=new Date();
+  const hora=agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  alert('✅ Versão em execução: '+APP_VERSION+'\n\nCarregado às: '+hora+'\n\nSe esta mensagem aparecer, o app está atualizado!\n(Botão "VER" é temporário — será removido em breve)');
+}
 
 function verificarNovidades(){
   try{
