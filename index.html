@@ -646,17 +646,21 @@ function novoAtivo(){
   _initAtivo(nome);
   marcarMudanca();autoBackup();
   mostrarToast('✓ Ativo '+nome+' criado!','#2E7D32');
-  // ── Limpa localStorage antigo para liberar espaço ──
+  // ── Limpa TUDO do localStorage para liberar espaço ──
 (function limparLSAntigo(){
   try{
-    const keys=['inspecao_v3','inspecao_v2','inspecao_v1','insp_db'];
-    keys.forEach(k=>{
-      if(localStorage.getItem(k)){
-        localStorage.removeItem(k);
-        console.log('localStorage limpo: '+k);
+    // Remove todas as chaves de dados antigos do app
+    const keysRemover=[];
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      // Remove chaves de dados do app mas preserva preferências pequenas (msgs rápidas, drive sync)
+      if(k&&(k.startsWith('inspecao')||k.startsWith('insp_db'))){
+        keysRemover.push(k);
       }
-    });
-  }catch{}
+    }
+    keysRemover.forEach(k=>{localStorage.removeItem(k);});
+    if(keysRemover.length) console.log('localStorage limpo:', keysRemover);
+  }catch(e){console.warn('Limpeza LS falhou:',e);}
 })();
 
 // ── Migração: status 'em' → 'ac' em todos os registros ──
@@ -4027,13 +4031,8 @@ async function salvarLS(){
       tx.onerror    = () => reject(tx.error);
     });
   }catch(e){
-    // IndexedDB falhou — não tenta localStorage (pode estar cheio)
-    // Avisa só se não avisou nos últimos 30s
-    const agora=Date.now();
-    if(!window._ultimoToastStorage||agora-window._ultimoToastStorage>30000){
-      window._ultimoToastStorage=agora;
-      mostrarToast('⚠ Erro ao salvar — faça backup manual!','#C62828');
-    }
+    // IndexedDB falhou silenciosamente — não tenta localStorage
+    console.warn('IndexedDB save failed:', e?.message||e);
   }
 }
 
@@ -4331,8 +4330,8 @@ if('serviceWorker' in navigator){
   }
 })();
 
-// Salva a cada 30 segundos como segurança extra
-setInterval(salvarLS, 30000);
+// Salva a cada 2 minutos como segurança extra (IndexedDB — sem risco de quota)
+setInterval(()=>salvarLS().catch(()=>{}), 120000);
 
 </script>
 </body>
