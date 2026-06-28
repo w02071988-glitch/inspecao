@@ -511,17 +511,18 @@ ATIVOS.forEach(a=>_initAtivo(a.id));
 
 function _initAtivo(id){
   if(!DB.registros[id]) DB.registros[id]=[];
-  if(!DB.fichas[id]) DB.fichas[id]={cod:'',comprimento_total:'',trechos:[{l:'A',de:'',ate:'',comp:'',fab:'',op:'',spec:'',unica:false,uss:Array(21).fill('')}],largura:'',tipo_lona:'lona',cabo_breaker:false,cob_sup:'',cob_inf:'',material:'',obs:''};
+  if(!DB.fichas[id]) DB.fichas[id]={cod:'',comprimento_total:'',trechos:[{l:'A',de:'',ate:'',comp:'',fab:'',op:'',spec:'',unica:false,uss:Array(21).fill('')}],largura:'',tipo_lona:'lona',cabo_breaker:false,cob_sup:'',cob_inf:'',material:'',obs:'',extrator:{temExtrator:false,largura:'',emenda:'',dataEmenda:'',cantoneiras:''}};
   if(!DB.raspAtivos[id]) DB.raspAtivos[id]={prim:true,p2:false,s1:false,s2:false,s3:false,s4:false,s5:false};
 }
 
 let ativoSel=null,fotoB64=null,passo='lista',secaoSel=null,editandoReg=null,regCounter=1,pagAnotacoes=1;
 let _defIdx=0;
 
-const SECAO_LABELS={anotacao:'Anotações',contra:'Contrapeso',defeito:'Defeitos/Reparos',desal:'Desalinhamento',interf:'Interferências',rasp:'Raspadores',...Object.fromEntries((['prim','p2','s1','s2','s3','s4','s5']).map(k=>['rasp-'+k,k==='prim'?'Primário (P1)':k==='p2'?'Primário (P2)':'Secundário '+k.toUpperCase()]))};
-const SECAO_ICONS={anotacao:'ti-notes',contra:'ti-adjustments',defeito:'ti-hammer',desal:'ti-arrows-left-right',interf:'ti-alert-triangle',rasp:'ti-tool'};
+const SECAO_LABELS={anotacao:'Anotações',contra:'Contrapeso',defeito:'Defeitos/Reparos',desal:'Desalinhamento',interf:'Interferências',rasp:'Raspadores','ext-defeito':'Ext. Defeitos/Reparos','ext-interf':'Ext. Interferências','ext-desal':'Ext. Desalinhamento',...Object.fromEntries((['prim','p2','s1','s2','s3','s4','s5']).map(k=>['rasp-'+k,k==='prim'?'Primário (P1)':k==='p2'?'Primário (P2)':'Secundário '+k.toUpperCase()]))};
+const SECAO_ICONS={anotacao:'ti-notes',contra:'ti-adjustments',defeito:'ti-hammer',desal:'ti-arrows-left-right',interf:'ti-alert-triangle',rasp:'ti-tool','ext-defeito':'ti-hammer','ext-interf':'ti-alert-triangle','ext-desal':'ti-arrows-left-right'};
 // Ordem alfabética para o menu
 const SECOES_MENU=['anotacao','contra','defeito','desal','interf','rasp'];
+const SECOES_EXT=['ext-defeito','ext-interf','ext-desal'];
 
 function fmtData(iso){if(!iso)return'—';const[y,m,d]=iso.split('-');return d+'/'+m+'/'+y;}
 function dataHojeISO(){return hoje.toISOString().split('T')[0];}
@@ -849,6 +850,8 @@ function renderMenu(){
   setStepBar(true,2);
 
   // seções em ordem alfabética — 3 por linha exceto rasp que destaca
+  const ficha=DB.fichas[ativoSel];
+  const temExtrator=ficha?.extrator?.temExtrator||false;
   let secoesHtml='<div class="grid-2" style="gap:8px;">';
   SECOES_MENU.forEach(s=>{
     secoesHtml+=`<div class="card-btn" onclick="selSecao('${s}')">
@@ -857,6 +860,18 @@ function renderMenu(){
     </div>`;
   });
   secoesHtml+=`</div>`;
+  // Bloco Extrator de Sucatas — aparece só se ativado na ficha técnica
+  const extHtml=temExtrator?`<div style="margin-top:10px;border-top:2px solid #E5E8ED;padding-top:10px;">
+    <div style="font-size:11px;font-weight:700;color:#E65100;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+      <i class="ti ti-trash" style="color:#E65100;"></i> Extrator de Sucatas
+    </div>
+    <div class="grid-2" style="gap:8px;">
+      ${SECOES_EXT.map(s=>`<div class="card-btn" style="border-color:#E65100;" onclick="selSecao('${s}')">
+        <i class="ti ${SECAO_ICONS[s]}" style="color:#E65100;"></i>
+        <div class="cb-nome" style="font-size:11px;">${SECAO_LABELS[s].replace('Ext. ','')}</div>
+      </div>`).join('')}
+    </div>
+  </div>`:'';
 
   document.getElementById('content').innerHTML=`
     <div class="ativo-banner">
@@ -876,6 +891,7 @@ function renderMenu(){
     </div>
     <div class="bloco-titulo">Registrar inspeção</div>
     ${secoesHtml}
+    ${extHtml}
     <button class="btn-sec" style="margin-top:12px;" onclick="renderLista()"><i class="ti ti-arrow-left"></i> Outro ativo</button>`;
 }
 
@@ -907,14 +923,14 @@ function renderForm(){
   </div>`;
 
   if(secaoSel==='rasp') c+=buildRaspForm();
-  else if(secaoSel==='interf') c+=buildInterfForm(rU);
-  else if(secaoSel==='desal') c+=buildDesalForm(rU);
+  else if(secaoSel==='interf'||secaoSel==='ext-interf') c+=buildInterfForm(rU);
+  else if(secaoSel==='desal'||secaoSel==='ext-desal') c+=buildDesalForm(rU);
   else if(secaoSel==='contra') c+=buildContraForm(rU);
-  else if(secaoSel==='defeito') c+=buildDefeitoForm();
+  else if(secaoSel==='defeito'||secaoSel==='ext-defeito') c+=buildDefeitoForm();
   else if(secaoSel==='anotacao') c+=buildAnotacaoForm(hDesc);
 
   // Galeria para seções simples (não rasp, defeito, anotacao — elas têm galeria própria)
-  if(!['defeito','rasp','anotacao'].includes(secaoSel)){
+  if(!['defeito','rasp','anotacao','ext-defeito'].includes(secaoSel)){
     c+=buildGaleriaField(ns);
   }
   c+=`<button class="btn-prim" onclick="salvar()">Salvar registro</button>
@@ -947,12 +963,16 @@ function buildGaleriaField(ns){
     <label>Fotos <span class="lbl-hint">(até 6)</span></label>
     <div class="galeria-wrap">
       <div class="galeria-grid" id="gal-grid-${ns}"></div>
-      <div id="gal-btn-${ns}">
-        <div class="galeria-add-btn" onclick="document.getElementById('gal-inp-${ns}').click()">
-          <i class="ti ti-camera"></i> Adicionar foto
+      <div id="gal-btn-${ns}" style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div class="galeria-add-btn" onclick="document.getElementById('gal-cam-${ns}').click()" style="flex:1;min-width:120px;">
+          <i class="ti ti-camera"></i> Câmera
+        </div>
+        <div class="galeria-add-btn" onclick="document.getElementById('gal-inp-${ns}').click()" style="flex:1;min-width:120px;background:#F0F4FA;color:#1F3864;border-color:#C5D8F0;">
+          <i class="ti ti-photo"></i> Galeria
         </div>
       </div>
     </div>
+    <input type="file" id="gal-cam-${ns}" accept="image/*" capture="environment" style="display:none" onchange="adicionarFotos('${ns}',this)">
     <input type="file" id="gal-inp-${ns}" accept="image/*" multiple style="display:none" onchange="adicionarFotos('${ns}',this)">
   </div>`;
 }
@@ -1120,20 +1140,20 @@ function buildInterfForm(rU){
   const ultCrit=rU?.campos?.crit||'';
   const ultStatus=rU?.campos?.status||'';
   return `
-  <div class="form-grupo"><label>Criticidade</label>
+  <div class="form-grupo"><label>Criticidade ${ultCrit?'<span class="lbl-hint">(último: '+ultCrit+')</span>':''}</label>
     <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <button type="button" class="btn-opcao btn-opcao-verde ${ultCrit==='Baixo'?'btn-opcao-ativo':''}" id="interf-crit-baixo" onclick="selecionarOpcao('interf-crit','Baixo',this)">Baixo</button>
-      <button type="button" class="btn-opcao btn-opcao-amarelo ${ultCrit==='Médio'?'btn-opcao-ativo':''}" id="interf-crit-medio" onclick="selecionarOpcao('interf-crit','Médio',this)">Médio</button>
-      <button type="button" class="btn-opcao btn-opcao-vermelho ${ultCrit==='Alto'?'btn-opcao-ativo':''}" id="interf-crit-alto" onclick="selecionarOpcao('interf-crit','Alto',this)">Alto</button>
+      <button type="button" class="btn-opcao btn-opcao-verde" id="interf-crit-baixo" onclick="selecionarOpcao('interf-crit','Baixo',this)">Baixo</button>
+      <button type="button" class="btn-opcao btn-opcao-amarelo" id="interf-crit-medio" onclick="selecionarOpcao('interf-crit','Médio',this)">Médio</button>
+      <button type="button" class="btn-opcao btn-opcao-vermelho" id="interf-crit-alto" onclick="selecionarOpcao('interf-crit','Alto',this)">Alto</button>
     </div>
-    <input type="hidden" id="interf-crit" value="${ultCrit}">
+    <input type="hidden" id="interf-crit" value="">
   </div>
-  <div class="form-grupo"><label>Status</label>
+  <div class="form-grupo"><label>Status ${ultStatus?'<span class="lbl-hint">(último: '+(ultStatus==='ac'?'Acompanhando':'Concluído')+')</span>':''}</label>
     <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <button type="button" class="btn-opcao btn-opcao-azul ${ultStatus==='ac'?'btn-opcao-ativo':''}" id="interf-status-ac" onclick="selecionarOpcao('interf-status','ac',this)">Acompanhando</button>
-      <button type="button" class="btn-opcao btn-opcao-verde ${ultStatus==='co'?'btn-opcao-ativo':''}" id="interf-status-co" onclick="selecionarOpcao('interf-status','co',this)">Concluído</button>
+      <button type="button" class="btn-opcao btn-opcao-azul" id="interf-status-ac" onclick="selecionarOpcao('interf-status','ac',this)">Acompanhando</button>
+      <button type="button" class="btn-opcao btn-opcao-verde" id="interf-status-co" onclick="selecionarOpcao('interf-status','co',this)">Concluído</button>
     </div>
-    <input type="hidden" id="interf-status" value="${ultStatus||'ac'}">
+    <input type="hidden" id="interf-status" value="">
   </div>
   <div class="form-grupo"><label>Tipo</label>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
@@ -1146,7 +1166,7 @@ function buildInterfForm(rU){
   <div id="bloco-outros-interf" style="display:none;">
     <div class="form-grupo"><label>Especificar</label><input type="text" id="f-tipo-outros" placeholder="Descreva..."></div>
   </div>
-  <div class="form-grupo"><label>Baliza / local</label><input type="text" id="f-bal" placeholder="Ex: B3, PE, cabeça..."></div>
+  ${secaoSel!=='ext-interf'?`<div class="form-grupo"><label>Baliza / local</label><input type="text" id="f-bal" placeholder="Ex: B3, PE, cabeça..."></div>`:'<input type="hidden" id="f-bal" value="">'}
   `+buildDescGroup('f-desc',rU?.desc||'')+`
   <div onclick="toggleAddAnotacao('interf')" style="display:flex;align-items:center;gap:8px;margin-top:4px;margin-bottom:12px;cursor:pointer;user-select:none;">
     <span id="interf-anotacao-box" style="width:16px;height:16px;border:2px solid #1F3864;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;background:#fff;flex-shrink:0;"></span>
@@ -1167,22 +1187,22 @@ function buildDesalForm(rU){
   const ultCrit=rU?.campos?.crit||'';
   const ultStatus=rU?.campos?.status||'';
   return `
-  <div class="form-grupo"><label>Criticidade</label>
+  <div class="form-grupo"><label>Criticidade ${ultCrit?'<span class="lbl-hint">(último: '+ultCrit+')</span>':''}</label>
     <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <button type="button" class="btn-opcao btn-opcao-verde ${ultCrit==='Baixo'?'btn-opcao-ativo':''}" id="desal-crit-baixo" onclick="selecionarOpcao('desal-crit','Baixo',this)">Baixo</button>
-      <button type="button" class="btn-opcao btn-opcao-amarelo ${ultCrit==='Médio'?'btn-opcao-ativo':''}" id="desal-crit-medio" onclick="selecionarOpcao('desal-crit','Médio',this)">Médio</button>
-      <button type="button" class="btn-opcao btn-opcao-vermelho ${ultCrit==='Alto'?'btn-opcao-ativo':''}" id="desal-crit-alto" onclick="selecionarOpcao('desal-crit','Alto',this)">Alto</button>
+      <button type="button" class="btn-opcao btn-opcao-verde" id="desal-crit-baixo" onclick="selecionarOpcao('desal-crit','Baixo',this)">Baixo</button>
+      <button type="button" class="btn-opcao btn-opcao-amarelo" id="desal-crit-medio" onclick="selecionarOpcao('desal-crit','Médio',this)">Médio</button>
+      <button type="button" class="btn-opcao btn-opcao-vermelho" id="desal-crit-alto" onclick="selecionarOpcao('desal-crit','Alto',this)">Alto</button>
     </div>
-    <input type="hidden" id="desal-crit" value="${ultCrit}">
+    <input type="hidden" id="desal-crit" value="">
   </div>
-  <div class="form-grupo"><label>Status</label>
+  <div class="form-grupo"><label>Status ${ultStatus?'<span class="lbl-hint">(último: '+(ultStatus==='ac'?'Acompanhando':'Concluído')+')</span>':''}</label>
     <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <button type="button" class="btn-opcao btn-opcao-azul ${ultStatus==='ac'?'btn-opcao-ativo':''}" id="desal-status-ac" onclick="selecionarOpcao('desal-status','ac',this)">Acompanhando</button>
-      <button type="button" class="btn-opcao btn-opcao-verde ${ultStatus==='co'?'btn-opcao-ativo':''}" id="desal-status-co" onclick="selecionarOpcao('desal-status','co',this)">Concluído</button>
+      <button type="button" class="btn-opcao btn-opcao-azul" id="desal-status-ac" onclick="selecionarOpcao('desal-status','ac',this)">Acompanhando</button>
+      <button type="button" class="btn-opcao btn-opcao-verde" id="desal-status-co" onclick="selecionarOpcao('desal-status','co',this)">Concluído</button>
     </div>
-    <input type="hidden" id="desal-status" value="${ultStatus||'ac'}">
+    <input type="hidden" id="desal-status" value="">
   </div>
-  <div class="form-grupo"><label>Baliza / local</label><input type="text" id="f-local" placeholder="Ex: retorno, carga, meio, B3..."></div>
+  ${secaoSel!=='ext-desal'?`<div class="form-grupo"><label>Baliza / local</label><input type="text" id="f-local" placeholder="Ex: retorno, carga, meio, B3..."></div>`:'<input type="hidden" id="f-local" value="">'}
   `+buildDescGroup('f-desc',rU?.desc||'')+`
   <div onclick="toggleAddAnotacao('desal')" style="display:flex;align-items:center;gap:8px;margin-top:4px;margin-bottom:12px;cursor:pointer;user-select:none;">
     <span id="desal-anotacao-box" style="width:16px;height:16px;border:2px solid #1F3864;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;background:#fff;flex-shrink:0;"></span>
@@ -1225,9 +1245,9 @@ function buildDefeitoBloco(idx){
     </div>
 
     <div id="${id}-bloco-emenda" style="display:none;">
-      <div class="form-grupo"><label>Data da emenda</label>
+      ${secaoSel!=='ext-defeito'?`<div class="form-grupo"><label>Data da emenda</label>
         <input type="text" id="${id}-data-emenda" placeholder="dd/mm/aaaa">
-      </div>
+      </div>`:''}
     </div>
 
     <div class="form-grupo"><label>Localização</label>
@@ -1585,7 +1605,7 @@ function salvar(){
     renderSucesso({id:newId(),tipo:'rasp',data,desc:'Inspeção de raspadores',fotos:[],campos:{}});return;
   }
 
-  if(secaoSel==='defeito'){
+  if(secaoSel==='defeito'||secaoSel==='ext-defeito'){
     const cards=document.querySelectorAll('[id^="card-def-"]');
     const defeitos=[];
     cards.forEach(card=>{
@@ -1616,7 +1636,7 @@ function salvar(){
         desc, fotos
       });
     });
-    const reg={id:newId(),tipo:'defeito',data,desc:'Defeitos/Reparos',fotos:[],campos:{defeitos}};
+    const reg={id:newId(),tipo:secaoSel,data,desc:SECAO_LABELS[secaoSel]||'Defeitos/Reparos',fotos:[],campos:{defeitos}};
     DB.registros[ativoSel].unshift(reg);
     renderSucesso(reg);return;
   }
@@ -1626,12 +1646,16 @@ function salvar(){
   const fotos=getGalFotos(galNs(secaoSel));
   const reg={id:newId(),tipo:secaoSel,data,desc,fotos,campos:{}};
 
-  if(secaoSel==='interf'){
+  // Extrator mapeia para mesmos handlers mas com tipo diferente
+  const _tipoBase=secaoSel.replace('ext-','');
+  const _isExt=secaoSel.startsWith('ext-');
+  if(secaoSel==='interf'||secaoSel==='ext-interf'){
     let tipo=document.getElementById('f-tipo-interf')?.value||'';
     if(tipo==='outros')tipo=document.getElementById('f-tipo-outros')?.value||'Outros';
     const intCrit=document.getElementById('interf-crit')?.value||'';
     const intStatus=document.getElementById('interf-status')?.value||'ac';
     reg.campos={tipo,bal:document.getElementById('f-bal')?.value||'',crit:intCrit,status:intStatus};
+    reg.tipo=secaoSel; // preserva ext-interf ou interf
     // Inserir em anotações
     if(document.getElementById('interf-add-anotacao')?.value==='1'&&desc&&desc!=='Sem relato'){
       const partes=[];
@@ -1644,10 +1668,11 @@ function salvar(){
       DB.anotacoesGerais.unshift({ativo:ativoSel,data,desc:'[Interferência'+(partes.length?' — '+partes.join(' / '):'')+']\n\nDescrição: '+desc,fotos:[...fotos]});
     }
   }
-  if(secaoSel==='desal'){
+  if(secaoSel==='desal'||secaoSel==='ext-desal'){
     const dsCrit=document.getElementById('desal-crit')?.value||'';
     const dsStatus=document.getElementById('desal-status')?.value||'ac';
     reg.campos={local:document.getElementById('f-local')?.value||'',crit:dsCrit,status:dsStatus};
+    reg.tipo=secaoSel; // preserva ext-desal ou desal
     // Inserir em anotações
     if(document.getElementById('desal-add-anotacao')?.value==='1'&&desc&&desc!=='Sem relato'){
       const partes=[];
@@ -1715,7 +1740,8 @@ function renderRelatorio(){
   const ficha=DB.fichas[ativoSel];
   const TIPOS_BASE=['anotacao','contra','defeito','desal','interf'];
   const RASP_K_TIPOS=RASP_CHAVES.map(k=>'rasp-'+k);
-  const TODOS_TIPOS=[...TIPOS_BASE,...RASP_K_TIPOS];
+  const EXT_TIPOS=['ext-defeito','ext-interf','ext-desal'];
+  const TODOS_TIPOS=[...TIPOS_BASE,...RASP_K_TIPOS,...EXT_TIPOS];
 
   // Separa ativos vs histórico
   const ativos={},hist={};
@@ -1815,6 +1841,66 @@ function renderRelatorio(){
     regsHtml+=buildSecaoRel('reg-'+tipo,SECAO_ICONS[tipo],SECAO_LABELS[tipo].toUpperCase(),body,false,'');
   });
 
+  // ── EXTRATOR DE SUCATAS ──────────────────────────────────────────────────
+  let extRelHtml='';
+  const temExt=EXT_TIPOS.some(t=>(ativos[t]||[]).length);
+  if(temExt){
+    let extBody='';
+    EXT_TIPOS.forEach(tipo=>{
+      if(!(ativos[tipo]||[]).length)return;
+      const subId='ativo-ext-'+tipo;
+      let cardsH=`<div id="${subId}-cards">`;
+      ativos[tipo].forEach(r=>cardsH+=buildRegCard(r,false));
+      cardsH+='</div>';
+      extBody+=`<div style="border:1px solid #FFCCBC;border-radius:8px;overflow:hidden;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#FFF3E0;cursor:pointer;" onclick="toggleHistSub('${subId}')">
+          <span style="font-size:12px;font-weight:700;color:#E65100;flex:1;">${SECAO_LABELS[tipo].replace('Ext. ','')}</span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:11px;background:#FFE0B2;color:#E65100;padding:2px 7px;border-radius:10px;">${ativos[tipo].length}</span>
+            <button class="rel-sec-toggle" id="${subId}-btn" style="width:22px;height:22px;font-size:13px;background:#FFE0B2;color:#E65100;" onclick="toggleHistSub('${subId}')">+</button>
+          </div>
+        </div>
+        <div id="${subId}" style="display:none;padding:8px 8px 4px;">${cardsH}</div>
+      </div>`;
+    });
+    // Seção começa recolhida (body oculto), abre com +
+    extRelHtml=`<div class="rel-sec-wrap" id="sec-wrap-extrator">
+      <div class="rel-sec-hdr" style="background:#E65100;" onclick="toggleSecaoExt()">
+        <i class="ti ti-trash rsh-icon"></i>
+        <span class="rsh-label">EXTRATOR DE SUCATAS</span>
+        <button class="rel-sec-toggle no-print" id="sec-btn-extrator" style="background:rgba(255,255,255,.2);color:#fff;">+</button>
+      </div>
+      <div class="rel-sec-body" id="sec-body-extrator" style="display:none;">${extBody}</div>
+    </div>`;
+  }
+  // ── HISTÓRICO EXTRATOR ───────────────────────────────────────────────────
+  let extHistHtml='';
+  const temExtHist=EXT_TIPOS.some(t=>(hist[t]||[]).length);
+  if(temExtHist){
+    let extHistBody='';
+    EXT_TIPOS.forEach(tipo=>{
+      if(!(hist[tipo]||[]).length)return;
+      const lim=100;const regs=hist[tipo]||[];
+      const subId='hist-ext-'+tipo;
+      const filtroLocal=buildFiltroLocalHist(subId,tipo,regs);
+      let cardsH=`<div id="${subId}-cards">`;
+      regs.slice(0,lim).forEach(r=>{cardsH+=buildRegCard(r,true);});
+      cardsH+='</div>';
+      extHistBody+=`<div style="border:1px solid #FFCCBC;border-radius:8px;overflow:hidden;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#FFF3E0;cursor:pointer;" onclick="toggleHistSub('${subId}')">
+          <span style="font-size:12px;font-weight:700;color:#E65100;flex:1;">${SECAO_LABELS[tipo].replace('Ext. ','')}</span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:11px;color:#6B7280;background:#FFE0B2;padding:2px 7px;border-radius:10px;" id="${subId}-count">${Math.min(regs.length,lim)}/${lim}</span>
+            <button onclick="event.stopPropagation();toggleHistSub('${subId}');toggleFiltroLocal('${subId}')" style="background:#FFE0B2;border:none;color:#E65100;width:26px;height:22px;border-radius:5px;cursor:pointer;"><i class="ti ti-filter" style="font-size:11px;"></i></button>
+            <button class="rel-sec-toggle" id="${subId}-btn" style="width:22px;height:22px;font-size:13px;background:#FFE0B2;color:#E65100;" onclick="toggleHistSub('${subId}')">+</button>
+          </div>
+        </div>
+        <div id="${subId}" style="display:none;">${filtroLocal}${cardsH}</div>
+      </div>`;
+    });
+    extHistHtml=buildSecaoRel('ext-hist','ti-trash','HISTÓRICO — EXTRATOR DE SUCATAS',extHistBody,true,'');
+  }
+
   // ── HISTÓRICO — subitens colapsáveis, limites, contagem e filtros ──
   let histHtml='';
   const HIST_LIMITS={defeito:100,interf:100,desal:100,'rasp-prim':100,'rasp-p2':100,'rasp-s1':100,'rasp-s2':100,'rasp-s3':100,'rasp-s4':100,'rasp-s5':100};
@@ -1893,7 +1979,7 @@ function renderRelatorio(){
     <button class="btn-prim no-print" style="margin-bottom:12px;" onclick="renderMenu()"><i class="ti ti-plus"></i> Novo registro</button>
     ${fichaHtml}${ussHtml}
     <div class="bloco-titulo no-print" style="margin-top:4px;">Registros ativos</div>
-    ${raspHtml}${regsHtml}${histHtml}
+    ${raspHtml}${regsHtml}${extRelHtml}${extHistHtml}${histHtml}
     <button class="btn-sec no-print" onclick="renderMenu()"><i class="ti ti-arrow-left"></i> Menu do ativo</button>
     <div style="height:24px;"></div>`;
 
@@ -2023,7 +2109,7 @@ function buildRegCard(r,isHist){
     });
     extras+='</div>';
   }
-  else if(r.tipo==='interf'){
+  else if(r.tipo==='interf'||r.tipo==='ext-interf'){
     extras=`<div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
       ${r._encerrado?'<span class="pill status-enc">Encerrado</span>':''}
       <span class="pill ${stCls[r.campos.status]||''}">${stMap[r.campos.status]||''}</span>
@@ -2032,7 +2118,7 @@ function buildRegCard(r,isHist){
       ${r.campos.bal?`<span class="pill pill-neu">📍 ${r.campos.bal}</span>`:''}
     </div>`+buildStatusBtns(r,isHist);
   }
-  else if(r.tipo==='desal'){
+  else if(r.tipo==='desal'||r.tipo==='ext-desal'){
     extras=`<div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
       ${r._encerrado?'<span class="pill status-enc">Encerrado</span>':''}
       <span class="pill ${stCls[r.campos.status]||''}">${stMap[r.campos.status]||''}</span>
@@ -2043,7 +2129,7 @@ function buildRegCard(r,isHist){
   else if(r.tipo==='contra'&&r.campos.pos){
     extras=`<div style="margin-top:5px;font-size:12px;color:#6B7280;">Posição: ${r.campos.pos}</div>`;
   }
-  else if(r.tipo==='defeito'){
+  else if(r.tipo==='defeito'||r.tipo==='ext-defeito'){
     extras='<div style="margin-top:7px;">';
     (r.campos.defeitos||[]).forEach((d,i)=>{
       // Linha do tempo — atualizações do defeito
@@ -2115,7 +2201,7 @@ function buildRegCard(r,isHist){
     extras+='</div>';
   }
 
-  const showDesc=!isRaspK&&r.tipo!=='rasp'&&r.tipo!=='defeito';
+  const showDesc=!isRaspK&&r.tipo!=='rasp'&&r.tipo!=='defeito'&&r.tipo!=='ext-defeito';
   // Para rasp-K mostra a descrição abaixo dos pills
   const descRaspK=isRaspK?(r.desc&&r.desc!=='Sem relato'?r.desc:''):'';
   const desc=showDesc?(r.desc==='Sem relato'?'<span style="color:#9CA3AF;font-style:italic;">Sem relato</span>':r.desc||''):'';
@@ -2200,6 +2286,8 @@ function abrirEdicao(regId){
   editandoReg=regId;
   const ns='edit-'+regId;
   const isRaspK=r.tipo&&r.tipo.startsWith('rasp-')&&r.tipo!=='rasp';
+  // Normaliza tipos do extrator para exibição idêntica ao base
+  const tipoBase=r.tipo?.replace('ext-','')||r.tipo;
   // Copia fotos atuais para edição
   galFotos[ns]=[...(r.fotos||[])];
 
@@ -3203,6 +3291,14 @@ function _passaPct(r,f){return true;}
 function trocarModoDataFG(){}
 function trocarModoDataLocal(){}
 
+function toggleSecaoExt(){
+  const body=document.getElementById('sec-body-extrator');
+  const btn=document.getElementById('sec-btn-extrator');
+  if(!body)return;
+  const open=body.style.display==='none';
+  body.style.display=open?'block':'none';
+  if(btn)btn.textContent=open?'−':'+';
+}
 function toggleHistSub(id){
   const el=document.getElementById(id);
   const btn=document.getElementById(id+'-btn');
@@ -3267,6 +3363,7 @@ function renderFicha(){
     <div class="rel-section" style="margin-bottom:11px;"><div class="rel-section-header"><i class="ti ti-notes"></i> OBSERVAÇÕES</div><div style="padding:11px;">
       <textarea style="width:100%;font-size:13px;padding:10px;border:1px solid #D1D5DB;border-radius:8px;min-height:70px;resize:vertical;" id="fc-obs" placeholder="Observações relevantes...">${ficha.obs||''}</textarea>
     </div></div>
+    ${buildExtratrorFichaBloco(ficha)}
     ${buildUssSecao(ficha)}
     <button class="btn-prim" onclick="salvarFicha()"><i class="ti ti-device-floppy"></i> Salvar ficha técnica</button>
     <button class="btn-sec" onclick="renderMenu()"><i class="ti ti-arrow-left"></i> Voltar ao menu</button>
@@ -3329,6 +3426,83 @@ function toggleUnica(i){
 }
 {const isCabo=document.querySelector('input[name="fc-tipo-lona"]:checked')?.value==='cabo';const w=document.getElementById('breaker-wrap');if(w)w.style.display=isCabo?'':'none';}
 function buildUssGrid(vals,trechoIdx){let h='';for(let j=0;j<21;j++){const n=String(j+1).padStart(2,'0');const pv=(vals&&vals[j])||'';h+=`<div class="uss-cell"><div class="uss-num">${n}</div><input type="text" id="fc-uss-${trechoIdx}-${j}" value="" placeholder="—" inputmode="decimal"><div class="uss-prev">${pv?`<span style="font-size:9px;color:#9CA3AF;cursor:pointer;" title="Última: ${pv}">${pv}</span>`:''}</div></div>`;}return h;}
+function buildExtratrorFichaBloco(ficha){
+  const ext=ficha.extrator||{};
+  const temExt=ext.temExtrator||false;
+  const emendaOpts=['Mecânica','A frio'];
+  return `<div class="rel-section" style="margin-bottom:11px;">
+    <div class="rel-section-header" style="cursor:pointer;" onclick="toggleExtratrorFicha()">
+      <i class="ti ti-trash" style="color:#E65100;"></i> EXTRATOR DE SUCATAS
+      <span id="ext-ficha-chev" style="margin-left:auto;font-size:12px;color:#9CA3AF;">▼</span>
+    </div>
+    <div id="ext-ficha-body" style="${temExt?'':'display:none'}padding:12px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span style="font-size:13px;font-weight:600;color:#374151;">Este ativo possui Extrator de Sucatas?</span>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:13px;">
+          <input type="radio" name="fc-ext-tem" value="sim" ${temExt?'checked':''} onchange="toggleExtratrorCampos(true)" style="accent-color:#E65100;"> Sim
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:13px;">
+          <input type="radio" name="fc-ext-tem" value="nao" ${!temExt?'checked':''} onchange="toggleExtratrorCampos(false)" style="accent-color:#6B7280;"> Não
+        </label>
+      </div>
+      <div id="ext-campos" style="${temExt?'':'display:none'}">
+        <div class="grid-3" style="gap:10px;margin-bottom:10px;">
+          <div class="form-grupo">
+            <label>Largura (mm)</label>
+            <input type="text" id="fc-ext-largura" value="${ext.largura||''}" placeholder="Ex: 1800" style="font-size:13px;padding:8px;">
+          </div>
+          <div class="form-grupo">
+            <label>Data de troca</label>
+            <input type="text" id="fc-ext-data" value="${ext.dataEmenda||''}" placeholder="Ex: 15/06/2026" style="font-size:13px;padding:8px;">
+          </div>
+          <div class="form-grupo">
+            <label>Qtd. cantoneiras</label>
+            <input type="number" id="fc-ext-cant" value="${ext.cantoneiras||''}" placeholder="Ex: 4" min="0" style="font-size:13px;padding:8px;">
+          </div>
+        </div>
+        <div class="form-grupo">
+          <label>Tipo de emenda</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+            <button type="button" class="btn-opcao ${ext.emenda==='Mecânica'?'btn-opcao-ativo':''}" id="fc-ext-em-mec" onclick="selecionarExtEmenda('Mecânica',this)">Mecânica</button>
+            <button type="button" class="btn-opcao ${ext.emenda==='A frio'?'btn-opcao-ativo':''}" id="fc-ext-em-frio" onclick="selecionarExtEmenda('A frio',this)">A frio</button>
+          </div>
+          <input type="hidden" id="fc-ext-emenda" value="${ext.emenda||''}">
+          <div id="fc-ext-parafusos-wrap" style="${ext.emenda==='Mecânica'?'':'display:none'}margin-top:8px;">
+            <div class="form-grupo">
+              <label>Qtd. parafusos</label>
+              <input type="number" id="fc-ext-parafusos" value="${ext.parafusos||''}" placeholder="Ex: 8" min="0" style="font-size:13px;padding:8px;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function selecionarExtEmenda(val, btn){
+  document.querySelectorAll('#fc-ext-em-mec,#fc-ext-em-frio').forEach(b=>b.classList.remove('btn-opcao-ativo'));
+  if(btn)btn.classList.add('btn-opcao-ativo');
+  const h=document.getElementById('fc-ext-emenda');
+  if(h)h.value=val;
+  const pw=document.getElementById('fc-ext-parafusos-wrap');
+  if(pw)pw.style.display=val==='Mecânica'?'block':'none';
+}
+function toggleExtratrorFicha(){
+  const body=document.getElementById('ext-ficha-body');
+  const chev=document.getElementById('ext-ficha-chev');
+  if(!body)return;
+  const open=body.style.display==='none';
+  body.style.display=open?'block':'none';
+  if(chev)chev.textContent=open?'▲':'▼';
+}
+
+function toggleExtratrorCampos(show){
+  const campos=document.getElementById('ext-campos');
+  if(campos)campos.style.display=show?'block':'none';
+  const body=document.getElementById('ext-ficha-body');
+  if(body)body.style.display='block';
+}
+
 function buildUssSecao(ficha){
   const trechos=ficha.trechos||[];
   let th='';
@@ -3409,6 +3583,15 @@ function lerFichaAtual(){
   ficha.cob_inf=document.getElementById('fc-cob-inf')?.value||ficha.cob_inf||'';
   ficha.material=document.getElementById('fc-material')?.value||ficha.material;
   ficha.obs=document.getElementById('fc-obs')?.value||ficha.obs;
+  // Salvar extrator de sucatas
+  const extTem=document.querySelector('input[name="fc-ext-tem"]:checked')?.value==='sim';
+  if(!ficha.extrator)ficha.extrator={};
+  ficha.extrator.temExtrator=extTem;
+  ficha.extrator.largura=document.getElementById('fc-ext-largura')?.value||'';
+  ficha.extrator.emenda=document.querySelector('input[name="fc-ext-emenda"]:checked')?.value||'';
+  ficha.extrator.dataEmenda=document.getElementById('fc-ext-data')?.value||'';
+  ficha.extrator.cantoneiras=document.getElementById('fc-ext-cant')?.value||'';
+  ficha.extrator.parafusos=document.getElementById('fc-ext-parafusos')?.value||'';
 }
 
 function adicionarTrechoUss(){lerFichaAtual();const ficha=DB.fichas[ativoSel];if(ficha.trechos.length<8)ficha.trechos.push({l:LETRAS[ficha.trechos.length]||'',de:'',ate:'',comp:'',fab:'',op:'',spec:'',unica:false,uss:Array(21).fill('')});renderFicha();setTimeout(()=>{const b=document.getElementById('uss-sec-body');const btn=document.getElementById('uss-sec-btn');if(b)b.style.display='block';if(btn)btn.textContent='−';},50);}
