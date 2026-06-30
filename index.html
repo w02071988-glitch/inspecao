@@ -1534,8 +1534,13 @@ function buildRaspForm(){
   h+=`</div></div>`;
   const ativosArr=RASP_CHAVES.filter(k=>ativos[k]);
   ativosArr.forEach(k=>{h+=buildRaspBloco(k);});
-  // init grids after DOM
-  setTimeout(()=>ativosArr.forEach(k=>renderGaleriaGrid('gal-rasp-'+k)),0);
+  // init grids e restaura dados temporários após DOM
+  setTimeout(()=>{
+    ativosArr.forEach(k=>{
+      renderGaleriaGrid('gal-rasp-'+k);
+      _restaurarRaspTemp(k);
+    });
+  },0);
   return h;
 }
 
@@ -1629,8 +1634,44 @@ function atualizarBarraRasp(chave){
 }
 
 function toggleRasp(chave){
+  // Salva o que foi digitado nos blocos existentes antes de recriar
+  _salvarRaspTemp();
   DB.raspAtivos[ativoSel][chave]=!DB.raspAtivos[ativoSel][chave];
   fotoB64=null;renderForm();
+}
+
+// Salva temporariamente os dados digitados nos campos rasp ainda visíveis
+const _raspTemp={};
+function _salvarRaspTemp(){
+  const ativos=DB.raspAtivos[ativoSel];
+  RASP_CHAVES.filter(k=>ativos[k]).forEach(k=>{
+    const desc=(document.getElementById('f-desc-'+k)?.value||'').trim();
+    const pct=document.getElementById('f-pct-'+k)?.value||'';
+    const crit=document.getElementById('rcrit-'+k)?.value||'';
+    const fotos=getGalFotos('gal-rasp-'+k);
+    _raspTemp[k]={desc,pct,crit,fotos};
+  });
+}
+
+// Restaura os dados temporários após recriar o form
+function _restaurarRaspTemp(chave){
+  const t=_raspTemp[chave];
+  if(!t)return;
+  setTimeout(()=>{
+    const descEl=document.getElementById('f-desc-'+chave);
+    if(descEl&&t.desc){descEl.value=t.desc;descEl.style.color='';}
+    const pctEl=document.getElementById('f-pct-'+chave);
+    if(pctEl&&t.pct){pctEl.value=t.pct;atualizarBarraRasp(chave);}
+    if(t.crit){
+      const critMap={Baixo:'b',Médio:'m',Alto:'a'};
+      const btn=document.getElementById('rcrit-'+chave+'-'+critMap[t.crit]);
+      if(btn){selecionarOpcao('rcrit-'+chave,t.crit,btn);}
+    }
+    if(t.fotos&&t.fotos.length){
+      galFotos['gal-rasp-'+chave]=[...t.fotos];
+      renderGaleriaGrid('gal-rasp-'+chave);
+    }
+  },50);
 }
 
 // ── Mensagens Rápidas ──────────────────────────────────────────────────────
@@ -2380,7 +2421,7 @@ function buildRegCard(r,isHist){
 
   const showDesc=!isRaspK&&r.tipo!=='rasp'&&r.tipo!=='defeito'&&r.tipo!=='ext-defeito';
   // Para rasp-K mostra a descrição abaixo dos pills
-  const descRaspK=isRaspK?(r.desc&&r.desc!=='Sem relato'?r.desc:''):'';
+  const descRaspK=isRaspK?(r.desc==='Sem relato'?'<span style="color:#9CA3AF;font-style:italic;">Sem relato</span>':(r.desc||'')):'';
   const desc=showDesc?(r.desc==='Sem relato'?'<span style="color:#9CA3AF;font-style:italic;">Sem relato</span>':r.desc||''):'';
   const titulo=isRaspK?SECAO_LABELS[r.tipo]||r.tipo:'';
 
