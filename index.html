@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#1F3864">
 <link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="./icon-192.png">
-<title>Inspeção de Correia — Washington Sales</title>
+<title>Inspeção de Correia</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -18,35 +18,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .topbar{background:#1F3864;color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;}
 .topbar-back{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:2px 6px 2px 0;display:none;}
 .topbar-back.vis{display:block;}
-.topbar-home{background:rgba(255,255,255,.15);border:none;color:#fff;font-size:16px;cursor:pointer;padding:5px 9px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;gap:4px;transition:background .15s;}
-.topbar-home:active{background:rgba(255,255,255,.3);}
-
-/* ── BOTÃO FLUTUANTE DRIVE ── */
-.drive-fab{position:fixed;bottom:22px;right:16px;z-index:200;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
-.drive-fab-btn{display:flex;align-items:center;gap:8px;padding:11px 16px;border-radius:50px;border:none;cursor:pointer;font-size:13px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,.18);transition:transform .15s,box-shadow .15s;}
-.drive-fab-btn:active{transform:scale(.96);}
-.drive-fab-main{background:#1F3864;color:#fff;}
-.drive-fab-main.sincronizado{background:#2E7D32;}
-.drive-fab-main.pendente{background:#E65100;animation:pulse-fab 2s infinite;}
-/* Indicador de memória — estilo bateria */
-/* drive-mem: círculo SVG inline */
-@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
-@keyframes pulse-fab{0%,100%{box-shadow:0 4px 16px rgba(230,81,0,.3);}50%{box-shadow:0 4px 24px rgba(230,81,0,.6);}}
-.drive-fab-status{font-size:10px;color:#fff;background:rgba(0,0,0,.45);padding:3px 9px;border-radius:10px;text-align:right;pointer-events:none;}
-
-/* ── LEMBRETE DRIVE ── */
-.drive-lembrete{position:fixed;bottom:80px;right:16px;left:16px;z-index:199;background:#1F3864;color:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 6px 24px rgba(0,0,0,.25);display:none;animation:slide-up .25s ease;}
-@keyframes slide-up{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-.drive-lembrete-titulo{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
-.drive-lembrete-sub{font-size:12px;opacity:.8;margin-bottom:12px;}
-.drive-lembrete-btns{display:flex;gap:8px;}
-.drive-lembrete-btns button{flex:1;padding:9px;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;}
-.drive-btn-sim{background:#fff;color:#1F3864;}
-.drive-btn-depois{background:rgba(255,255,255,.2);color:#fff;}
-.topbar-home span{font-size:11px;font-weight:600;letter-spacing:.02em;}
-.topbar-info{flex:1;min-width:0;}
-.topbar-info h1{font-size:17px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:800;}
-.topbar-info p{font-size:11px!important;opacity:.8;white-space:nowrap;}
+.topbar-info{flex:1;}
 .topbar h1{font-size:15px;font-weight:600;}
 .topbar p{font-size:11px;opacity:.65;margin-top:1px;}
 .step-bar{display:flex;align-items:center;padding:12px 16px;background:#fff;border-bottom:1px solid #E5E8ED;}
@@ -62,16 +34,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .content{padding:12px;}
 
 /* LISTA DE ATIVOS — GRID */
-.ativo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
-.ativo-grid.cols2{grid-template-columns:1fr 1fr;}
-.layout-toggle-btn{background:#EEF0F3;border:none;border-radius:8px;padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:4px;color:#374151;font-size:12px;font-weight:600;}
-.layout-toggle-btn:active{background:#E0E3E8;}
-.layout-toggle-btn.ativo{background:#1F3864;color:#fff;}
-.ativo-card{background:#fff;border:1px solid #E5E8ED;border-radius:10px;padding:10px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;transition:border-color .15s;}
+.ativo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.ativo-card{background:#fff;border:1px solid #E5E8ED;border-radius:12px;padding:12px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px;transition:border-color .15s;}
 .ativo-card:active{background:#F5F7FA;border-color:#2E75B6;}
 .ativo-card .ac-icon{font-size:24px;color:#2E75B6;margin-bottom:2px;}
 .ativo-card .ac-id{font-size:13px;font-weight:700;color:#1F3864;}
-.ativo-card .ac-tipo{display:none;}
+.ativo-card .ac-tipo{font-size:10px;color:#9CA3AF;}
 /* Card Anotações Gerais — ocupa linha inteira */
 .anotacoes-gerais-card{background:#1F3864;border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;margin-bottom:8px;}
 .anotacoes-gerais-card:active{opacity:.88;}
@@ -160,10 +128,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .galeria-add-btn i{font-size:15px;}
 .galeria-add-btn:active{background:#EEF0F3;}
 /* LIGHTBOX */
-.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;align-items:center;justify-content:center;flex-direction:column;}
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:500;align-items:center;justify-content:center;flex-direction:column;touch-action:pinch-zoom;}
 .lightbox.vis{display:flex;}
-.lightbox img{max-width:96vw;max-height:80vh;border-radius:8px;object-fit:contain;}
-.lightbox-nav{display:flex;align-items:center;gap:16px;margin-top:14px;}
+.lightbox img{max-width:100vw;max-height:88vh;border-radius:0;object-fit:contain;cursor:zoom-in;}
+.lightbox-nav{display:flex;align-items:center;gap:16px;margin-top:10px;}
 .lb-btn{background:rgba(255,255,255,.15);border:none;color:#fff;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .lb-btn:disabled{opacity:.3;cursor:default;}
 .lb-counter{color:#fff;font-size:13px;min-width:50px;text-align:center;}
@@ -172,7 +140,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-prim{width:100%;padding:13px;background:#1F3864;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px;}
 .btn-prim:active{opacity:.85;}
 .btn-sec{width:100%;padding:11px;background:#fff;color:#374151;border:1px solid #D1D5DB;border-radius:10px;font-size:13px;cursor:pointer;margin-top:8px;}
-.btn-danger{width:100%;padding:11px;background:#FFF5F5;color:#C62828;border:1px solid #FFCDD2;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;}
+.btn-danger{width:100%;padding:11px;background:#fff;color:#C62828;border:1px solid #FFCDD2;border-radius:10px;font-size:13px;cursor:pointer;margin-top:8px;}
 .btn-sm{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;}
 .btn-sm-sec{background:#EEF0F3;color:#374151;}
 .btn-sm-danger{background:#FFEBEE;color:#C62828;}
@@ -206,9 +174,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .status-em{background:#FFF3E0;color:#E65100;}
 .status-ac{background:#E3F2FD;color:#1565C0;}
 .status-co{background:#E8F5E9;color:#2E7D32;}
-.status-enc{background:#EDE7F6;color:#4527A0;}
-.btn-encerrar{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid #4527A0;background:#EDE7F6;color:#4527A0;}
-.btn-encerrar:active{background:#D1C4E9;}
 .ficha-table{width:100%;border-collapse:collapse;font-size:12px;}
 .ficha-table th{background:#1F3864;color:#fff;padding:6px 8px;text-align:left;font-weight:600;}
 .ficha-table td{padding:6px 8px;border-bottom:1px solid #F0F2F5;}
@@ -231,81 +196,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .empty-state{text-align:center;padding:18px;color:#9CA3AF;font-size:13px;}
 .empty-state i{font-size:30px;display:block;margin-bottom:5px;opacity:.4;}
 
-/* ── BADGE VERSÃO + MODAL NOVIDADES ── */
-.app-version-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.15);color:#BDD9F8;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;cursor:pointer;letter-spacing:.03em;border:1px solid rgba(255,255,255,.2);}
-.app-version-badge:active{background:rgba(255,255,255,.25);}
-.novidades-overlay{position:fixed;inset:0;background:transparent;z-index:500;}
-.novidades-box{position:fixed;top:58px;left:8px;background:#fff;border-radius:12px;width:240px;padding:12px 14px 14px;box-shadow:0 8px 32px rgba(0,0,0,.22);border:1px solid #E5E8ED;z-index:501;}
-.novidades-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.novidades-titulo{font-size:13px;font-weight:800;color:#1F3864;display:flex;align-items:center;gap:6px;}
-.novidades-versao{font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;}
-.novidades-item{display:flex;align-items:flex-start;gap:8px;padding:0;}
-.novidades-dot{width:7px;height:7px;border-radius:50%;background:#2E75B6;flex-shrink:0;margin-top:4px;}
-.novidades-text{font-size:12px;color:#374151;line-height:1.5;}
-.novidades-fechar{width:100%;padding:8px;background:#1F3864;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;margin-top:12px;}
-
-/* ── FILTROS DO HISTÓRICO ── */
-/* ── FILTRO ÁRVORE ANO/MÊS ── */
-.hf-wrap{background:#F0F4FA;border-top:1px solid #E5E8ED;padding:8px 10px;display:none;}
-.hf-ano-row{display:flex;align-items:center;gap:6px;padding:5px 4px;cursor:pointer;border-radius:6px;user-select:none;}
-.hf-ano-row:active{background:#E5E8ED;}
-.hf-chk{width:15px;height:15px;border:1.5px solid #9CA3AF;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff;transition:all .15s;}
-.hf-chk.sel{background:#1F3864;border-color:#1F3864;}
-.hf-chk.sel::after{content:'✓';font-size:9px;color:#fff;font-weight:900;}
-.hf-chk.parcial{background:#EBF3FF;border-color:#2E75B6;}
-.hf-chk.parcial::after{content:'−';font-size:11px;color:#1F3864;font-weight:900;}
-.hf-ano-label{font-size:13px;font-weight:700;color:#1F3864;flex:1;}
-.hf-count{font-size:10px;color:#9CA3AF;background:#E5E8ED;padding:1px 6px;border-radius:8px;}
-.hf-chevron{font-size:11px;color:#9CA3AF;transition:transform .2s;}
-.hf-chevron.open{transform:rotate(90deg);}
-.hf-meses{padding-left:20px;display:none;}
-.hf-mes-row{display:flex;align-items:center;gap:6px;padding:4px 4px;cursor:pointer;border-radius:6px;user-select:none;}
-.hf-mes-row:active{background:#E5E8ED;}
-.hf-mes-label{font-size:12px;color:#374151;flex:1;}
-.hf-limpar{font-size:10px;color:#C62828;background:none;border:none;cursor:pointer;padding:2px 6px;float:right;}
-.hf-resultado{font-size:11px;color:#2E75B6;font-weight:600;margin-top:4px;display:none;padding:0 4px;}
-.hf-busca-wrap{margin-top:8px;border-top:1px solid #E5E8ED;padding-top:8px;}
-.hf-busca-label{font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;display:flex;align-items:center;gap:4px;}
-.hf-busca-input{width:100%;font-size:13px;padding:7px 10px;border:1px solid #D1D5DB;border-radius:8px;background:#fff;color:#111827;box-sizing:border-box;}
-.hf-busca-input:focus{outline:none;border-color:#2E75B6;box-shadow:0 0 0 3px rgba(46,117,182,.1);}
-
-/* ── LINHA DO TEMPO DE DEFEITO ── */
-.def-timeline{margin-top:8px;border-left:2px solid #E5E8ED;padding-left:12px;}
-.def-tl-item{position:relative;margin-bottom:10px;}
-.def-tl-dot{position:absolute;left:-19px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 2px #E5E8ED;background:#9CA3AF;}
-.def-tl-dot.dot-em{background:#E65100;box-shadow:0 0 0 2px #FFC947;}
-.def-tl-dot.dot-ac{background:#1565C0;box-shadow:0 0 0 2px #90CAF9;}
-.def-tl-dot.dot-co{background:#2E7D32;box-shadow:0 0 0 2px #A5D6A7;}
-.def-tl-dot.dot-new{background:#1F3864;box-shadow:0 0 0 2px #90CAF9;}
-.def-tl-meta{font-size:10px;color:#9CA3AF;margin-bottom:3px;display:flex;align-items:center;gap:5px;}
-.def-tl-body{background:#F8F9FB;border:1px solid #E5E8ED;border-radius:7px;padding:8px 10px;font-size:12px;color:#374151;}
-.def-tl-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px;}
-.btn-atualizar{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #1F3864;background:#EBF3FF;color:#1F3864;margin-top:6px;}
-.btn-atualizar:active{background:#D0E8FF;}
-.btn-mesclar{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:1px dashed #6B7280;background:#fff;color:#6B7280;margin-top:4px;}
-.btn-mesclar:active{background:#F3F4F6;}
-.mesclar-sel{border:2px solid #2E75B6!important;background:#EBF3FF!important;}
-.mesclar-banner{background:#1F3864;color:#fff;border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;}
-.mesclar-banner button{background:rgba(255,255,255,.2);border:none;color:#fff;padding:5px 10px;border-radius:7px;font-size:12px;cursor:pointer;font-weight:600;}
-.upd-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:flex-end;justify-content:center;}
-.upd-modal-box{background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:18px 16px 30px;max-height:90vh;overflow-y:auto;}
-.upd-modal-titulo{font-size:15px;font-weight:700;color:#1F3864;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
-
-/* MENSAGENS RÁPIDAS */
-.msgs-rapidas-wrap{margin-bottom:6px;}
-.msgs-rapidas-row{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-bottom:5px;}
-.msg-rap-btn{padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #D1D5DB;background:#fff;color:#374151;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
-.msg-rap-btn:active{background:#F0F0F0;}
-.msg-rap-del{background:none;border:none;color:#C62828;font-size:12px;cursor:pointer;padding:0 2px;line-height:1;opacity:.7;}
-.msg-rap-del:hover{opacity:1;}
-.msg-rap-add{padding:4px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px dashed #2E75B6;background:#EBF3FF;color:#1F3864;display:inline-flex;align-items:center;gap:3px;}
-.msg-rap-add:active{background:#D6EAFF;}
-.msg-rap-input-row{display:flex;gap:5px;margin-bottom:5px;align-items:center;}
-.msg-rap-input-row input{flex:1;font-size:12px;padding:5px 8px;border:1px solid #2E75B6;border-radius:6px;background:#fff;}
-.msg-rap-input-row button{padding:5px 10px;font-size:12px;font-weight:700;border-radius:6px;border:none;cursor:pointer;}
-.msg-rap-ok{background:#1F3864;color:#fff;}
-.msg-rap-cancel{background:#EEF0F3;color:#374151;}
-
 /* ANOTAÇÕES GERAIS */
 .anotacao-card{background:#fff;border:1px solid #E5E8ED;border-radius:10px;padding:12px;margin-bottom:8px;}
 .anotacao-ativo-badge{display:inline-block;background:#1F3864;color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-bottom:7px;}
@@ -318,9 +208,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .pag-btn:disabled{opacity:.4;cursor:default;}
 
 /* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;justify-content:center;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;}
 .modal-overlay.vis{display:flex;}
-.modal-box{background:#fff;border-radius:16px 16px 0 0;padding:18px 15px 48px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.modal-box{background:#fff;border-radius:16px 16px 0 0;padding:18px 15px;width:100%;max-height:88vh;overflow-y:auto;}
 .modal-titulo{font-size:15px;font-weight:700;color:#1F2937;margin-bottom:13px;display:flex;justify-content:space-between;align-items:center;}
 .modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:#6B7280;}
 /* TOPBAR EXTRA BUTTONS */
@@ -376,63 +266,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <h1 id="topbar-titulo">Inspeção de Correia</h1>
     <p id="topbar-sub"></p>
   </div>
-  <button class="topbar-home" id="btn-home" onclick="renderLista()" title="Ir para início" style="display:none;">
-    <i class="ti ti-home"></i><span>Início</span>
-  </button>
-
   <div class="topbar-actions" id="topbar-actions" style="display:none;">
     <button class="topbar-icon-btn" id="btn-print" title="Imprimir" onclick="imprimirRelatorio()" style="display:none;"><i class="ti ti-printer"></i></button>
     <button class="topbar-icon-btn" id="btn-share-pdf" title="Compartilhar relatório PDF" onclick="compartilharPDF()" style="display:none;"><i class="ti ti-share"></i></button>
     <button class="topbar-icon-btn" title="Exportar backup" onclick="exportarBackup()"><i class="ti ti-download"></i></button>
     <button class="topbar-icon-btn" title="Importar backup" onclick="document.getElementById('import-input').click()"><i class="ti ti-upload"></i></button>
     <input type="file" id="import-input" accept=".json" style="display:none" onchange="importarBackup(this)">
-    <a href="https://wa.me/5527997016332?text=Olá%20Washington%2C%20preciso%20de%20suporte%20no%20app%20de%20inspeção%20de%20correia!" target="_blank" rel="noopener"
-      class="topbar-icon-btn" title="Suporte via WhatsApp"
-      style="display:flex;align-items:center;justify-content:center;text-decoration:none;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-        <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.112 1.523 5.838L0 24l6.338-1.508A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.374l-.36-.214-3.732.888.936-3.618-.235-.372A9.818 9.818 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/>
-      </svg>
-    </a>
   </div>
 </div>
-<!-- Indicador de mudanças não salvas (mantido para compatibilidade) -->
-<div id="indicador-mudanca" style="display:none;"></div>
-
-<!-- Lembrete automático de sincronização -->
-<div class="drive-lembrete" id="drive-lembrete">
-  <div class="drive-lembrete-titulo">
-    <svg width="18" height="18" viewBox="0 0 87.3 78" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5z" fill="#0066DA"/>
-      <path d="M43.65 25L29.9 1.2C28.55 2 27.4 3.1 26.6 4.5L1.2 48.4A9 9 0 000 52.9h27.5z" fill="#00AC47"/>
-      <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8l5.85 11.5z" fill="#EA4335"/>
-      <path d="M43.65 25L57.4 1.2A9.06 9.06 0 0053.9 0H33.4c-1.3 0-2.6.35-3.75 1.1z" fill="#00832D"/>
-      <path d="M59.8 52.9h27.5c0-1.55-.4-3.1-1.2-4.5L60.7 4.5c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25z" fill="#2684FC"/>
-      <path d="M27.45 52.9l-13.7 23.8c1.35.8 2.9 1.2 4.5 1.2h51c1.6 0 3.1-.45 4.5-1.2L59.8 52.9z" fill="#FFBA00"/>
-    </svg>
-    Salvar no Google Drive
-  </div>
-  <div class="drive-lembrete-sub" id="drive-lembrete-sub">Você tem alterações não sincronizadas.</div>
-  <div class="drive-lembrete-btns">
-    <button class="drive-btn-sim" onclick="salvarNoDrive(true)">📤 Salvar agora</button>
-    <button class="drive-btn-depois" onclick="fecharLembrete()">Depois</button>
-  </div>
-</div>
-
-<!-- Botão flutuante Google Drive -->
-<div class="drive-fab" id="drive-fab" style="display:none;">
-  <div class="drive-fab-status" id="drive-fab-status"></div>
-  <button class="drive-fab-btn drive-fab-main" id="drive-fab-btn" onclick="salvarNoDrive(false)" title="Salvar backup no Google Drive">
-    <svg width="18" height="16" viewBox="0 0 87.3 78" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5z" fill="#fff" opacity=".9"/>
-      <path d="M43.65 25L29.9 1.2C28.55 2 27.4 3.1 26.6 4.5L1.2 48.4A9 9 0 000 52.9h27.5z" fill="#fff" opacity=".9"/>
-      <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8l5.85 11.5z" fill="#fff" opacity=".9"/>
-      <path d="M43.65 25L57.4 1.2A9.06 9.06 0 0053.9 0H33.4c-1.3 0-2.6.35-3.75 1.1z" fill="#fff"/>
-      <path d="M59.8 52.9h27.5c0-1.55-.4-3.1-1.2-4.5L60.7 4.5c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25z" fill="#fff" opacity=".9"/>
-      <path d="M27.45 52.9l-13.7 23.8c1.35.8 2.9 1.2 4.5 1.2h51c1.6 0 3.1-.45 4.5-1.2L59.8 52.9z" fill="#fff"/>
-    </svg>
-    Drive
-  </button>
+<!-- Indicador de mudanças não salvas -->
+<div id="indicador-mudanca" style="display:none;background:#E65100;color:#fff;font-size:11px;font-weight:600;padding:5px 14px;text-align:center;align-items:center;justify-content:center;gap:8px;">
+  <i class="ti ti-alert-circle" style="font-size:13px;"></i>
+  Alterações não salvas
+  <button onclick="exportarBackup()" style="background:rgba(255,255,255,.25);border:none;color:#fff;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;">Salvar agora</button>
 </div>
 <!-- Modal edição anotação geral -->
 <div class="modal-overlay" id="modal-anotacao">
@@ -522,134 +368,22 @@ ATIVOS.forEach(a=>_initAtivo(a.id));
 
 function _initAtivo(id){
   if(!DB.registros[id]) DB.registros[id]=[];
-  if(!DB.fichas[id]) DB.fichas[id]={cod:'',comprimento_total:'',trechos:[{l:'A',de:'',ate:'',comp:'',fab:'',op:'',spec:'',unica:false,uss:Array(21).fill('')}],largura:'',tipo_lona:'lona',cabo_breaker:false,cob_sup:'',cob_inf:'',material:'',obs:'',extrator:{temExtrator:false,largura:'',emenda:'',dataEmenda:'',cantoneiras:''}};
+  if(!DB.fichas[id]) DB.fichas[id]={cod:'',comprimento_total:'',trechos:[{l:'A',de:'',ate:'',comp:'',fab:'',op:'',spec:'',unica:false,uss:Array(21).fill('')}],largura:'',tipo_lona:'lona',cabo_breaker:false,cob_sup:'',cob_inf:'',material:'',obs:''};
   if(!DB.raspAtivos[id]) DB.raspAtivos[id]={prim:true,p2:false,s1:false,s2:false,s3:false,s4:false,s5:false};
 }
 
 let ativoSel=null,fotoB64=null,passo='lista',secaoSel=null,editandoReg=null,regCounter=1,pagAnotacoes=1;
 let _defIdx=0;
 
-const SECAO_LABELS={anotacao:'Anotações',contra:'Contrapeso',defeito:'Defeitos/Reparos',desal:'Desalinhamento',interf:'Interferências',rasp:'Raspadores','ext-defeito':'Ext. Defeitos/Reparos','ext-interf':'Ext. Interferências','ext-desal':'Ext. Desalinhamento',...Object.fromEntries((['prim','p2','s1','s2','s3','s4','s5']).map(k=>['rasp-'+k,k==='prim'?'Primário (P1)':k==='p2'?'Primário (P2)':'Secundário '+k.toUpperCase()]))};
-const SECAO_ICONS={anotacao:'ti-notes',contra:'ti-adjustments',defeito:'ti-hammer',desal:'ti-arrows-left-right',interf:'ti-alert-triangle',rasp:'ti-tool','ext-defeito':'ti-hammer','ext-interf':'ti-alert-triangle','ext-desal':'ti-arrows-left-right'};
+const SECAO_LABELS={anotacao:'Anotações',contra:'Contrapeso',defeito:'Defeitos/Reparos',desal:'Desalinhamento',interf:'Interferências',rasp:'Raspadores',...Object.fromEntries((['prim','p2','s1','s2','s3','s4','s5']).map(k=>['rasp-'+k,k==='prim'?'Primário (P1)':k==='p2'?'Primário (P2)':'Secundário '+k.toUpperCase()]))};
+const SECAO_ICONS={anotacao:'ti-notes',contra:'ti-adjustments',defeito:'ti-hammer',desal:'ti-arrows-left-right',interf:'ti-alert-triangle',rasp:'ti-tool'};
 // Ordem alfabética para o menu
 const SECOES_MENU=['anotacao','contra','defeito','desal','interf','rasp'];
-const SECOES_EXT=['ext-defeito','ext-interf','ext-desal'];
 
 function fmtData(iso){if(!iso)return'—';const[y,m,d]=iso.split('-');return d+'/'+m+'/'+y;}
 function dataHojeISO(){return hoje.toISOString().split('T')[0];}
 function diasDesde(iso){if(!iso)return null;return Math.round((hoje-new Date(iso+'T00:00:00'))/86400000);}
 function iconeAtivo(t){return t==='Empilhadeira'?'ti-forklift':t==='Recuperadora'?'ti-refresh':'ti-engine';}
-
-// SVGs personalizados por tipo de ativo
-const _SVG_ATIVOS={
-  'Empilhadeira': `<svg width="40" height="40" viewBox="0 0 372 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-<line x1="20" y1="75" x2="160" y2="75" stroke="#2E4A7A" stroke-width="5" stroke-linecap="round"/>
-<line x1="20" y1="93" x2="160" y2="93" stroke="#2E4A7A" stroke-width="5" stroke-linecap="round"/>
-<line x1="20" y1="75" x2="20" y2="93" stroke="#2E4A7A" stroke-width="5" stroke-linecap="round"/>
-<line x1="40" y1="75" x2="58" y2="93" stroke="#2E4A7A" stroke-width="2.2" opacity=".8"/>
-<line x1="58" y1="75" x2="40" y2="93" stroke="#2E4A7A" stroke-width="2.2" opacity=".8"/>
-<line x1="78" y1="75" x2="96" y2="93" stroke="#2E4A7A" stroke-width="2.2" opacity=".8"/>
-<line x1="96" y1="75" x2="78" y2="93" stroke="#2E4A7A" stroke-width="2.2" opacity=".8"/>
-<line x1="116" y1="75" x2="134" y2="93" stroke="#2E4A7A" stroke-width="2.2" opacity=".8"/>
-<line x1="134" y1="75" x2="116" y2="93" stroke="#2E4A7A" stroke-width="2.2" opacity=".8"/>
-<path d="M20,75 Q90,38 160,75" fill="none" stroke="#2E4A7A" stroke-width="2.5" stroke-dasharray="6,4" opacity=".9"/>
-<circle cx="160" cy="84" r="13" fill="none" stroke="#2E4A7A" stroke-width="3"/>
-<circle cx="160" cy="84" r="5" fill="#2E4A7A"/>
-<ellipse cx="160" cy="122" rx="16" ry="7" fill="#8B6914" opacity=".9"/>
-<ellipse cx="160" cy="148" rx="15" ry="7" fill="#A07820" opacity=".85"/>
-<ellipse cx="160" cy="174" rx="16" ry="7" fill="#8B6914" opacity=".85"/>
-<ellipse cx="160" cy="198" rx="14" ry="6" fill="#A07820" opacity=".8"/>
-<circle cx="140" cy="132" r="4" fill="#8B6914" opacity=".7"/>
-<circle cx="178" cy="150" r="3" fill="#A07820" opacity=".6"/>
-<circle cx="138" cy="170" r="3" fill="#8B6914" opacity=".7"/>
-<circle cx="180" cy="185" r="4" fill="#A07820" opacity=".6"/>
-<path d="M100,218 Q160,180 220,218" fill="none" stroke="#8B6914" stroke-width="2.5"/>
-<line x1="0" y1="218" x2="290" y2="218" stroke="#8B6914" stroke-width="2.5"/>
-<path d="M118,218 Q138,202 160,206 Q182,198 202,218" fill="none" stroke="#8B6914" stroke-width="1.5" opacity=".5"/>
-</svg>`,
-  'Recuperadora': `<svg width="40" height="40" viewBox="0 0 372 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-<line x1="258" y1="22" x2="96" y2="96" stroke="#2E4A7A" stroke-width="2.8" stroke-linecap="round"/>
-<line x1="258" y1="34" x2="96" y2="108" stroke="#2E4A7A" stroke-width="2.8" stroke-linecap="round"/>
-<line x1="230" y1="27" x2="220" y2="38" stroke="#2E4A7A" stroke-width="1.5" opacity=".7"/>
-<line x1="200" y1="41" x2="212" y2="52" stroke="#2E4A7A" stroke-width="1.5" opacity=".7"/>
-<line x1="212" y1="52" x2="172" y2="61" stroke="#2E4A7A" stroke-width="1.5" opacity=".7"/>
-<line x1="172" y1="48" x2="184" y2="64" stroke="#2E4A7A" stroke-width="1.5" opacity=".7"/>
-<line x1="184" y1="64" x2="144" y2="73" stroke="#2E4A7A" stroke-width="1.5" opacity=".7"/>
-<line x1="144" y1="60" x2="156" y2="78" stroke="#2E4A7A" stroke-width="1.5" opacity=".7"/>
-<line x1="156" y1="78" x2="116" y2="87" stroke="#2E4A7A" stroke-width="1.5" opacity=".7"/>
-<line x1="116" y1="74" x2="128" y2="90" stroke="#2E4A7A" stroke-width="1.5" opacity=".7"/>
-<path d="M258,22 Q180,0 96,96" fill="none" stroke="#2E4A7A" stroke-width="1.4" stroke-dasharray="5,3" opacity=".8"/>
-<circle cx="96" cy="102" r="5" fill="#2E4A7A"/>
-<circle cx="72" cy="124" r="44" fill="none" stroke="#2E4A7A" stroke-width="2.5"/>
-<circle cx="72" cy="124" r="14" fill="none" stroke="#2E4A7A" stroke-width="2"/>
-<circle cx="72" cy="124" r="5" fill="#2E4A7A"/>
-<line x1="72" y1="110" x2="72" y2="80" stroke="#2E4A7A" stroke-width="2"/>
-<line x1="72" y1="138" x2="72" y2="168" stroke="#2E4A7A" stroke-width="2"/>
-<line x1="58" y1="124" x2="28" y2="124" stroke="#2E4A7A" stroke-width="2"/>
-<line x1="86" y1="124" x2="116" y2="124" stroke="#2E4A7A" stroke-width="2"/>
-<line x1="82" y1="114" x2="103" y2="93" stroke="#2E4A7A" stroke-width="2"/>
-<line x1="62" y1="134" x2="41" y2="155" stroke="#2E4A7A" stroke-width="2"/>
-<line x1="62" y1="114" x2="41" y2="93" stroke="#2E4A7A" stroke-width="2"/>
-<line x1="82" y1="134" x2="103" y2="155" stroke="#2E4A7A" stroke-width="2"/>
-<rect x="66" y="73" width="12" height="9" rx="2" fill="none" stroke="#2E4A7A" stroke-width="2"/>
-<rect x="66" y="160" width="12" height="9" rx="2" fill="none" stroke="#2E4A7A" stroke-width="2"/>
-<rect x="21" y="119" width="9" height="11" rx="2" fill="none" stroke="#2E4A7A" stroke-width="2"/>
-<rect x="114" y="119" width="9" height="11" rx="2" fill="none" stroke="#2E4A7A" stroke-width="2"/>
-<rect x="98" y="86" width="11" height="9" rx="2" fill="none" stroke="#2E4A7A" stroke-width="2" transform="rotate(-45 103 90)"/>
-<rect x="34" y="148" width="11" height="9" rx="2" fill="none" stroke="#2E4A7A" stroke-width="2" transform="rotate(-45 39 152)"/>
-<rect x="34" y="86" width="11" height="9" rx="2" fill="none" stroke="#2E4A7A" stroke-width="2" transform="rotate(45 39 90)"/>
-<rect x="98" y="148" width="11" height="9" rx="2" fill="none" stroke="#2E4A7A" stroke-width="2" transform="rotate(45 103 152)"/>
-<path d="M0,210 Q72,158 144,210" fill="none" stroke="#8B6914" stroke-width="2.2"/>
-<line x1="0" y1="210" x2="280" y2="210" stroke="#8B6914" stroke-width="2.2"/>
-<circle cx="36" cy="156" r="3" fill="#8B6914" opacity=".9"/>
-<circle cx="26" cy="146" r="2" fill="#8B6914" opacity=".7"/>
-<circle cx="44" cy="166" r="2" fill="#A07820" opacity=".8"/>
-<circle cx="32" cy="172" r="3" fill="#A07820" opacity=".7"/>
-<path d="M116,102 A48,48 0 0,0 100,78" fill="none" stroke="#2E4A7A" stroke-width="1.8" stroke-dasharray="4,3"/>
-<polygon points="100,72 95,83 105,81" fill="#2E4A7A"/>
-</svg>`,
-  'Transportador': `<svg width="40" height="40" viewBox="0 0 290 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="26" cy="100" r="38" fill="none" stroke="#2E4A7A" stroke-width="3.5"/>
-<circle cx="26" cy="100" r="13" fill="none" stroke="#2E4A7A" stroke-width="2.5"/>
-<circle cx="26" cy="100" r="5" fill="#2E4A7A"/>
-<circle cx="264" cy="100" r="38" fill="none" stroke="#2E4A7A" stroke-width="3.5"/>
-<circle cx="264" cy="100" r="13" fill="none" stroke="#2E4A7A" stroke-width="2.5"/>
-<circle cx="264" cy="100" r="5" fill="#2E4A7A"/>
-<line x1="26" y1="62" x2="264" y2="62" stroke="#2E4A7A" stroke-width="3.5"/>
-<line x1="26" y1="138" x2="264" y2="138" stroke="#2E4A7A" stroke-width="3"/>
-<ellipse cx="90" cy="58" rx="18" ry="8" fill="#8B6914" opacity=".9"/>
-<ellipse cx="145" cy="54" rx="20" ry="9" fill="#A07820" opacity=".85"/>
-<ellipse cx="200" cy="57" rx="18" ry="8" fill="#8B6914" opacity=".85"/>
-<circle cx="112" cy="50" r="5" fill="#C09030" opacity=".9"/>
-<circle cx="168" cy="47" r="6" fill="#8B6914" opacity=".8"/>
-<circle cx="222" cy="51" r="5" fill="#A07820" opacity=".9"/>
-</svg>`,
-  'Extrator': `<svg width="32" height="32" viewBox="0 0 148 148" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <line x1="8" y1="38" x2="8" y2="104" stroke="#4a4a4a" stroke-width="3" stroke-linecap="round"/>
-  <line x1="140" y1="38" x2="140" y2="104" stroke="#4a4a4a" stroke-width="3" stroke-linecap="round"/>
-  <line x1="4" y1="38" x2="144" y2="38" stroke="#4a4a4a" stroke-width="2.5" stroke-linecap="round"/>
-  <line x1="14" y1="38" x2="14" y2="22" stroke="#6a6a6a" stroke-width="2" stroke-dasharray="4,3"/>
-  <line x1="134" y1="38" x2="134" y2="22" stroke="#6a6a6a" stroke-width="2" stroke-dasharray="4,3"/>
-  <rect x="6" y="14" width="16" height="10" rx="2" fill="#4a4a4a"/>
-  <rect x="126" y="14" width="16" height="10" rx="2" fill="#4a4a4a"/>
-  <rect x="8" y="96" width="132" height="10" rx="5" fill="#2a2a2a"/>
-  <rect x="8" y="118" width="132" height="7" rx="3" fill="#2a2a2a" opacity=".5"/>
-  <circle cx="12" cy="101" r="14" fill="#3a3a3a" stroke="#1a1a1a" stroke-width="2"/>
-  <circle cx="12" cy="101" r="5" fill="#1a1a1a"/>
-  <circle cx="136" cy="101" r="14" fill="#3a3a3a" stroke="#1a1a1a" stroke-width="2"/>
-  <circle cx="136" cy="101" r="5" fill="#1a1a1a"/>
-  <polygon points="8,106 140,106 148,120 0,120" fill="#E65100" stroke="#CC4400" stroke-width="2"/>
-  <rect x="68" y="120" width="12" height="14" rx="2" fill="#CC4400"/>
-  <ellipse cx="74" cy="138" rx="12" ry="6" fill="#CC4400"/>
-  <rect x="24" y="84" width="12" height="8" rx="1" fill="#9E9E9E" transform="rotate(-15 24 84)"/>
-  <rect x="54" y="82" width="16" height="7" rx="1" fill="#757575" transform="rotate(10 54 82)"/>
-  <rect x="84" y="83" width="11" height="8" rx="1" fill="#BDBDBD" transform="rotate(-8 84 83)"/>
-  <rect x="112" y="84" width="13" height="7" rx="1" fill="#9E9E9E" transform="rotate(12 112 84)"/>
-</svg>`
-};
-function svgAtivo(t){
-  return _SVG_ATIVOS[t]||_SVG_ATIVOS['Transportador'];
-}
 function newId(){return 'r'+(regCounter++);}
 function ultimaAlteracao(id){const r=DB.registros[id];if(!r.length)return null;return r.map(x=>x.data).sort().reverse()[0];}
 function pillUltima(id){
@@ -666,17 +400,19 @@ function ultimoReg(ativoId,tipo){
   return r.length?r.sort((a,b)=>b.data.localeCompare(a.data))[0]:null;
 }
 function ultimoRaspChave(ativoId,chave){
-  const r=DB.registros[ativoId].filter(x=>x.tipo==='rasp'&&x.campos&&x.campos[chave]);
-  return r.length?r.sort((a,b)=>b.data.localeCompare(a.data))[0]:null;
+  // New per-component type: rasp-prim, rasp-p2, etc
+  const tipoK='rasp-'+chave;
+  const rNew=DB.registros[ativoId].filter(x=>x.tipo===tipoK);
+  if(rNew.length) return rNew.sort((a,b)=>b.data.localeCompare(a.data))[0];
+  // Legacy: grouped rasp with campos[chave]
+  const rOld=DB.registros[ativoId].filter(x=>x.tipo==='rasp'&&x.campos&&x.campos[chave]);
+  return rOld.length?rOld.sort((a,b)=>b.data.localeCompare(a.data))[0]:null;
 }
 
 function setTopbar(titulo,sub,back,showPrint){
   document.getElementById('topbar-titulo').textContent=titulo;
   document.getElementById('topbar-sub').textContent=sub||'';
   document.getElementById('btn-voltar').classList.toggle('vis',!!back);
-  // Mostrar botão Home em todas as telas exceto a lista principal
-  const btnHome=document.getElementById('btn-home');
-  if(btnHome)btnHome.style.display=(passo&&passo!=='lista')?'flex':'none';
   document.getElementById('topbar-actions').style.display='flex';
   const btnP=document.getElementById('btn-print');
   if(btnP)btnP.style.display=showPrint?'flex':'none';
@@ -699,17 +435,7 @@ function setStepBar(show,step){
 // ════════════════════════════════
 function renderLista(){
   passo='lista';
-  const dataFormatada=hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});
-  setTopbar('Inspeção de Correia — Washington Sales',dataFormatada,false,false);
-  // Injeta badge v0.1 na frente da data
-  setTimeout(()=>{
-    const sub=document.getElementById('topbar-sub');
-    if(sub&&!sub.querySelector('.ver-badge')){
-      const vc=_verCor();
-      sub.innerHTML=`<span class="ver-badge" onclick="mostrarNovidades()" style="cursor:pointer;background:${vc.bg};border:1px solid ${vc.border};color:${vc.text};border-radius:6px;padding:1px 7px;font-size:10px;font-weight:700;margin-right:6px;letter-spacing:.02em;">${APP_VERSION}</span>${dataFormatada}`;
-    }
-  },30);
-
+  setTopbar('Inspeção de Correia',hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}),false,false);
   setStepBar(true,1);
   const favCount=DB.favoritos.size;
   let h=`
@@ -727,19 +453,9 @@ function renderLista(){
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
       <span class="bloco-titulo" style="margin-bottom:0;">Ativos (${ATIVOS.length}/50)</span>
-      <div style="display:flex;gap:6px;align-items:center;">
-        <div style="display:flex;border:1px solid #E5E8ED;border-radius:8px;overflow:hidden;">
-          <button id="btn-layout-2" class="layout-toggle-btn${_layoutAtivos===2?' ativo':''}" onclick="setLayoutAtivos(2)" title="2 por linha">
-            <i class="ti ti-layout-columns" style="font-size:14px;"></i>
-          </button>
-          <button id="btn-layout-3" class="layout-toggle-btn${_layoutAtivos===3?' ativo':''}" onclick="setLayoutAtivos(3)" title="3 por linha" style="border-left:1px solid #E5E8ED;">
-            <i class="ti ti-layout-grid" style="font-size:14px;"></i>
-          </button>
-        </div>
-        ${ATIVOS.length<50?`<button onclick="novoAtivo()" style="background:#1F3864;color:#fff;border:none;border-radius:8px;padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;"><i class="ti ti-plus"></i> Novo ativo</button>`:"<span style='font-size:11px;color:#9CA3AF;'>Limite atingido</span>"}
-      </div>
+      ${ATIVOS.length<50?`<button onclick="novoAtivo()" style="background:#1F3864;color:#fff;border:none;border-radius:8px;padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;"><i class="ti ti-plus"></i> Novo ativo</button>`:"<span style='font-size:11px;color:#9CA3AF;'>Limite atingido</span>"}
     </div>
-    <div class="ativo-grid${_layoutAtivos===2?' cols2':''}">`;
+    <div class="ativo-grid">`;
   const sorted=[...ATIVOS].sort((a,b)=>a.id.localeCompare(b.id));
   sorted.forEach(a=>{
     const{cls,txt}=pillUltima(a.id);
@@ -747,7 +463,7 @@ function renderLista(){
     h+=`<div class="ativo-card-wrap" id="wrap-${a.id}" style="position:relative;">
       ${isFav?'<span class="ativo-fav-star"><i class="ti ti-star-filled"></i></span>':''}
       <div class="ativo-card" onclick="selAtivo('${a.id}')">
-        <span class="ac-icon" style="display:flex;align-items:center;justify-content:center;">${svgAtivo(a.tipo)}</span>
+        <i class="ti ${iconeAtivo(a.tipo)} ac-icon"></i>
         <div class="ac-id">${a.id}</div>
         <div class="ac-tipo">${a.tipo}</div>
         <span class="pill ${cls}" style="margin-top:3px;">${txt}</span>
@@ -774,24 +490,6 @@ function toggleAtivoMenu(id){
   if(m)m.style.display='block';
   setTimeout(()=>document.addEventListener('click',fecharMenusAtivo,{once:true,capture:true}),50);
 }
-// Layout da grid de ativos (2 ou 3 colunas)
-let _layoutAtivos = (() => { try { return parseInt(localStorage.getItem('insp_layout_ativos')||'3'); } catch { return 3; } })();
-
-function setLayoutAtivos(n){
-  _layoutAtivos = n;
-  try { localStorage.setItem('insp_layout_ativos', String(n)); } catch {}
-  // Atualiza grid sem re-renderizar tudo
-  const grid = document.querySelector('.ativo-grid');
-  if(grid){
-    grid.className = n===2 ? 'ativo-grid cols2' : 'ativo-grid';
-  }
-  // Atualiza botões
-  const b2=document.getElementById('btn-layout-2');
-  const b3=document.getElementById('btn-layout-3');
-  if(b2)b2.className='layout-toggle-btn'+(n===2?' ativo':'');
-  if(b3)b3.className='layout-toggle-btn'+(n===3?' ativo':'');
-}
-
 function novoAtivo(){
   if(ATIVOS.length>=50){mostrarToast('Limite de 50 ativos atingido','#C62828');return;}
   const nome=(prompt('Nome do novo ativo (ex: TRH99):')||'').trim().toUpperCase();
@@ -805,34 +503,7 @@ function novoAtivo(){
   _initAtivo(nome);
   marcarMudanca();autoBackup();
   mostrarToast('✓ Ativo '+nome+' criado!','#2E7D32');
-  // ── Limpa TUDO do localStorage para liberar espaço ──
-(function limparLSAntigo(){
-  try{
-    // Remove todas as chaves de dados antigos do app
-    const keysRemover=[];
-    for(let i=0;i<localStorage.length;i++){
-      const k=localStorage.key(i);
-      // Remove chaves de dados do app mas preserva preferências pequenas (msgs rápidas, drive sync)
-      if(k&&(k.startsWith('inspecao')||k.startsWith('insp_db'))){
-        keysRemover.push(k);
-      }
-    }
-    keysRemover.forEach(k=>{localStorage.removeItem(k);});
-    if(keysRemover.length) console.log('localStorage limpo:', keysRemover);
-  }catch(e){console.warn('Limpeza LS falhou:',e);}
-})();
-
-// ── Migração: status 'em' → 'ac' em todos os registros ──
-(function migrarStatusEm(){
-  Object.values(DB.registros).forEach(regs=>{
-    regs.forEach(r=>{
-      if(r.campos?.status==='em')r.campos.status='ac';
-      if(r.tipo==='defeito')(r.campos?.defeitos||[]).forEach(d=>{if(d.status==='em')d.status='ac';});
-      (r.campos?.defeitos||[]).forEach(d=>{(d.atualizacoes||[]).forEach(u=>{if(u.status==='em')u.status='ac';});});
-    });
-  });
-})();
-renderLista();
+  renderLista();
 }
 function editarAtivo(id){
   fecharMenusAtivo();
@@ -888,7 +559,7 @@ function renderFavoritos(){
       h+=`<div class="ativo-card-wrap" style="position:relative;">
         <span class="ativo-fav-star"><i class="ti ti-star-filled"></i></span>
         <div class="ativo-card" onclick="selAtivo('${a.id}')">
-          <span class="ac-icon" style="display:flex;align-items:center;justify-content:center;">${svgAtivo(a.tipo)}</span>
+          <i class="ti ${iconeAtivo(a.tipo)} ac-icon"></i>
           <div class="ac-id">${a.id}</div>
           <div class="ac-tipo">${a.tipo}</div>
           <span class="pill ${cls}" style="margin-top:3px;">${txt}</span>
@@ -1003,8 +674,14 @@ function salvarAnotacaoGeral(){
 function excluirAnotacaoGeral(idx){
   if(!confirm('Excluir esta anotação?'))return;
   DB.anotacoesGerais.splice(idx,1);
+  marcarMudanca();
   if(pagAnotacoes>Math.max(1,Math.ceil(DB.anotacoesGerais.length/POR_PAGINA))) pagAnotacoes=1;
-  document.getElementById('content').innerHTML=buildAnotacoesGeraisHtml();setTimeout(()=>renderGaleriaGrid('gal-ag'),0);
+  // Refresh current view
+  if(passo==='anotacoes-gerais'){
+    document.getElementById('content').innerHTML=buildAnotacoesGeraisHtml();setTimeout(()=>renderGaleriaGrid('gal-ag'),0);
+  } else if(passo==='relatorio'){
+    renderRelatorio();
+  }
 }
 
 function mudaPagAnotacoes(p){
@@ -1026,8 +703,6 @@ function renderMenu(){
   setStepBar(true,2);
 
   // seções em ordem alfabética — 3 por linha exceto rasp que destaca
-  const ficha=DB.fichas[ativoSel];
-  const temExtrator=ficha?.extrator?.temExtrator||false;
   let secoesHtml='<div class="grid-2" style="gap:8px;">';
   SECOES_MENU.forEach(s=>{
     secoesHtml+=`<div class="card-btn" onclick="selSecao('${s}')">
@@ -1036,22 +711,10 @@ function renderMenu(){
     </div>`;
   });
   secoesHtml+=`</div>`;
-  // Bloco Extrator de Sucatas — aparece só se ativado na ficha técnica
-  const extHtml=temExtrator?`<div style="margin-top:10px;border-top:2px solid #E5E8ED;padding-top:10px;">
-    <div style="font-size:11px;font-weight:700;color:#E65100;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-      <i class="ti ti-trash" style="color:#E65100;"></i> Extrator de Sucatas
-    </div>
-    <div class="grid-2" style="gap:8px;">
-      ${SECOES_EXT.map(s=>`<div class="card-btn" style="border-color:#E65100;" onclick="selSecao('${s}')">
-        <i class="ti ${SECAO_ICONS[s]}" style="color:#E65100;"></i>
-        <div class="cb-nome" style="font-size:11px;">${SECAO_LABELS[s].replace('Ext. ','')}</div>
-      </div>`).join('')}
-    </div>
-  </div>`:'';
 
   document.getElementById('content').innerHTML=`
     <div class="ativo-banner">
-      <span style="display:flex;align-items:center;justify-content:center;">${svgAtivo(a.tipo)}</span>
+      <i class="ti ${iconeAtivo(a.tipo)}"></i>
       <div><div class="ab-id">${a.id}</div><div class="ab-nome">${a.tipo}</div></div>
       <span class="pill ${cls}" style="margin-left:auto;">${txt}</span>
     </div>
@@ -1067,24 +730,18 @@ function renderMenu(){
     </div>
     <div class="bloco-titulo">Registrar inspeção</div>
     ${secoesHtml}
-    ${extHtml}
     <button class="btn-sec" style="margin-top:12px;" onclick="renderLista()"><i class="ti ti-arrow-left"></i> Outro ativo</button>`;
 }
 
 // ════════════════════════════════
 // FORMULÁRIO
 // ════════════════════════════════
-function selSecao(key){secaoSel=key;fotoB64=null;_defIdx=0;_limparFormCompleto();renderForm();}
+function selSecao(key){secaoSel=key;fotoB64=null;_defIdx=0;renderForm();}
 
 function galNs(sec){return 'gal-'+sec;}
 
 function renderForm(){
   passo='form';
-  // Limpa todas as fotos do formulário anterior
-  Object.keys(galFotos).forEach(k=>{
-    // Não limpa fotos de modais de edição (prefix 'edit-')
-    if(!k.startsWith('edit-')&&!k.startsWith('upd-'))delete galFotos[k];
-  });
   setTopbar(ativoSel,SECAO_LABELS[secaoSel],true,false);
   setStepBar(true,3);
   const rU=ultimoReg(ativoSel,secaoSel);
@@ -1099,14 +756,14 @@ function renderForm(){
   </div>`;
 
   if(secaoSel==='rasp') c+=buildRaspForm();
-  else if(secaoSel==='interf'||secaoSel==='ext-interf') c+=buildInterfForm(rU);
-  else if(secaoSel==='desal'||secaoSel==='ext-desal') c+=buildDesalForm(rU);
+  else if(secaoSel==='interf') c+=buildInterfForm(rU);
+  else if(secaoSel==='desal') c+=buildDesalForm(rU);
   else if(secaoSel==='contra') c+=buildContraForm(rU);
-  else if(secaoSel==='defeito'||secaoSel==='ext-defeito') c+=buildDefeitoForm();
+  else if(secaoSel==='defeito') c+=buildDefeitoForm();
   else if(secaoSel==='anotacao') c+=buildAnotacaoForm(hDesc);
 
   // Galeria para seções simples (não rasp, defeito, anotacao — elas têm galeria própria)
-  if(!['defeito','rasp','anotacao','ext-defeito'].includes(secaoSel)){
+  if(!['defeito','rasp','anotacao'].includes(secaoSel)){
     c+=buildGaleriaField(ns);
   }
   c+=`<button class="btn-prim" onclick="salvar()">Salvar registro</button>
@@ -1139,16 +796,12 @@ function buildGaleriaField(ns){
     <label>Fotos <span class="lbl-hint">(até 6)</span></label>
     <div class="galeria-wrap">
       <div class="galeria-grid" id="gal-grid-${ns}"></div>
-      <div id="gal-btn-${ns}" style="display:flex;gap:8px;flex-wrap:wrap;">
-        <div class="galeria-add-btn" onclick="document.getElementById('gal-cam-${ns}').click()" style="flex:1;min-width:120px;">
-          <i class="ti ti-camera"></i> Câmera
-        </div>
-        <div class="galeria-add-btn" onclick="document.getElementById('gal-inp-${ns}').click()" style="flex:1;min-width:120px;background:#F0F4FA;color:#1F3864;border-color:#C5D8F0;">
-          <i class="ti ti-photo"></i> Galeria
+      <div id="gal-btn-${ns}">
+        <div class="galeria-add-btn" onclick="document.getElementById('gal-inp-${ns}').click()">
+          <i class="ti ti-camera"></i> Adicionar foto
         </div>
       </div>
     </div>
-    <input type="file" id="gal-cam-${ns}" accept="image/*" capture="environment" style="display:none" onchange="adicionarFotos('${ns}',this)">
     <input type="file" id="gal-inp-${ns}" accept="image/*" multiple style="display:none" onchange="adicionarFotos('${ns}',this)">
   </div>`;
 }
@@ -1171,32 +824,6 @@ function renderGaleriaGrid(ns){
   if(btn) btn.style.display=fotos.length>=6?'none':'block';
 }
 
-// Redimensiona foto para máx 1920x1080 mantendo proporção, JPEG 90%
-function _redimensionarFoto(file, callback){
-  const MAX_W=1920, MAX_H=1080, QUALIDADE=0.90;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const img=new Image();
-    img.onload=()=>{
-      let w=img.width, h=img.height;
-      // Calcula novo tamanho mantendo proporção
-      if(w>MAX_W||h>MAX_H){
-        const ratio=Math.min(MAX_W/w, MAX_H/h);
-        w=Math.round(w*ratio);
-        h=Math.round(h*ratio);
-      }
-      // Se já está dentro do limite, só converte para JPEG com qualidade reduzida
-      const canvas=document.createElement('canvas');
-      canvas.width=w; canvas.height=h;
-      const ctx=canvas.getContext('2d');
-      ctx.drawImage(img,0,0,w,h);
-      callback(canvas.toDataURL('image/jpeg', QUALIDADE));
-    };
-    img.src=e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
 function adicionarFotos(ns,input){
   if(!galFotos[ns])galFotos[ns]=[];
   const files=Array.from(input.files);
@@ -1204,11 +831,13 @@ function adicionarFotos(ns,input){
   const toAdd=files.slice(0,restante);
   let loaded=0;
   toAdd.forEach(file=>{
-    _redimensionarFoto(file, b64=>{
-      galFotos[ns].push(b64);
+    const reader=new FileReader();
+    reader.onload=e=>{
+      galFotos[ns].push(e.target.result);
       loaded++;
       if(loaded===toAdd.length) renderGaleriaGrid(ns);
-    });
+    };
+    reader.readAsDataURL(file);
   });
   input.value='';
 }
@@ -1248,7 +877,7 @@ function lbOpenSaved(uid,idx,arr){
 function buildAnotacaoForm(hDesc){
   resetGal('gal-anotacao');
   setTimeout(()=>renderGaleriaGrid('gal-anotacao'),0);
-  return buildDescGroup('f-desc',hDesc,'anotacao')+buildGaleriaField('gal-anotacao');
+  return buildDescGroup('f-desc',hDesc)+buildGaleriaField('gal-anotacao');
 }
 
 function resetGal(ns){
@@ -1313,78 +942,28 @@ function carregarFoto(input,prevId){
 }
 
 function buildInterfForm(rU){
-  const ultCrit=rU?.campos?.crit||'';
-  const ultStatus=rU?.campos?.status||'';
-  return `
-  <div class="form-grupo"><label>Criticidade ${ultCrit?'<span class="lbl-hint">(último: '+ultCrit+')</span>':''}</label>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <button type="button" class="btn-opcao btn-opcao-verde" id="interf-crit-baixo" onclick="selecionarOpcao('interf-crit','Baixo',this)">Baixo</button>
-      <button type="button" class="btn-opcao btn-opcao-amarelo" id="interf-crit-medio" onclick="selecionarOpcao('interf-crit','Médio',this)">Médio</button>
-      <button type="button" class="btn-opcao btn-opcao-vermelho" id="interf-crit-alto" onclick="selecionarOpcao('interf-crit','Alto',this)">Alto</button>
-    </div>
-    <input type="hidden" id="interf-crit" value="">
-  </div>
-  <div class="form-grupo"><label>Status ${ultStatus?'<span class="lbl-hint">(último: '+(ultStatus==='ac'?'Acompanhando':'Concluído')+')</span>':''}</label>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <button type="button" class="btn-opcao btn-opcao-azul" id="interf-status-ac" onclick="selecionarOpcao('interf-status','ac',this)">Acompanhando</button>
-      <button type="button" class="btn-opcao btn-opcao-verde" id="interf-status-co" onclick="selecionarOpcao('interf-status','co',this)">Concluído</button>
-    </div>
-    <input type="hidden" id="interf-status" value="">
-  </div>
+  return buildDescGroup('f-desc',rU?.desc||'')+`
   <div class="form-grupo"><label>Tipo</label>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-      <button type="button" class="btn-opcao" id="interf-tipo-interf" onclick="selecionarOpcaoInterf('Interferência',this)">Interferência</button>
-      <button type="button" class="btn-opcao" id="interf-tipo-inter" onclick="selecionarOpcaoInterf('Interdição',this)">Interdição</button>
-      <button type="button" class="btn-opcao" id="interf-tipo-outros" onclick="selecionarOpcaoInterf('outros',this)">Outros</button>
-    </div>
-    <input type="hidden" id="f-tipo-interf" value="">
-  </div>
+    <select id="f-tipo-interf" onchange="toggleEl('f-tipo-interf','outros','bloco-outros-interf')">
+      <option value="">Selecione</option><option>Interferência</option><option>Interdição</option>
+      <option value="outros">Outros (digitar)</option>
+    </select></div>
   <div id="bloco-outros-interf" style="display:none;">
     <div class="form-grupo"><label>Especificar</label><input type="text" id="f-tipo-outros" placeholder="Descreva..."></div>
   </div>
-  ${secaoSel!=='ext-interf'?`<div class="form-grupo"><label>Baliza / local</label><input type="text" id="f-bal" placeholder="Ex: B3, PE, cabeça..."></div>`:'<input type="hidden" id="f-bal" value="">'}
-  `+buildDescGroup('f-desc',rU?.desc||'')+`
-  <div onclick="toggleAddAnotacao('interf')" style="display:flex;align-items:center;gap:8px;margin-top:4px;margin-bottom:12px;cursor:pointer;user-select:none;">
-    <span id="interf-anotacao-box" style="width:16px;height:16px;border:2px solid #1F3864;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;background:#fff;flex-shrink:0;"></span>
-    <input type="hidden" id="interf-add-anotacao" value="0">
-    <span style="font-size:13px;color:#374151;font-weight:500;">Inserir também em Anotações</span>
-  </div>`;
-}
-
-function selecionarOpcaoInterf(valor, btn){
-  document.querySelectorAll('#interf-tipo-interf,#interf-tipo-inter,#interf-tipo-outros').forEach(b=>b.classList.remove('btn-opcao-ativo'));
-  btn.classList.add('btn-opcao-ativo');
-  document.getElementById('f-tipo-interf').value=valor;
-  const bl=document.getElementById('bloco-outros-interf');
-  if(bl)bl.style.display=(valor==='outros'?'block':'none');
+  <div class="form-grupo"><label>Baliza / local</label><input type="text" id="f-bal" placeholder="Ex: B3, PE, cabeça..."></div>
+  <div class="check-row"><input type="checkbox" id="f-novo"><label for="f-novo">Novo evento (não existia antes)</label></div>
+  <div class="form-grupo" style="margin-top:8px;"><label>Criticidade</label>
+    <select id="f-crit"><option value="">Selecione</option><option>Baixo</option><option>Médio</option><option>Alto</option></select></div>
+  <div class="form-grupo"><label>Status</label>
+    <select id="f-status"><option value="em">Em andamento</option><option value="ac">Acompanhando</option><option value="co">Concluído</option></select></div>`;
 }
 
 function buildDesalForm(rU){
-  const ultCrit=rU?.campos?.crit||'';
-  const ultStatus=rU?.campos?.status||'';
-  return `
-  <div class="form-grupo"><label>Criticidade ${ultCrit?'<span class="lbl-hint">(último: '+ultCrit+')</span>':''}</label>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <button type="button" class="btn-opcao btn-opcao-verde" id="desal-crit-baixo" onclick="selecionarOpcao('desal-crit','Baixo',this)">Baixo</button>
-      <button type="button" class="btn-opcao btn-opcao-amarelo" id="desal-crit-medio" onclick="selecionarOpcao('desal-crit','Médio',this)">Médio</button>
-      <button type="button" class="btn-opcao btn-opcao-vermelho" id="desal-crit-alto" onclick="selecionarOpcao('desal-crit','Alto',this)">Alto</button>
-    </div>
-    <input type="hidden" id="desal-crit" value="">
-  </div>
-  <div class="form-grupo"><label>Status ${ultStatus?'<span class="lbl-hint">(último: '+(ultStatus==='ac'?'Acompanhando':'Concluído')+')</span>':''}</label>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <button type="button" class="btn-opcao btn-opcao-azul" id="desal-status-ac" onclick="selecionarOpcao('desal-status','ac',this)">Acompanhando</button>
-      <button type="button" class="btn-opcao btn-opcao-verde" id="desal-status-co" onclick="selecionarOpcao('desal-status','co',this)">Concluído</button>
-    </div>
-    <input type="hidden" id="desal-status" value="">
-  </div>
-  ${secaoSel!=='ext-desal'?`<div class="form-grupo"><label>Baliza / local</label><input type="text" id="f-local" placeholder="Ex: retorno, carga, meio, B3..."></div>`:'<input type="hidden" id="f-local" value="">'}
-  `+buildDescGroup('f-desc',rU?.desc||'')+`
-  <div onclick="toggleAddAnotacao('desal')" style="display:flex;align-items:center;gap:8px;margin-top:4px;margin-bottom:12px;cursor:pointer;user-select:none;">
-    <span id="desal-anotacao-box" style="width:16px;height:16px;border:2px solid #1F3864;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;background:#fff;flex-shrink:0;"></span>
-    <input type="hidden" id="desal-add-anotacao" value="0">
-    <span style="font-size:13px;color:#374151;font-weight:500;">Inserir também em Anotações</span>
-  </div>`;
+  return buildDescGroup('f-desc',rU?.desc||'')+`
+  <div class="form-grupo"><label>Local</label><input type="text" id="f-local" placeholder="Ex: retorno, carga, meio..."></div>
+  <div class="form-grupo"><label>Status</label>
+    <select id="f-status-desal"><option value="ac">Acompanhando</option><option value="em">Em andamento</option><option value="co">Concluído</option></select></div>`;
 }
 
 function buildContraForm(rU){
@@ -1421,9 +1000,9 @@ function buildDefeitoBloco(idx){
     </div>
 
     <div id="${id}-bloco-emenda" style="display:none;">
-      ${secaoSel!=='ext-defeito'?`<div class="form-grupo"><label>Data da emenda</label>
+      <div class="form-grupo"><label>Data da emenda</label>
         <input type="text" id="${id}-data-emenda" placeholder="dd/mm/aaaa">
-      </div>`:''}
+      </div>
     </div>
 
     <div class="form-grupo"><label>Localização</label>
@@ -1449,11 +1028,13 @@ function buildDefeitoBloco(idx){
         <button type="button" class="btn-opcao btn-opcao-azul" id="${id}-status-ac" onclick="selecionarOpcao('${id}-status','ac',this)">Acompanhando</button>
         <button type="button" class="btn-opcao btn-opcao-verde" id="${id}-status-co" onclick="selecionarOpcao('${id}-status','co',this)">Concluído</button>
       </div>
-      <input type="hidden" id="${id}-status" value="ac">
+      <input type="hidden" id="${id}-status" value="em">
     </div>
 
     <div class="form-grupo"><label>Descrição</label>
-      ${buildMsgsRapidas(id+'-desc','defeito')}
+      <div style="display:flex;gap:6px;margin-bottom:5px;flex-wrap:wrap;">
+        <button type="button" class="btn-sm btn-sm-sec" onclick="setSemRelato('${id}-desc')">Sem relato</button>
+      </div>
       <textarea id="${id}-desc" rows="2" style="width:100%;font-size:13px;padding:8px;border:1px solid #D1D5DB;border-radius:8px;resize:vertical;" placeholder="Descreva a condição..."></textarea>
       <div onclick="toggleAddAnotacao('${id}')" style="display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer;user-select:none;">
         <span id="${id}-anotacao-box" style="width:16px;height:16px;border:2px solid #1F3864;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;background:#fff;flex-shrink:0;"></span>
@@ -1489,6 +1070,10 @@ function toggleAddAnotacao(id){
   }
 }
 
+function setSemRelato(id){
+  const el=document.getElementById(id);
+  if(el)el.value='Sem relato';
+}
 
 function abrirNotaDefeito(id){
   const desc=document.getElementById(id+'-desc')?.value||'';
@@ -1534,229 +1119,76 @@ function buildRaspForm(){
   h+=`</div></div>`;
   const ativosArr=RASP_CHAVES.filter(k=>ativos[k]);
   ativosArr.forEach(k=>{h+=buildRaspBloco(k);});
-  // init grids e restaura dados temporários após DOM
-  setTimeout(()=>{
-    ativosArr.forEach(k=>{
-      renderGaleriaGrid('gal-rasp-'+k);
-      _restaurarRaspTemp(k);
-    });
-  },0);
+  // init grids after DOM
+  setTimeout(()=>ativosArr.forEach(k=>renderGaleriaGrid('gal-rasp-'+k)),0);
   return h;
 }
 
 function buildRaspBloco(chave){
   const rU=ultimoRaspChave(ativoSel,chave);
-  const ultPct=rU?.campos?.[chave]?.pct||'';
-  const ultCrit=rU?.campos?.[chave]?.crit||'';
+  // Get values from new structure (per-component) or legacy
+  const ultPct=rU?.campos?.pct||rU?.campos?.[chave]?.pct||'';
+  const ultCrit=rU?.campos?.crit||rU?.campos?.[chave]?.crit||'';
+  const ultDesc=rU?.desc||rU?.campos?.[chave]?.desc||'';
   const ultData=rU?fmtData(rU.data):'';
-  // Barra visual de desgaste
-  function desgasteCor(p){
-    const n=parseInt(p)||0;
-    if(n<=30)return{bg:'#C62828',label:'Crítico'};
-    if(n<=50)return{bg:'#E65100',label:'Alto'};
-    if(n<=75)return{bg:'#F9A825',label:'Médio'};
-    return{bg:'#2E7D32',label:'Bom'};
-  }
-  const cor=ultPct?desgasteCor(ultPct):null;
-  const barraUlt=cor?`<div style="margin-bottom:4px;font-size:10px;color:#6B7280;">Último: ${ultPct}% — <span style="color:${cor.bg};font-weight:700;">${cor.label}</span></div>
-    <div style="background:#E5E8ED;border-radius:6px;height:10px;overflow:hidden;margin-bottom:8px;">
-      <div style="height:100%;width:${Math.min(parseInt(ultPct),100)}%;background:${cor.bg};border-radius:6px;transition:width .3s;"></div>
-    </div>`:'';
   return `<div class="rasp-bloco" id="rasp-bloco-${chave}">
     <div class="rasp-bloco-titulo">
       <span><i class="ti ti-tool" style="color:${chave.startsWith('p')?'#2E75B6':'#6B7280'};margin-right:4px;"></i>
-        ${RASP_LABELS[chave]} ${ultData?'<span class="lbl-hint">(última: '+ultData+')</span>':''}
+        ${RASP_LABELS[chave]}
       </span>
+      ${rU?`<button type="button" class="btn-sm btn-sm-sec" onclick="copiarUltimaInspecaoRasp('${chave}')" title="Copiar última inspeção"><i class="ti ti-copy"></i> Copiar última</button>`:''}
+    </div>
+    ${ultData||ultPct||ultCrit?`<div style="background:#F0F6FF;border-radius:7px;padding:7px 10px;margin-bottom:8px;font-size:11px;color:#374151;display:flex;gap:10px;flex-wrap:wrap;">
+      ${ultData?`<span>📅 Última: <b>${ultData}</b></span>`:''}
+      ${ultPct?`<span>⚙️ Desgaste: <b>${ultPct}%</b></span>`:''}
+      ${ultCrit?`<span>⚠️ Criticidade: <b>${ultCrit}</b></span>`:''}
+    </div>`:''}
+    ${buildDescGroup('f-desc-'+chave,ultDesc)}
+    <div class="form-grupo">
+      <label>% Desgaste</label>
+      <input type="number" id="f-pct-${chave}" min="0" max="100" placeholder="${ultPct?'Último: '+ultPct+'%':'0 a 100'}">
     </div>
     <div class="form-grupo">
-      <label>% Desgaste <span class="lbl-hint">(lâminas)</span></label>
-      ${barraUlt}
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#C62828;" id="pct-btn-${chave}-0" onclick="setPct('${chave}',15,this)" title="0–30%">🔴 0–30%</button>
-        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#E65100;" id="pct-btn-${chave}-1" onclick="setPct('${chave}',40,this)" title="31–50%">🟠 31–50%</button>
-        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#F9A825;" id="pct-btn-${chave}-2" onclick="setPct('${chave}',63,this)" title="51–75%">🟡 51–75%</button>
-        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#2E7D32;" id="pct-btn-${chave}-3" onclick="setPct('${chave}',88,this)" title="76–100%">🟢 76–100%</button>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input type="number" id="f-pct-${chave}" min="0" max="100" placeholder="Ou digitar %" style="width:110px;font-size:13px;padding:7px 10px;border:1px solid #D1D5DB;border-radius:8px;" oninput="atualizarBarraRasp('${chave}')">
-        <div id="barra-wrap-${chave}" style="flex:1;">
-          <div style="background:#E5E8ED;border-radius:6px;height:12px;overflow:hidden;">
-            <div id="barra-rasp-${chave}" style="height:100%;width:0%;background:#E5E8ED;border-radius:6px;transition:width .2s;"></div>
-          </div>
-          <div id="barra-label-${chave}" style="font-size:10px;color:#9CA3AF;margin-top:2px;"></div>
-        </div>
-      </div>
-    </div>
-    <div class="form-grupo"><label>Criticidade</label>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button type="button" class="btn-opcao btn-opcao-verde" id="rcrit-${chave}-b" onclick="selecionarOpcao('rcrit-${chave}','Baixo',this)">Baixo</button>
-        <button type="button" class="btn-opcao btn-opcao-amarelo" id="rcrit-${chave}-m" onclick="selecionarOpcao('rcrit-${chave}','Médio',this)">Médio</button>
-        <button type="button" class="btn-opcao btn-opcao-vermelho" id="rcrit-${chave}-a" onclick="selecionarOpcao('rcrit-${chave}','Alto',this)">Alto</button>
-      </div>
-      <input type="hidden" id="rcrit-${chave}" value="">
-    </div>
-    ${buildDescGroup('f-desc-'+chave,rU?.desc||'','rasp')}
-    <div onclick="toggleAddAnotacao('rasp-${chave}')" style="display:flex;align-items:center;gap:8px;margin-top:4px;margin-bottom:10px;cursor:pointer;user-select:none;">
-      <span id="rasp-${chave}-anotacao-box" style="width:16px;height:16px;border:2px solid #1F3864;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;background:#fff;flex-shrink:0;"></span>
-      <input type="hidden" id="rasp-${chave}-add-anotacao" value="0">
-      <span style="font-size:13px;color:#374151;font-weight:500;">Inserir também em Anotações</span>
+      <label>Criticidade</label>
+      <select id="f-crit-${chave}">
+        <option value="">Sem alteração</option><option>Baixo</option><option>Médio</option><option>Alto</option>
+      </select>
     </div>
     ${buildGaleriaField('gal-rasp-'+chave)}
   </div>`;
 }
 
-function desgasteCor(p){
-  const n=parseInt(p)||0;
-  if(n<=30)return{bg:'#C62828',label:'Crítico'};
-  if(n<=50)return{bg:'#E65100',label:'Alto'};
-  if(n<=75)return{bg:'#F9A825',label:'Médio'};
-  return{bg:'#2E7D32',label:'Bom'};
-}
-
-function setPct(chave, val, btn){
-  const inp=document.getElementById('f-pct-'+chave);
-  if(inp)inp.value=val;
-  // Desmarca outros botões da faixa
-  [0,1,2,3].forEach(i=>{const b=document.getElementById('pct-btn-'+chave+'-'+i);if(b)b.classList.remove('btn-opcao-ativo');});
-  if(btn)btn.classList.add('btn-opcao-ativo');
-  atualizarBarraRasp(chave);
-}
-
-function atualizarBarraRasp(chave){
-  const val=parseInt(document.getElementById('f-pct-'+chave)?.value)||0;
-  const barra=document.getElementById('barra-rasp-'+chave);
-  const label=document.getElementById('barra-label-'+chave);
-  if(!barra)return;
-  const cor=desgasteCor(val);
-  barra.style.width=Math.min(val,100)+'%';
-  barra.style.background=val>0?cor.bg:'#E5E8ED';
-  if(label)label.textContent=val>0?val+'% — '+cor.label:'';
+function copiarUltimaInspecaoRasp(chave){
+  const rU=ultimoRaspChave(ativoSel,chave);
+  if(!rU)return;
+  const ultDesc=rU?.desc||rU?.campos?.[chave]?.desc||'';
+  const ultPct=rU?.campos?.pct||rU?.campos?.[chave]?.pct||'';
+  const ultCrit=rU?.campos?.crit||rU?.campos?.[chave]?.crit||'';
+  const descEl=document.getElementById('f-desc-'+chave);
+  const pctEl=document.getElementById('f-pct-'+chave);
+  const critEl=document.getElementById('f-crit-'+chave);
+  if(descEl&&ultDesc){descEl.value=ultDesc;descEl.style.color='';}
+  if(pctEl&&ultPct)pctEl.value=ultPct;
+  if(critEl&&ultCrit){
+    const opt=[...critEl.options].find(o=>o.value===ultCrit||o.text===ultCrit);
+    if(opt)critEl.value=opt.value;
+  }
+  mostrarToast('✓ Última inspeção copiada!','#2E7D32');
 }
 
 function toggleRasp(chave){
-  // Salva o que foi digitado nos blocos existentes antes de recriar
-  _salvarRaspTemp();
   DB.raspAtivos[ativoSel][chave]=!DB.raspAtivos[ativoSel][chave];
   fotoB64=null;renderForm();
 }
 
-// Salva temporariamente os dados digitados nos campos rasp ainda visíveis
-const _raspTemp={};
-function _salvarRaspTemp(){
-  const ativos=DB.raspAtivos[ativoSel];
-  RASP_CHAVES.filter(k=>ativos[k]).forEach(k=>{
-    const desc=(document.getElementById('f-desc-'+k)?.value||'').trim();
-    const pct=document.getElementById('f-pct-'+k)?.value||'';
-    const crit=document.getElementById('rcrit-'+k)?.value||'';
-    const fotos=getGalFotos('gal-rasp-'+k);
-    _raspTemp[k]={desc,pct,crit,fotos};
-  });
-}
-
-// Restaura os dados temporários após recriar o form
-function _restaurarRaspTemp(chave){
-  const t=_raspTemp[chave];
-  if(!t)return;
-  setTimeout(()=>{
-    const descEl=document.getElementById('f-desc-'+chave);
-    if(descEl&&t.desc){descEl.value=t.desc;descEl.style.color='';}
-    const pctEl=document.getElementById('f-pct-'+chave);
-    if(pctEl&&t.pct){pctEl.value=t.pct;atualizarBarraRasp(chave);}
-    if(t.crit){
-      const critMap={Baixo:'b',Médio:'m',Alto:'a'};
-      const btn=document.getElementById('rcrit-'+chave+'-'+critMap[t.crit]);
-      if(btn){selecionarOpcao('rcrit-'+chave,t.crit,btn);}
-    }
-    if(t.fotos&&t.fotos.length){
-      galFotos['gal-rasp-'+chave]=[...t.fotos];
-      renderGaleriaGrid('gal-rasp-'+chave);
-    }
-  },50);
-}
-
-// ── Mensagens Rápidas ──────────────────────────────────────────────────────
-// ── Mensagens Rápidas POR SEÇÃO ────────────────────────────────────────────
-// Cada seção tem sua própria lista no localStorage
-// Chaves: insp_msgs_rasp, insp_msgs_defeito, insp_msgs_interf,
-//         insp_msgs_desal, insp_msgs_contra, insp_msgs_anotacao, insp_msgs_upd
-const MAX_MSGS=5;
-function _msgsKey(secao){return 'insp_msgs_'+(secao||'geral');}
-function getMsgsRapidas(secao){
-  try{return JSON.parse(localStorage.getItem(_msgsKey(secao))||'[]');}catch{return[];}
-}
-function saveMsgsRapidas(arr,secao){
-  try{localStorage.setItem(_msgsKey(secao),JSON.stringify(arr));}catch{}
-}
-function buildMsgsRapidas(targetId,secao){
-  const uid='mr-'+targetId.replace(/[^a-z0-9]/gi,'-');
-  const sec=secao||'geral';
-  return `<div class="msgs-rapidas-wrap" id="${uid}-wrap" data-secao="${sec}">
-    ${_renderMsgsRows(targetId,uid,sec)}
-  </div>`;
-}
-function _renderMsgsRows(targetId,uid,secao){
-  const sec=secao||document.getElementById(uid+'-wrap')?.dataset?.secao||'geral';
-  const msgs=getMsgsRapidas(sec);
-  const pode=msgs.length<MAX_MSGS;
-  let h='<div class="msgs-rapidas-row">';
-  h+=`<button type="button" class="msg-rap-btn" onclick="usarMsgRapida('${targetId}','Sem relato')">Sem relato</button>`;
-  msgs.forEach((m,i)=>{
-    const esc=m.replace(/'/g,"\'");
-    h+=`<span style="display:inline-flex;align-items:center;gap:0px;border:1px solid #D1D5DB;border-radius:6px;background:#fff;overflow:hidden;">
-      <button type="button" class="msg-rap-btn" style="border:none;border-radius:0;" onclick="usarMsgRapida('${targetId}','${esc}')">${m}</button>
-      <button type="button" class="msg-rap-del" onclick="delMsgRapida(${i},'${targetId}','${uid}','${sec}')" title="Remover">✕</button>
-    </span>`;
-  });
-  if(pode) h+=`<button type="button" class="msg-rap-add" onclick="showAddMsg('${targetId}','${uid}','${sec}')"><i class="ti ti-plus" style="font-size:12px;"></i></button>`;
-  h+='</div>';
-  h+=`<div id="${uid}-addinput" style="display:none;" class="msg-rap-input-row">
-    <input type="text" id="${uid}-newinput" placeholder="Nova mensagem rápida..." maxlength="60" onkeydown="if(event.key==='Enter')confirmAddMsg('${targetId}','${uid}','${sec}')">
-    <button class="msg-rap-ok" onclick="confirmAddMsg('${targetId}','${uid}','${sec}')">OK</button>
-    <button class="msg-rap-cancel" onclick="cancelAddMsg('${uid}')">✕</button>
-  </div>`;
-  return h;
-}
-function usarMsgRapida(targetId,msg){
-  const el=document.getElementById(targetId);
-  if(!el)return;
-  el.value=msg;
-  el.style.color=msg==='Sem relato'?'#9CA3AF':'';
-}
-function delMsgRapida(idx,targetId,uid,secao){
-  const arr=getMsgsRapidas(secao);
-  arr.splice(idx,1);
-  saveMsgsRapidas(arr,secao);
-  const wrap=document.getElementById(uid+'-wrap');
-  if(wrap)wrap.innerHTML=_renderMsgsRows(targetId,uid,secao);
-}
-function showAddMsg(targetId,uid,secao){
-  const row=document.getElementById(uid+'-addinput');
-  if(row){row.style.display='flex';setTimeout(()=>document.getElementById(uid+'-newinput')?.focus(),50);}
-}
-function cancelAddMsg(uid){
-  const row=document.getElementById(uid+'-addinput');
-  if(row)row.style.display='none';
-}
-function confirmAddMsg(targetId,uid,secao){
-  const inp=document.getElementById(uid+'-newinput');
-  const val=(inp?.value||'').trim();
-  if(!val)return;
-  const arr=getMsgsRapidas(secao);
-  if(arr.length>=MAX_MSGS){cancelAddMsg(uid);return;}
-  arr.push(val);
-  saveMsgsRapidas(arr,secao);
-  const wrap=document.getElementById(uid+'-wrap');
-  if(wrap)wrap.innerHTML=_renderMsgsRows(targetId,uid,secao);
-}
-// ── buildDescGroup ──────────────────────────────────────────────────────────
-function buildDescGroup(id,ultimoRelato,secao){
+function buildDescGroup(id,ultimoRelato){
   const tem=!!ultimoRelato;
-  const sec=secao||secaoSel||'geral';
-  const copiarBtn=tem?`<button type="button" class="desc-opt-btn blue" onclick="copiarRelato('${id}','${ultimoRelato.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ')}')">↩ Copiar último</button>`:'';
   return `<div class="form-grupo">
     <label>Descrição ${tem?'<span class="lbl-hint">(último: '+ultimoRelato.substring(0,25)+(ultimoRelato.length>25?'...':'')+')</span>':''}</label>
-    ${buildMsgsRapidas(id,sec)}
-    ${copiarBtn?'<div class="desc-opts">'+copiarBtn+'</div>':''}
+    <div class="desc-opts">
+      <button type="button" class="desc-opt-btn" onclick="usarSemRelato('${id}')">Sem relato</button>
+      ${tem?`<button type="button" class="desc-opt-btn blue" onclick="copiarRelato('${id}','${ultimoRelato.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,' ')}')">↩ Copiar último</button>`:''}
+    </div>
     <textarea id="${id}" placeholder="Descreva a condição..."></textarea>
   </div>`;
 }
@@ -1787,7 +1219,6 @@ function salvar(){
     if(!desc){alert('Preencha a descrição ou use "Sem relato".');return;}
     const fotos=getGalFotos('gal-anotacao');
     DB.anotacoesGerais.unshift({ativo:ativoSel,data,desc,fotos});
-    galFotos['gal-anotacao']=[];
     renderSucesso({id:newId(),tipo:'anotacao',data,desc,fotos,campos:{}});
     return;
   }
@@ -1798,24 +1229,14 @@ function salvar(){
       if(!ativosR[k])return;
       const desc=(document.getElementById('f-desc-'+k)?.value||'').trim();
       const pct=document.getElementById('f-pct-'+k)?.value||'';
-      const crit=document.getElementById('rcrit-'+k)?.value||'';
+      const crit=document.getElementById('f-crit-'+k)?.value||'';
       const fotos=getGalFotos('gal-rasp-'+k);
       // Só cria registro se preencheu algo
-      const fotosNovas=fotos.filter(f=>f);
-      if(!desc&&!pct&&!crit&&!fotosNovas.length) return; // nada preenchido → mantém o registro ativo anterior intacto
-
-      // Inserir em anotações se marcado
-      const addAnot=document.getElementById('rasp-'+k+'-add-anotacao')?.value==='1';
-      if(addAnot&&desc&&desc!=='Sem relato'){
-        const partes=[];
-        if(pct)partes.push('%Desgaste: '+pct+'%');
-        if(crit)partes.push('Criticidade: '+crit);
-        DB.anotacoesGerais.unshift({ativo:ativoSel,data,desc:'[Raspador — '+RASP_LABELS[k]+(partes.length?' — '+partes.join(' / '):'')+']\n\nDescrição: '+desc,fotos:[...fotos]});
-      }
-      // Só move para histórico APÓS confirmar que há dados novos para criar registro
+      if(!desc&&!pct&&!crit&&!fotos.length) return;
+      // Busca registro ativo anterior deste componente e move para histórico
       const regs=DB.registros[ativoSel];
-      const idxAtivo=regs.findIndex(r=>r.tipo==='rasp-'+k&&!r._hist&&!r._encerrado);
-      if(idxAtivo>=0) regs[idxAtivo]._hist=true;
+      const idxAtivo=regs.findIndex(r=>r.tipo==='rasp-'+k&&!r._hist);
+      if(idxAtivo>=0) regs[idxAtivo]._hist=true; // marca como histórico
       // Cria novo registro individual por componente
       const reg={id:newId(),tipo:'rasp-'+k,data,desc:desc||'Sem relato',fotos,campos:{pct,crit},_hist:false};
       DB.registros[ativoSel].unshift(reg);
@@ -1823,7 +1244,7 @@ function salvar(){
     renderSucesso({id:newId(),tipo:'rasp',data,desc:'Inspeção de raspadores',fotos:[],campos:{}});return;
   }
 
-  if(secaoSel==='defeito'||secaoSel==='ext-defeito'){
+  if(secaoSel==='defeito'){
     const cards=document.querySelectorAll('[id^="card-def-"]');
     const defeitos=[];
     cards.forEach(card=>{
@@ -1837,7 +1258,7 @@ function salvar(){
       if(addAnotacao && desc && desc!=='Sem relato'){
         const locLabel=document.getElementById(id+'-loc')?.value||'';
         const critLabel=document.getElementById(id+'-crit')?.value||'';
-        const statusLabel={em:'Acompanhando',ac:'Acompanhando',co:'Concluído'}[document.getElementById(id+'-status')?.value||'ac']||'';
+        const statusLabel={em:'Em andamento',ac:'Acompanhando',co:'Concluído'}[document.getElementById(id+'-status')?.value||'em']||'';
         const partes=[];
         if(locLabel)    partes.push('Local: '+locLabel);
         if(critLabel)   partes.push('Criticidade: '+critLabel);
@@ -1850,11 +1271,11 @@ function salvar(){
         loc:document.getElementById(id+'-loc')?.value||'',
         novo:document.getElementById(id+'-novo')?.checked||false,
         crit:document.getElementById(id+'-crit')?.value||'',
-        status:document.getElementById(id+'-status')?.value||'ac',
+        status:document.getElementById(id+'-status')?.value||'em',
         desc, fotos
       });
     });
-    const reg={id:newId(),tipo:secaoSel,data,desc:SECAO_LABELS[secaoSel]||'Defeitos/Reparos',fotos:[],campos:{defeitos}};
+    const reg={id:newId(),tipo:'defeito',data,desc:'Defeitos/Reparos',fotos:[],campos:{defeitos}};
     DB.registros[ativoSel].unshift(reg);
     renderSucesso(reg);return;
   }
@@ -1864,69 +1285,19 @@ function salvar(){
   const fotos=getGalFotos(galNs(secaoSel));
   const reg={id:newId(),tipo:secaoSel,data,desc,fotos,campos:{}};
 
-  // Extrator mapeia para mesmos handlers mas com tipo diferente
-  const _tipoBase=secaoSel.replace('ext-','');
-  const _isExt=secaoSel.startsWith('ext-');
-  if(secaoSel==='interf'||secaoSel==='ext-interf'){
+  if(secaoSel==='interf'){
     let tipo=document.getElementById('f-tipo-interf')?.value||'';
     if(tipo==='outros')tipo=document.getElementById('f-tipo-outros')?.value||'Outros';
-    const intCrit=document.getElementById('interf-crit')?.value||'';
-    const intStatus=document.getElementById('interf-status')?.value||'ac';
-    reg.campos={tipo,bal:document.getElementById('f-bal')?.value||'',crit:intCrit,status:intStatus};
-    reg.tipo=secaoSel; // preserva ext-interf ou interf
-    // Inserir em anotações
-    if(document.getElementById('interf-add-anotacao')?.value==='1'&&desc&&desc!=='Sem relato'){
-      const partes=[];
-      if(tipo)partes.push('Tipo: '+tipo);
-      if(intCrit)partes.push('Criticidade: '+intCrit);
-      const stLbl={ac:'Acompanhando',co:'Concluído',em:'Em andamento'}[intStatus]||'';
-      if(stLbl)partes.push('Status: '+stLbl);
-      const bal=document.getElementById('f-bal')?.value||'';
-      if(bal)partes.push('Baliza: '+bal);
-      DB.anotacoesGerais.unshift({ativo:ativoSel,data,desc:'[Interferência'+(partes.length?' — '+partes.join(' / '):'')+']\n\nDescrição: '+desc,fotos:[...fotos]});
-    }
+    reg.campos={tipo,bal:document.getElementById('f-bal')?.value||'',novo:document.getElementById('f-novo')?.checked||false,crit:document.getElementById('f-crit')?.value||'',status:document.getElementById('f-status')?.value||'em'};
   }
-  if(secaoSel==='desal'||secaoSel==='ext-desal'){
-    const dsCrit=document.getElementById('desal-crit')?.value||'';
-    const dsStatus=document.getElementById('desal-status')?.value||'ac';
-    reg.campos={local:document.getElementById('f-local')?.value||'',crit:dsCrit,status:dsStatus};
-    reg.tipo=secaoSel; // preserva ext-desal ou desal
-    // Inserir em anotações
-    if(document.getElementById('desal-add-anotacao')?.value==='1'&&desc&&desc!=='Sem relato'){
-      const partes=[];
-      if(dsCrit)partes.push('Criticidade: '+dsCrit);
-      const stLbl={ac:'Acompanhando',co:'Concluído',em:'Em andamento'}[dsStatus]||'';
-      if(stLbl)partes.push('Status: '+stLbl);
-      const bal=document.getElementById('f-local')?.value||'';
-      if(bal)partes.push('Local: '+bal);
-      DB.anotacoesGerais.unshift({ativo:ativoSel,data,desc:'[Desalinhamento'+(partes.length?' — '+partes.join(' / '):'')+']\n\nDescrição: '+desc,fotos:[...fotos]});
-    }
-  }
+  if(secaoSel==='desal')reg.campos={local:document.getElementById('f-local')?.value||'',status:document.getElementById('f-status-desal')?.value||'em'};
   if(secaoSel==='contra')reg.campos={pos:document.getElementById('f-pos')?.value||''};
 
   DB.registros[ativoSel].unshift(reg);
   renderSucesso(reg);
 }
 
-function _limparFormCompleto(){
-  // Limpa todos os galFotos do formulário (não de edição)
-  Object.keys(galFotos).forEach(k=>{
-    if(!k.startsWith('edit-')&&!k.startsWith('upd-'))delete galFotos[k];
-  });
-  // Limpa campos de texto, selects e hidden
-  document.querySelectorAll(
-    '#content textarea, #content input[type=text], #content input[type=number], #content input[type=date]'
-  ).forEach(el=>{ if(!el.closest('.modal-edit'))el.value=''; });
-  // Limpa botões de opção selecionados
-  document.querySelectorAll('#content .btn-opcao-ativo').forEach(el=>el.classList.remove('btn-opcao-ativo'));
-  // Limpa hidden values de status/criticidade/etc
-  document.querySelectorAll('#content input[type=hidden]').forEach(el=>{
-    if(!el.closest('.modal-edit'))el.value='';
-  });
-}
-
 function renderSucesso(reg){
-  _limparFormCompleto();
   marcarMudanca(); autoBackup();
   passo='sucesso';
   setTopbar('Registro salvo!',ativoSel,false,false);
@@ -1958,17 +1329,14 @@ function renderRelatorio(){
   const ficha=DB.fichas[ativoSel];
   const TIPOS_BASE=['anotacao','contra','defeito','desal','interf'];
   const RASP_K_TIPOS=RASP_CHAVES.map(k=>'rasp-'+k);
-  const EXT_TIPOS=['ext-defeito','ext-interf','ext-desal'];
-  const TODOS_TIPOS=[...TIPOS_BASE,...RASP_K_TIPOS,...EXT_TIPOS];
+  const TODOS_TIPOS=[...TIPOS_BASE,...RASP_K_TIPOS];
 
   // Separa ativos vs histórico
   const ativos={},hist={};
   TODOS_TIPOS.forEach(t=>{ativos[t]=[];hist[t]=[];});
   DB.registros[ativoSel].forEach(r=>{
     if(!TODOS_TIPOS.includes(r.tipo))return;
-    // Para defeitos: vai pro histórico só se TODOS estiverem encerrados (ou _encerrado geral)
-    const conc=r._hist||r._encerrado;
-    // Para defeitos com mistura ativo/encerrado, o registro fica nos ativos mas mostra os encerrados no hist inline
+    const conc=r._hist||r.campos?.status==='co'||(r.tipo==='defeito'&&r.campos?.defeitos?.every(d=>d.status==='co'));
     if(conc)hist[r.tipo].push(r);else ativos[r.tipo].push(r);
   });
 
@@ -2031,7 +1399,26 @@ function renderRelatorio(){
   const ussHtml=''; // USS now inside fichaBody
 
 
-  // ── RASPADORES (por componente) ──
+  // ── ANOTAÇÕES DO ATIVO (filtradas das Anotações Gerais) ──
+  const anotAtivo=DB.anotacoesGerais.map((an,i)=>({an,i})).filter(x=>x.an.ativo===ativoSel);
+  let anotHtml='';
+  if(anotAtivo.length){
+    let body='';
+    anotAtivo.forEach(({an,i})=>{
+      const fotos=an.fotos||[];
+      body+=`<div class="reg-card" style="margin-bottom:8px;">
+        <div class="reg-card-header">
+          <span class="rc-data"><i class="ti ti-calendar" style="vertical-align:-2px;"></i> ${fmtData(an.data)}</span>
+          <span style="flex:1;"></span>
+          <input type="checkbox" class="item-print-chk no-print" checked title="Incluir na impressão" onclick="event.stopPropagation()">
+          <button class="btn-sm btn-sm-sec no-print" onclick="excluirAnotacaoGeral(${i})"><i class="ti ti-trash"></i> Excluir</button>
+        </div>
+        <div class="reg-card-body" style="white-space:pre-line;">${an.desc||''}</div>
+        ${fotos.length?buildGaleriaDisplay(fotos,'rag-'+i):''}
+      </div>`;
+    });
+    anotHtml=buildSecaoRel('anotativo','ti-notes','ANOTAÇÕES — '+ativoSel,body,false,'');
+  }
   const raspAtiv=DB.raspAtivos[ativoSel];
   let raspBody='';
   let temRasp=false;
@@ -2059,135 +1446,26 @@ function renderRelatorio(){
     regsHtml+=buildSecaoRel('reg-'+tipo,SECAO_ICONS[tipo],SECAO_LABELS[tipo].toUpperCase(),body,false,'');
   });
 
-  // ── EXTRATOR DE SUCATAS ──────────────────────────────────────────────────
-  let extRelHtml='';
-  const temExt=EXT_TIPOS.some(t=>(ativos[t]||[]).length);
-  if(temExt){
-    let extBody='';
-    EXT_TIPOS.forEach(tipo=>{
-      if(!(ativos[tipo]||[]).length)return;
-      const subId='ativo-ext-'+tipo;
-      let cardsH=`<div id="${subId}-cards">`;
-      ativos[tipo].forEach(r=>cardsH+=buildRegCard(r,false));
-      cardsH+='</div>';
-      extBody+=`<div style="border:1px solid #FFCCBC;border-radius:8px;overflow:hidden;margin-bottom:8px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#FFF3E0;cursor:pointer;" onclick="toggleHistSub('${subId}')">
-          <span style="font-size:12px;font-weight:700;color:#E65100;flex:1;">${SECAO_LABELS[tipo].replace('Ext. ','')}</span>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span style="font-size:11px;background:#FFE0B2;color:#E65100;padding:2px 7px;border-radius:10px;">${ativos[tipo].length}</span>
-            <button class="rel-sec-toggle" id="${subId}-btn" style="width:22px;height:22px;font-size:13px;background:#FFE0B2;color:#E65100;" onclick="toggleHistSub('${subId}')">+</button>
-          </div>
-        </div>
-        <div id="${subId}" style="display:none;padding:8px 8px 4px;">${cardsH}</div>
-      </div>`;
-    });
-    // Seção começa recolhida (body oculto), abre com +
-    extRelHtml=`<div class="rel-sec-wrap" id="sec-wrap-extrator">
-      <div class="rel-sec-hdr" style="background:#E65100;" onclick="toggleSecaoExt()">
-        <i class="ti ti-trash rsh-icon"></i>
-        <span class="rsh-label">EXTRATOR DE SUCATAS</span>
-        <button class="rel-sec-toggle no-print" id="sec-btn-extrator" style="background:rgba(255,255,255,.2);color:#fff;">+</button>
-      </div>
-      <div class="rel-sec-body" id="sec-body-extrator" style="display:none;">${extBody}</div>
-    </div>`;
-  }
-  // ── HISTÓRICO EXTRATOR ───────────────────────────────────────────────────
-  let extHistHtml='';
-  const temExtHist=EXT_TIPOS.some(t=>(hist[t]||[]).length);
-  if(temExtHist){
-    let extHistBody='';
-    EXT_TIPOS.forEach(tipo=>{
-      if(!(hist[tipo]||[]).length)return;
-      const lim=100;const regs=hist[tipo]||[];
-      const subId='hist-ext-'+tipo;
-      const filtroLocal=buildFiltroLocalHist(subId,tipo,regs);
-      let cardsH=`<div id="${subId}-cards">`;
-      regs.slice(0,lim).forEach(r=>{cardsH+=buildRegCard(r,true);});
-      cardsH+='</div>';
-      extHistBody+=`<div style="border:1px solid #FFCCBC;border-radius:8px;overflow:hidden;margin-bottom:8px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#FFF3E0;cursor:pointer;" onclick="toggleHistSub('${subId}')">
-          <span style="font-size:12px;font-weight:700;color:#E65100;flex:1;">${SECAO_LABELS[tipo].replace('Ext. ','')}</span>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span style="font-size:11px;color:#6B7280;background:#FFE0B2;padding:2px 7px;border-radius:10px;" id="${subId}-count">${Math.min(regs.length,lim)}/${lim}</span>
-            <button onclick="event.stopPropagation();toggleHistSub('${subId}');toggleFiltroLocal('${subId}')" style="background:#FFE0B2;border:none;color:#E65100;width:26px;height:22px;border-radius:5px;cursor:pointer;"><i class="ti ti-filter" style="font-size:11px;"></i></button>
-            <button class="rel-sec-toggle" id="${subId}-btn" style="width:22px;height:22px;font-size:13px;background:#FFE0B2;color:#E65100;" onclick="toggleHistSub('${subId}')">+</button>
-          </div>
-        </div>
-        <div id="${subId}" style="display:none;">${filtroLocal}${cardsH}</div>
-      </div>`;
-    });
-    extHistHtml=buildSecaoRel('ext-hist','ti-trash','HISTÓRICO — EXTRATOR DE SUCATAS',extHistBody,true,'');
-  }
-
-  // ── HISTÓRICO — subitens colapsáveis, limites, contagem e filtros ──
+  // ── HISTÓRICO ──
   let histHtml='';
-  const HIST_LIMITS={defeito:100,interf:100,desal:100,'rasp-prim':100,'rasp-p2':100,'rasp-s1':100,'rasp-s2':100,'rasp-s3':100,'rasp-s4':100,'rasp-s5':100};
   const temHist=[...TODOS_TIPOS].some(t=>hist[t].length);
   if(temHist){
-    // Filtro geral (valores atuais — atualizados por aplicarFiltroHist)
-    const filtroGeral=buildFiltroGeralHist();
-    let histBody=filtroGeral;
-
-    // ── Raspadores: grupo com subitens ──
-    const raspHistKeys=RASP_CHAVES.filter(k=>hist['rasp-'+k].length);
-    if(raspHistKeys.length){
-      const raspSubId='hist-rasp-sub';
-      let raspSubBody='';
-      raspHistKeys.forEach(k=>{
-        const tipo='rasp-'+k;
-        const regs=hist[tipo];
-        const lim=HIST_LIMITS[tipo]||100;
-        const subId='hist-'+tipo.replace('-','_');
-        const filtroLocal=buildFiltroLocalHist(subId,'rasp',regs);
-        let cardsH=`<div id="${subId}-cards">`;
-        regs.slice(0,lim).forEach(r=>{cardsH+=buildRegCard(r,true);});
-        cardsH+='</div>';
-        raspSubBody+=`<div style="border-top:1px solid #F0F2F5;">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#F8F9FB;">
-            <span style="font-size:12px;font-weight:700;color:#1F3864;cursor:pointer;flex:1;" onclick="toggleHistSub('${subId}')">${SECAO_LABELS[tipo]}</span>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:11px;color:#6B7280;background:#E5E8ED;padding:2px 7px;border-radius:10px;" id="${subId}-count">${Math.min(regs.length,lim)}/${lim}</span>
-              <button onclick="event.stopPropagation();toggleHistSub('${subId}');toggleFiltroLocal('${subId}')" style="background:#EBF3FF;border:none;color:#1F3864;width:26px;height:22px;border-radius:5px;font-size:11px;cursor:pointer;" title="Filtrar"><i class="ti ti-filter" style="font-size:11px;"></i></button>
-              <button class="rel-sec-toggle" id="${subId}-btn" style="width:22px;height:22px;font-size:13px;background:#E5E8ED;color:#374151;" onclick="toggleHistSub('${subId}')">+</button>
-            </div>
-          </div>
-          <div id="${subId}" style="display:none;">${filtroLocal}${cardsH}</div>
-        </div>`;
-      });
-      histBody+=`<div style="border:1px solid #E5E8ED;border-radius:8px;overflow:hidden;margin-bottom:8px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#EBF3FF;cursor:pointer;" onclick="toggleHistSub('${raspSubId}')">
-          <span style="font-size:12px;font-weight:700;color:#1F3864;display:flex;align-items:center;gap:6px;"><i class="ti ti-tool"></i> RASPADORES</span>
-          <button class="rel-sec-toggle" id="${raspSubId}-btn" style="width:22px;height:22px;font-size:13px;background:#C5D8F0;color:#1F3864;">+</button>
-        </div>
-        <div id="${raspSubId}" style="display:none;">${raspSubBody}</div>
-      </div>`;
-    }
-
-    // ── Outros tipos com subitens ──
+    let histBody='';
+    // Raspadores histórico
+    let temRaspHist=false;
+    RASP_CHAVES.forEach(k=>{
+      const tipo='rasp-'+k;
+      if(!hist[tipo].length)return;
+      temRaspHist=true;
+      histBody+=`<div class="hist-sep">${SECAO_LABELS[tipo]}</div>`;
+      hist[tipo].forEach(r=>{histBody+=buildRegCard(r,true);});
+    });
+    // Outros históricos
     TIPOS_BASE.forEach(tipo=>{
       if(!hist[tipo].length)return;
-      const lim=HIST_LIMITS[tipo]||100;
-      const regs=hist[tipo];
-      const subId='hist-'+tipo;
-      const filtroLocal=buildFiltroLocalHist(subId,tipo,regs);
-      let cardsH=`<div id="${subId}-cards">`;
-      regs.slice(0,lim).forEach(r=>{cardsH+=buildRegCard(r,true);});
-      cardsH+='</div>';
-      histBody+=`<div style="border:1px solid #E5E8ED;border-radius:8px;overflow:hidden;margin-bottom:8px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#F8F9FB;">
-          <span style="font-size:12px;font-weight:700;color:#1F3864;display:flex;align-items:center;gap:6px;cursor:pointer;flex:1;" onclick="toggleHistSub('${subId}')">
-            <i class="ti ${SECAO_ICONS[tipo]||'ti-file'}"></i> ${SECAO_LABELS[tipo].toUpperCase()}
-          </span>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span style="font-size:11px;color:#6B7280;background:#E5E8ED;padding:2px 7px;border-radius:10px;" id="${subId}-count">${Math.min(regs.length,lim)}/${lim}</span>
-            <button onclick="event.stopPropagation();toggleHistSub('${subId}');toggleFiltroLocal('${subId}')" style="background:#EBF3FF;border:none;color:#1F3864;width:26px;height:22px;border-radius:5px;cursor:pointer;" title="Filtrar"><i class="ti ti-filter" style="font-size:11px;"></i></button>
-            <button class="rel-sec-toggle" id="${subId}-btn" style="width:22px;height:22px;font-size:13px;background:#E5E8ED;color:#374151;" onclick="toggleHistSub('${subId}')">+</button>
-          </div>
-        </div>
-        <div id="${subId}" style="display:none;">${filtroLocal}${cardsH}</div>
-      </div>`;
+      histBody+=`<div class="hist-sep">${SECAO_LABELS[tipo]}</div>`;
+      hist[tipo].forEach(r=>{histBody+=buildRegCard(r,true);});
     });
-
     histHtml=buildSecaoRel('hist','ti-history','HISTÓRICO DE REGISTROS',histBody,true,'hist-hdr');
   }
 
@@ -2197,47 +1475,24 @@ function renderRelatorio(){
     <button class="btn-prim no-print" style="margin-bottom:12px;" onclick="renderMenu()"><i class="ti ti-plus"></i> Novo registro</button>
     ${fichaHtml}${ussHtml}
     <div class="bloco-titulo no-print" style="margin-top:4px;">Registros ativos</div>
-    ${raspHtml}${regsHtml}${extRelHtml}${extHistHtml}${histHtml}
+    ${anotHtml}${raspHtml}${regsHtml}${histHtml}
     <button class="btn-sec no-print" onclick="renderMenu()"><i class="ti ti-arrow-left"></i> Menu do ativo</button>
     <div style="height:24px;"></div>`;
-
 }
 
 // Constrói uma seção recolhível com checkbox de impressão
 function buildSecaoRel(uid,icon,titulo,body,isHist,extraHdrClass){
   const bodyId='sec-body-'+uid;
   const chkId='sec-chk-'+uid;
-  const filtroBtnHtml=isHist?`<button class="rel-sec-toggle no-print" id="sec-filtro-${uid}" onclick="event.stopPropagation();toggleFiltroGeralPainel('${uid}')" title="Filtrar por data" style="background:rgba(255,255,255,.15);margin-right:2px;"><i class="ti ti-filter" style="font-size:12px;"></i></button>`:'';
   return `<div class="rel-sec-wrap" id="sec-wrap-${uid}">
     <div class="rel-sec-hdr ${extraHdrClass||''}" onclick="toggleSecao('${bodyId}','${uid}')">
       <i class="ti ${icon} rsh-icon"></i>
       <span class="rsh-label">${titulo}</span>
-      ${filtroBtnHtml}
       <input type="checkbox" class="rel-sec-chk no-print" id="${chkId}" checked onclick="event.stopPropagation();toggleChkSecao('${uid}')" title="Incluir na impressão">
       <button class="rel-sec-toggle no-print" id="sec-btn-${uid}">−</button>
     </div>
     <div class="rel-sec-body" id="${bodyId}">${body}</div>
   </div>`;
-}
-
-function toggleFiltroGeralPainel(uid){
-  // Abre o painel do histórico se estiver fechado, e mostra/esconde o filtro geral
-  const bodyId='sec-body-'+uid;
-  const body=document.getElementById(bodyId);
-  const btn=document.getElementById('sec-btn-'+uid);
-  // Garante que o histórico está aberto
-  if(body&&body.classList.contains('recolhido')){
-    body.classList.remove('recolhido');
-    if(btn)btn.textContent='−';
-  }
-  // Mostra/esconde o painel de filtro geral (primeiro filho do body)
-  const filtro=document.getElementById('filtro-geral-hist');
-  if(filtro){
-    const open=filtro.style.display==='none'||filtro.style.display==='';
-    filtro.style.display=open?'block':'none';
-    const fBtn=document.getElementById('sec-filtro-'+uid);
-    if(fBtn)fBtn.style.background=open?'rgba(255,255,255,.35)':'rgba(255,255,255,.15)';
-  }
 }
 
 function toggleUssRelFicha(){
@@ -2291,8 +1546,8 @@ function salvarUss(){
   if(msg){msg.textContent='✓ Salvo';setTimeout(()=>{if(msg)msg.textContent='';},1500);}
 }
 
-const stMap={em:'Acompanhando',ac:'Acompanhando',co:'Concluído',enc:'Encerrado'};
-const stCls={em:'status-ac',ac:'status-ac',co:'status-co',enc:'status-enc'};
+const stMap={em:'Em andamento',ac:'Acompanhando',co:'Concluído'};
+const stCls={em:'status-em',ac:'status-ac',co:'status-co'};
 
 function buildRegCard(r,isHist){
   let extras='';
@@ -2301,12 +1556,8 @@ function buildRegCard(r,isHist){
   if(isRaspK){
     const v=r.campos||{};
     if(v.pct||v.crit){
-      const pn=parseInt(v.pct)||0;
-      const dcor=pn<=30?'#C62828':pn<=50?'#E65100':pn<=75?'#F9A825':'#2E7D32';
-      const dlbl=pn<=30?'Crítico':pn<=50?'Alto':pn<=75?'Médio':'Bom';
-      extras=`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;align-items:center;">
-        ${v.pct?`<span class="pill" style="background:${dcor}20;color:${dcor};border:1px solid ${dcor}40;">${v.pct}% — ${dlbl}</span>`:''}
-        ${v.pct?`<div style="flex:1;min-width:60px;background:#E5E8ED;border-radius:4px;height:8px;overflow:hidden;"><div style="height:100%;width:${Math.min(pn,100)}%;background:${dcor};border-radius:4px;"></div></div>`:''}
+      extras=`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;">
+        ${v.pct?`<span class="pill pill-neu">${v.pct}% desgaste</span>`:''}
         ${v.crit?`<span class="pill pill-vn">${v.crit}</span>`:''}
       </div>`;
     }
@@ -2327,101 +1578,50 @@ function buildRegCard(r,isHist){
     });
     extras+='</div>';
   }
-  else if(r.tipo==='interf'||r.tipo==='ext-interf'){
+  else if(r.tipo==='interf'){
     extras=`<div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
-      ${r._encerrado?'<span class="pill status-enc">Encerrado</span>':''}
       <span class="pill ${stCls[r.campos.status]||''}">${stMap[r.campos.status]||''}</span>
       ${r.campos.tipo?`<span class="pill pill-neu">${r.campos.tipo}</span>`:''}
       ${r.campos.crit?`<span class="pill pill-vn">${r.campos.crit}</span>`:''}
       ${r.campos.bal?`<span class="pill pill-neu">📍 ${r.campos.bal}</span>`:''}
+      ${r.campos.novo?`<span class="pill pill-at">Novo evento</span>`:''}
     </div>`+buildStatusBtns(r,isHist);
   }
-  else if(r.tipo==='desal'||r.tipo==='ext-desal'){
+  else if(r.tipo==='desal'){
     extras=`<div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
-      ${r._encerrado?'<span class="pill status-enc">Encerrado</span>':''}
       <span class="pill ${stCls[r.campos.status]||''}">${stMap[r.campos.status]||''}</span>
-      ${r.campos.crit?`<span class="pill pill-vn">${r.campos.crit}</span>`:''}
       ${r.campos.local?`<span class="pill pill-neu">📍 ${r.campos.local}</span>`:''}
     </div>`+buildStatusBtns(r,isHist);
   }
   else if(r.tipo==='contra'&&r.campos.pos){
     extras=`<div style="margin-top:5px;font-size:12px;color:#6B7280;">Posição: ${r.campos.pos}</div>`;
   }
-  else if(r.tipo==='defeito'||r.tipo==='ext-defeito'){
+  else if(r.tipo==='defeito'){
     extras='<div style="margin-top:7px;">';
     (r.campos.defeitos||[]).forEach((d,i)=>{
-      // Linha do tempo — atualizações do defeito
-      const tl={emenda:'Emenda',fora_emenda:'Fora de emenda',ambos:'Ambos'};
-      const tLabel=d.tipo?tl[d.tipo]||d.tipo:'';
-      const atualizacoes=d.atualizacoes||[];
-      // Monta timeline
-      let timelineH='';
-      if(atualizacoes.length){
-        timelineH='<div class="def-timeline">';
-        atualizacoes.forEach((u,ui)=>{
-          const stDot={em:'dot-em',ac:'dot-ac',co:'dot-co'}[u.status]||'dot-new';
-          const stLabel=stMap[u.status]||'Atualização';
-          timelineH+=`<div class="def-tl-item">
-            <div class="def-tl-dot ${stDot}"></div>
-            <div class="def-tl-meta"><i class="ti ti-calendar" style="font-size:10px;"></i>${fmtData(u.data)} — <span style="color:${stCls[u.status]?'inherit':'#6B7280'};font-weight:600;">${stLabel}</span>${u._origem==='Mesclado'?'<span style="background:#EDE7F6;color:#4527A0;font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:4px;">MESCLADO</span>':''}</div>
-            <div class="def-tl-body">
-              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">
-                <div style="flex:1;">
-                  <div class="def-tl-tags">
-                    ${u.crit?`<span class="pill pill-vn" style="font-size:10px;">${u.crit}</span>`:''}
-                    ${u.loc?`<span class="pill pill-neu" style="font-size:10px;">${u.loc}</span>`:''}
-                  </div>
-                  ${u.desc&&u.desc!=='Sem relato'?`<div>${u.desc}</div>`:'<span style="color:#9CA3AF;font-style:italic;font-size:11px;">Sem relato</span>'}
-                  ${u.fotos&&u.fotos.length?buildGaleriaDisplay(u.fotos,'atu-'+r.id+'-'+i+'-'+ui):''}
-                </div>
-                ${!isHist?`<div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0;">
-                  ${u._origem==='Mesclado'?`<button class="btn-sm" style="font-size:9px;padding:3px 5px;background:#EDE7F6;color:#4527A0;border:none;border-radius:5px;cursor:pointer;white-space:nowrap;" onclick="separarMesclado('${r.id}',${i},${ui})" title="Separar este defeito mesclado em um registro independente"><i class="ti ti-git-branch" style="font-size:10px;"></i> Separar</button>`:''}
-                  <button class="btn-sm btn-sm-sec" style="font-size:10px;padding:3px 6px;" onclick="editarAtualizacao('${r.id}',${i},${ui})"><i class="ti ti-edit" style="font-size:10px;"></i></button>
-                  <button class="btn-sm btn-sm-danger" style="font-size:10px;padding:3px 6px;" onclick="excluirAtualizacao('${r.id}',${i},${ui})"><i class="ti ti-trash" style="font-size:10px;"></i></button>
-                </div>`:''}
-              </div>
-            </div>
-          </div>`;
-        });
-        timelineH+='</div>';
-      }
-      // Status toggle visual inline
-      const dSt=d.status==='co'?'co':'ac';
-      const stAcAtivo=dSt!=='co';
-      const stCoAtivo=dSt==='co';
-      extras+=`<div style="background:#fff;border:1px solid #E5E8ED;border-radius:10px;padding:10px;margin-bottom:8px;" id="def-bloco-${r.id}-${i}">
-        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
-          <span style="font-size:12px;font-weight:700;color:#1F3864;">Defeito${i>0?' #'+(i+1):''}</span>
-          <span style="color:#D1D5DB;font-size:12px;">/</span>
-          ${!isHist&&!d._encerrado?`
-            <button style="background:none;border:none;padding:0;cursor:pointer;font-size:12px;font-weight:${stAcAtivo?700:400};color:${stAcAtivo?'#1565C0':'#9CA3AF'};opacity:${stAcAtivo?1:.45};" onclick="confirmarMudaStatusDefeito('${r.id}',${i},'ac')">Acompanhando</button>
-            <span style="color:#D1D5DB;font-size:12px;">·</span>
-            <button style="background:none;border:none;padding:0;cursor:pointer;font-size:12px;font-weight:${stCoAtivo?700:400};color:${stCoAtivo?'#2E7D32':'#9CA3AF'};opacity:${stCoAtivo?1:.45};" onclick="confirmarMudaStatusDefeito('${r.id}',${i},'co')">Concluído</button>
-          `:`<span class="pill ${d._encerrado?'status-enc':stCls[dSt]||''}">${d._encerrado?'Encerrado':stMap[dSt]||''}</span>`}
-          <span style="flex:1;"></span>
-          ${!isHist&&!d._encerrado?`<button class="btn-sm btn-sm-sec" style="font-size:10px;padding:3px 7px;" onclick="iniciarMesclar('${r.id}',${i})"><i class="ti ti-git-merge" style="font-size:10px;"></i> Mesclar</button>`:''}
-        </div>
-        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
-          ${tLabel?`<span class="pill pill-neu">${tLabel}${d.tipo==='emenda'&&d.dataEmenda?' ('+d.dataEmenda+')':''}</span>`:''}
+      extras+=`<div style="background:#fff;border:1px solid #E5E8ED;border-radius:7px;padding:8px;margin-bottom:6px;">
+        <div style="font-size:11px;font-weight:700;color:#1F3864;margin-bottom:4px;">Defeito${i>0?' #'+(i+1):''}</div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:5px;">
+          <span class="pill ${stCls[d.status]||''}">${stMap[d.status]||''}</span>
+          ${(()=>{const tl={emenda:'Emenda',fora_emenda:'Fora de emenda',ambos:'Ambos'};const tLabel=d.tipo?tl[d.tipo]||d.tipo:'';return tLabel?`<span class="pill pill-neu">${tLabel}${d.tipo==='emenda'&&d.dataEmenda?' ('+d.dataEmenda+')':''}</span>`:'';})()} 
           ${d.loc?`<span class="pill pill-neu">${d.loc}</span>`:''}
           ${d.crit?`<span class="pill pill-vn">${d.crit}</span>`:''}
+          ${d.novo?`<span class="pill pill-at">Novo evento</span>`:''}
         </div>
-        <div style="font-size:12px;color:#374151;line-height:1.5;">${d.desc==='Sem relato'?'<span style="color:#9CA3AF;font-style:italic;">Sem relato</span>':d.desc||''}</div>
-        ${d.fotos&&d.fotos.length?buildGaleriaDisplay(d.fotos,'rd-'+r.id+'-'+i):(d.foto?`<img src="${d.foto}" style="width:100%;border-radius:6px;margin-top:6px;">`:'')  }
-        ${timelineH}
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center;">
-          ${!isHist&&!d._encerrado?`<button class="btn-atualizar" onclick="abrirAtualizarDefeito('${r.id}',${i})"><i class="ti ti-pencil-plus"></i> Registrar atualização</button>`:''}
-          ${!isHist&&!d._encerrado?`<button class="btn-encerrar" onclick="encerrarDefeito('${r.id}',${i})" title="Encerra este defeito e move para histórico"><i class="ti ti-archive" style="font-size:11px;"></i> Encerrar</button>`:''}
-          ${isHist||d._encerrado?`<button class="btn-sm btn-sm-sec" onclick="reabrirDefeito('${r.id}',${i})">↩ Reabrir</button>`:''}
+        <div style="font-size:12px;color:#374151;">${d.desc==='Sem relato'?'<span style="color:#9CA3AF;font-style:italic;">Sem relato</span>':d.desc}</div>
+        ${d.fotos&&d.fotos.length?buildGaleriaDisplay(d.fotos,'rd-'+r.id+'-'+i):(d.foto?`<img src="${d.foto}" style="width:100%;border-radius:6px;margin-top:6px;">`:'')}<div style="margin-top:8px;">
+          ${!isHist
+            ? d.status==='co'
+              ? ''
+              : `<button class="btn-sm btn-sm-green" onclick="mudaStatusDefeito('${r.id}',${i},'co')">✓ Concluir</button>`
+            : `<button class="btn-sm btn-sm-danger" onclick="mudaStatusDefeito('${r.id}',${i},'em')">↩ Reabrir</button>`}
         </div>
       </div>`;
     });
     extras+='</div>';
   }
 
-  const showDesc=!isRaspK&&r.tipo!=='rasp'&&r.tipo!=='defeito'&&r.tipo!=='ext-defeito';
-  // Para rasp-K mostra a descrição abaixo dos pills
-  const descRaspK=isRaspK?(r.desc==='Sem relato'?'<span style="color:#9CA3AF;font-style:italic;">Sem relato</span>':(r.desc||'')):'';
+  const showDesc=!isRaspK&&r.tipo!=='rasp'&&r.tipo!=='defeito';
   const desc=showDesc?(r.desc==='Sem relato'?'<span style="color:#9CA3AF;font-style:italic;">Sem relato</span>':r.desc||''):'';
   const titulo=isRaspK?SECAO_LABELS[r.tipo]||r.tipo:'';
 
@@ -2432,68 +1632,25 @@ function buildRegCard(r,isHist){
       <span style="flex:1;"></span>
       <input type="checkbox" class="item-print-chk no-print" checked title="Incluir na impressão" onclick="event.stopPropagation()">
       <button class="btn-sm btn-sm-sec no-print" onclick="abrirEdicao('${r.id}')"><i class="ti ti-edit"></i> Editar</button>
-      ${isHist?`<button class="btn-sm no-print" style="background:#FFEBEE;color:#C62828;padding:4px 7px;" onclick="excluirRegistroHist('${r.id}')" title="Excluir permanentemente"><i class="ti ti-trash"></i></button>`:''}
     </div>
     ${desc?`<div class="reg-card-body">${desc}</div>`:''}
-    ${descRaspK?`<div class="reg-card-body" style="font-size:12px;color:#374151;margin-top:4px;">${descRaspK}</div>`:''}
     ${extras}
     ${!isRaspK&&r.fotos&&r.fotos.length?buildGaleriaDisplay(r.fotos,'rg-'+r.id):(r.foto?`<img src="${r.foto}" style="width:100%;border-radius:6px;margin-top:8px;">`:'')}</div>`;
 }
 
 function buildStatusBtns(r,isHist){
-  if(!isHist&&!r._encerrado){
-    const st=r.campos.status==='co'?'co':'ac';
-    const stAcAtivo=st!=='co';
-    const stCoAtivo=st==='co';
-    return`<div style="border-top:1px solid #F0F2F5;margin-top:8px;padding-top:8px;">
-      <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
-        <span style="font-size:11px;color:#9CA3AF;font-weight:500;">Status:</span>
-        <button style="background:none;border:none;padding:2px 6px;cursor:pointer;font-size:12px;font-weight:${stAcAtivo?700:400};color:${stAcAtivo?'#1565C0':'#9CA3AF'};opacity:${stAcAtivo?1:.45};border-radius:5px;" onclick="confirmarMudaStatus('${r.id}','ac')">Acompanhando</button>
-        <span style="color:#D1D5DB;font-size:12px;">·</span>
-        <button style="background:none;border:none;padding:2px 6px;cursor:pointer;font-size:12px;font-weight:${stCoAtivo?700:400};color:${stCoAtivo?'#2E7D32':'#9CA3AF'};opacity:${stCoAtivo?1:.45};border-radius:5px;" onclick="confirmarMudaStatus('${r.id}','co')">Concluído</button>
-        <span style="flex:1;"></span>
-        <button class="btn-encerrar" onclick="encerrarRegistro('${r.id}')" title="Encerra definitivamente e move para o histórico"><i class="ti ti-archive" style="font-size:11px;"></i> Encerrar</button>
-      </div>
-    </div>`;
-  }
+  if(!isHist)return`<div class="reg-card-footer">
+    ${r.campos.status!=='em'?`<button class="btn-sm btn-sm-danger" onclick="mudaStatus('${r.id}','em')">Em andamento</button>`:''}
+    ${r.campos.status!=='ac'?`<button class="btn-sm btn-sm-sec" onclick="mudaStatus('${r.id}','ac')">Acompanhando</button>`:''}
+    ${r.campos.status!=='co'?`<button class="btn-sm btn-sm-green" onclick="mudaStatus('${r.id}','co')">✓ Concluído</button>`:''}
+  </div>`;
   return`<div class="reg-card-footer">
-    <button class="btn-sm btn-sm-sec" onclick="reabrirRegistro('${r.id}')">↩ Reabrir</button>
+    <button class="btn-sm btn-sm-danger" onclick="mudaStatus('${r.id}','em')">↩ Reabrir (Em andamento)</button>
+    <button class="btn-sm btn-sm-sec" onclick="mudaStatus('${r.id}','ac')">↩ Reabrir (Acompanhando)</button>
   </div>`;
 }
-function confirmarMudaStatus(regId,novoStatus){
-  const r=DB.registros[ativoSel].find(x=>x.id===regId);
-  if(!r)return;
-  const atual=r.campos.status==='co'?'co':'ac';
-  if(atual===novoStatus)return;
-  const labels={ac:'Acompanhando',co:'Concluído'};
-  if(!confirm('Mudar status para "'+labels[novoStatus]+'"?'))return;
-  r.campos.status=novoStatus;
-  marcarMudanca();autoBackup();renderRelatorio();
-}
-function mudaStatus(regId,s){const r=DB.registros[ativoSel].find(x=>x.id===regId);if(r){r.campos.status=s;}marcarMudanca();autoBackup();renderRelatorio();}
-function mudaStatusDefeito(regId,idx,s){const r=DB.registros[ativoSel].find(x=>x.id===regId);if(r&&r.campos.defeitos&&r.campos.defeitos[idx]){r.campos.defeitos[idx].status=s;}marcarMudanca();autoBackup();renderRelatorio();}
-function confirmarMudaStatusDefeito(regId,idx,novoStatus){
-  const r=DB.registros[ativoSel].find(x=>x.id===regId);
-  const d=r?.campos?.defeitos?.[idx];
-  if(!d)return;
-  const atual=d.status==='co'?'co':'ac';
-  if(atual===novoStatus)return; // já está nesse status
-  const labels={ac:'Acompanhando',co:'Concluído'};
-  if(!confirm('Mudar status para "'+labels[novoStatus]+'"?'))return;
-  d.status=novoStatus;
-  marcarMudanca();autoBackup();renderRelatorio();
-}
-function encerrarRegistro(regId){
-  if(!confirm('Encerrar este registro definitivamente?\nEle será movido para o Histórico e não aparecerá mais nos registros ativos.'))return;
-  const r=DB.registros[ativoSel].find(x=>x.id===regId);
-  if(r){r._encerrado=true;r.campos.status=r.campos.status||'co';}
-  marcarMudanca();autoBackup();renderRelatorio();
-}
-function reabrirRegistro(regId){
-  const r=DB.registros[ativoSel].find(x=>x.id===regId);
-  if(r){r._encerrado=false;r._hist=false;r.campos.status='ac';}
-  marcarMudanca();autoBackup();renderRelatorio();
-}
+function mudaStatus(regId,s){const r=DB.registros[ativoSel].find(x=>x.id===regId);if(r)r.campos.status=s;renderRelatorio();}
+function mudaStatusDefeito(regId,idx,s){const r=DB.registros[ativoSel].find(x=>x.id===regId);if(r&&r.campos.defeitos&&r.campos.defeitos[idx])r.campos.defeitos[idx].status=s;renderRelatorio();}
 
 // ════════════════════════════════
 // EDIÇÃO MODAL
@@ -2503,55 +1660,13 @@ function abrirEdicao(regId){
   if(!r)return;
   editandoReg=regId;
   const ns='edit-'+regId;
-  const isRaspK=r.tipo&&r.tipo.startsWith('rasp-')&&r.tipo!=='rasp';
-  // Normaliza tipos do extrator para exibição idêntica ao base
-  const tipoBase=r.tipo?.replace('ext-','')||r.tipo;
   // Copia fotos atuais para edição
   galFotos[ns]=[...(r.fotos||[])];
 
   let c=`<div class="form-grupo"><label>Data</label><input type="date" id="edit-data" value="${r.data}"></div>`;
 
-  // ── RASPADORES (formato novo — tipo rasp-prim, rasp-s1 etc.) ──
-  if(isRaspK){
-    const chave=r.tipo.replace('rasp-','');
-    galFotos[ns]=[...(r.fotos||[])];
-    const pct=r.campos?.pct||'';
-    const crit=r.campos?.crit||'';
-    const pn=parseInt(pct)||0;
-    const dcor=pn<=30?'#C62828':pn<=50?'#E65100':pn<=75?'#F9A825':'#2E7D32';
-    const dlbl=pn<=30?'Crítico':pn<=50?'Alto':pn<=75?'Médio':'Bom';
-    c+=`<div class="form-grupo"><label>% Desgaste</label>
-      ${pct?`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <span class="pill" style="background:${dcor}20;color:${dcor};border:1px solid ${dcor}40;">${pct}% — ${dlbl}</span>
-        <div style="flex:1;background:#E5E8ED;border-radius:4px;height:8px;overflow:hidden;"><div style="height:100%;width:${Math.min(pn,100)}%;background:${dcor};border-radius:4px;"></div></div>
-      </div>`:''}
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#C62828;" id="edit-pct-btn-0" onclick="editSetPct(0,15,this)">🔴 0–30%</button>
-        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#E65100;" id="edit-pct-btn-1" onclick="editSetPct(1,40,this)">🟠 31–50%</button>
-        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#F9A825;" id="edit-pct-btn-2" onclick="editSetPct(2,63,this)">🟡 51–75%</button>
-        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#2E7D32;" id="edit-pct-btn-3" onclick="editSetPct(3,88,this)">🟢 76–100%</button>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input type="number" id="edit-pct" min="0" max="100" value="${pct}" placeholder="Ou digitar %" style="width:110px;font-size:13px;padding:7px 10px;border:1px solid #D1D5DB;border-radius:8px;" oninput="editAtualizarBarra()">
-        <div style="flex:1;"><div style="background:#E5E8ED;border-radius:6px;height:12px;overflow:hidden;"><div id="edit-barra-rasp" style="height:100%;width:${pct?Math.min(pn,100)+'%':'0%'};background:${pct?dcor:'#E5E8ED'};border-radius:6px;transition:width .2s;"></div></div>
-        <div id="edit-barra-label" style="font-size:10px;color:#9CA3AF;margin-top:2px;">${pct?pct+'% — '+dlbl:''}</div></div>
-      </div>
-    </div>
-    <div class="form-grupo"><label>Criticidade</label>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button type="button" class="btn-opcao btn-opcao-verde ${crit==='Baixo'?'btn-opcao-ativo':''}" id="edit-rcrit-b" onclick="selecionarOpcao('edit-rcrit','Baixo',this)">Baixo</button>
-        <button type="button" class="btn-opcao btn-opcao-amarelo ${crit==='Médio'?'btn-opcao-ativo':''}" id="edit-rcrit-m" onclick="selecionarOpcao('edit-rcrit','Médio',this)">Médio</button>
-        <button type="button" class="btn-opcao btn-opcao-vermelho ${crit==='Alto'?'btn-opcao-ativo':''}" id="edit-rcrit-a" onclick="selecionarOpcao('edit-rcrit','Alto',this)">Alto</button>
-      </div>
-      <input type="hidden" id="edit-rcrit" value="${crit}">
-    </div>
-    <div class="form-grupo"><label>Descrição</label>
-      <textarea id="edit-desc-rasp" rows="3" style="width:100%;font-size:13px;padding:8px;border:1px solid #D1D5DB;border-radius:8px;resize:vertical;">${r.desc&&r.desc!=='Sem relato'?r.desc:''}</textarea>
-    </div>
-    ${buildGaleriaField(ns)}`;
-  }
-  // ── RASPADORES (formato legado agrupado) ──
-  else if(r.tipo==='rasp'){
+  // ── RASPADORES ──
+  if(r.tipo==='rasp'){
     Object.entries(r.campos).forEach(([k,v])=>{
       const nsK=ns+'-'+k;
       galFotos[nsK]=[...(v.fotos||[])];
@@ -2573,60 +1688,45 @@ function abrirEdicao(regId){
   // ── INTERFERÊNCIAS ──
   else if(r.tipo==='interf'){
     const isOu=r.campos.tipo&&!['Interferência','Interdição'].includes(r.campos.tipo);
-    const ec=r.campos.crit||''; const es=r.campos.status||'ac';
-    c+=`
-    <div class="form-grupo"><label>Criticidade</label>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button type="button" class="btn-opcao btn-opcao-verde ${ec==='Baixo'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ei-crit','Baixo',this)">Baixo</button>
-        <button type="button" class="btn-opcao btn-opcao-amarelo ${ec==='Médio'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ei-crit','Médio',this)">Médio</button>
-        <button type="button" class="btn-opcao btn-opcao-vermelho ${ec==='Alto'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ei-crit','Alto',this)">Alto</button>
-      </div>
-      <input type="hidden" id="ei-crit" value="${ec}">
-    </div>
-    <div class="form-grupo"><label>Status</label>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button type="button" class="btn-opcao btn-opcao-azul ${es==='ac'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ei-status','ac',this)">Acompanhando</button>
-        <button type="button" class="btn-opcao btn-opcao-verde ${es==='co'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ei-status','co',this)">Concluído</button>
-      </div>
-      <input type="hidden" id="ei-status" value="${es}">
-    </div>
+    c+=`<div class="form-grupo"><label>Descrição</label><textarea id="edit-desc">${r.desc||''}</textarea></div>
     <div class="form-grupo"><label>Tipo</label>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-        <button type="button" class="btn-opcao ${r.campos.tipo==='Interferência'?'btn-opcao-ativo':''}" id="ei-tipo-i" onclick="editSelecionaTipoInterf('Interferência',this)">Interferência</button>
-        <button type="button" class="btn-opcao ${r.campos.tipo==='Interdição'?'btn-opcao-ativo':''}" id="ei-tipo-in" onclick="editSelecionaTipoInterf('Interdição',this)">Interdição</button>
-        <button type="button" class="btn-opcao ${isOu?'btn-opcao-ativo':''}" id="ei-tipo-ou" onclick="editSelecionaTipoInterf('outros',this)">Outros</button>
-      </div>
-      <input type="hidden" id="edit-tipo-interf" value="${isOu?'outros':r.campos.tipo||''}">
-    </div>
+      <select id="edit-tipo-interf" onchange="toggleEl('edit-tipo-interf','outros','edit-bloco-outros')">
+        <option value="">—</option>
+        <option ${r.campos.tipo==='Interferência'?'selected':''}>Interferência</option>
+        <option ${r.campos.tipo==='Interdição'?'selected':''}>Interdição</option>
+        <option value="outros" ${isOu?'selected':''}>Outros</option>
+      </select></div>
     <div id="edit-bloco-outros" style="${isOu?'':'display:none'}">
       <div class="form-grupo"><label>Especificar</label><input type="text" id="edit-tipo-outros" value="${isOu?r.campos.tipo:''}"></div>
     </div>
     <div class="form-grupo"><label>Baliza / local</label><input type="text" id="edit-bal" value="${r.campos.bal||''}"></div>
-    <div class="form-grupo"><label>Descrição</label><textarea id="edit-desc">${r.desc||''}</textarea></div>
+    <div class="check-row"><input type="checkbox" id="edit-novo" ${r.campos.novo?'checked':''}><label for="edit-novo">Novo evento</label></div>
+    <div class="form-grupo" style="margin-top:8px;"><label>Criticidade</label>
+      <select id="edit-crit-interf">
+        <option value="" ${!r.campos.crit?'selected':''}>—</option>
+        <option ${r.campos.crit==='Baixo'?'selected':''}>Baixo</option>
+        <option ${r.campos.crit==='Médio'?'selected':''}>Médio</option>
+        <option ${r.campos.crit==='Alto'?'selected':''}>Alto</option>
+      </select></div>
+    <div class="form-grupo"><label>Status</label>
+      <select id="edit-status">
+        <option value="em" ${r.campos.status==='em'?'selected':''}>Em andamento</option>
+        <option value="ac" ${r.campos.status==='ac'?'selected':''}>Acompanhando</option>
+        <option value="co" ${r.campos.status==='co'?'selected':''}>Concluído</option>
+      </select></div>
     ${buildGaleriaField(ns)}`;
   }
 
   // ── DESALINHAMENTO ──
   else if(r.tipo==='desal'){
-    const dc=r.campos.crit||''; const ds=r.campos.status||'ac';
-    c+=`
-    <div class="form-grupo"><label>Criticidade</label>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button type="button" class="btn-opcao btn-opcao-verde ${dc==='Baixo'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ed-crit','Baixo',this)">Baixo</button>
-        <button type="button" class="btn-opcao btn-opcao-amarelo ${dc==='Médio'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ed-crit','Médio',this)">Médio</button>
-        <button type="button" class="btn-opcao btn-opcao-vermelho ${dc==='Alto'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ed-crit','Alto',this)">Alto</button>
-      </div>
-      <input type="hidden" id="ed-crit" value="${dc}">
-    </div>
+    c+=`<div class="form-grupo"><label>Descrição</label><textarea id="edit-desc">${r.desc||''}</textarea></div>
+    <div class="form-grupo"><label>Local</label><input type="text" id="edit-local" value="${r.campos.local||''}"></div>
     <div class="form-grupo"><label>Status</label>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button type="button" class="btn-opcao btn-opcao-azul ${ds==='ac'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ed-status','ac',this)">Acompanhando</button>
-        <button type="button" class="btn-opcao btn-opcao-verde ${ds==='co'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ed-status','co',this)">Concluído</button>
-      </div>
-      <input type="hidden" id="ed-status" value="${ds}">
-    </div>
-    <div class="form-grupo"><label>Baliza / local</label><input type="text" id="edit-local" value="${r.campos.local||''}"></div>
-    <div class="form-grupo"><label>Descrição</label><textarea id="edit-desc">${r.desc||''}</textarea></div>
+      <select id="edit-status-desal">
+        <option value="em" ${r.campos.status==='em'?'selected':''}>Em andamento</option>
+        <option value="ac" ${r.campos.status==='ac'?'selected':''}>Acompanhando</option>
+        <option value="co" ${r.campos.status==='co'?'selected':''}>Concluído</option>
+      </select></div>
     ${buildGaleriaField(ns)}`;
   }
 
@@ -2649,54 +1749,45 @@ function abrirEdicao(regId){
     defs.forEach((d,i)=>{
       const nsD=ns+'-d'+i;
       galFotos[nsD]=[...(d.fotos||[])];
-      const ddc=d.crit||''; const dds=d.status||'ac'; const ddloc=d.loc||''; const ddtipo=d.tipo||'';
       c+=`<div class="defeito-card">
         <div class="defeito-card-header">Defeito${i>0?' #'+(i+1):''}</div>
-        <div class="form-grupo"><label>Defeito</label>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button type="button" class="btn-opcao ${ddtipo==='emenda'?'btn-opcao-ativo':''}" id="edt-tipo-${i}-em" onclick="editDefTipo(${i},'emenda',this)">Emenda</button>
-            <button type="button" class="btn-opcao ${ddtipo==='fora_emenda'?'btn-opcao-ativo':''}" id="edt-tipo-${i}-fo" onclick="editDefTipo(${i},'fora_emenda',this)">Fora de emenda</button>
-            <button type="button" class="btn-opcao ${ddtipo==='ambos'?'btn-opcao-ativo':''}" id="edt-tipo-${i}-am" onclick="editDefTipo(${i},'ambos',this)">Ambos</button>
-          </div>
-          <input type="hidden" id="edit-def-tipo-${i}" value="${ddtipo}">
-        </div>
-        <div id="edit-def-emenda-${i}" style="${(d.tipo==='emenda'||d.tipo==='ambos')?'':'display:none'}">
+        <div class="form-grupo"><label>Tipo</label>
+          <select id="edit-def-tipo-${i}" onchange="toggleEmendaEdit(${i})">
+            <option value="">—</option>
+            <option value="emenda" ${d.tipo==='emenda'?'selected':''}>Emenda</option>
+            <option value="fora_emenda" ${d.tipo==='fora_emenda'?'selected':''}>Fora de emenda</option>
+          </select></div>
+        <div id="edit-def-emenda-${i}" style="${d.tipo==='emenda'?'':'display:none'}">
           <div class="form-grupo"><label>Data da emenda</label><input type="text" id="edit-def-data-emenda-${i}" value="${d.dataEmenda||''}" placeholder="dd/mm/aaaa"></div>
         </div>
         <div class="form-grupo"><label>Localização</label>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button type="button" class="btn-opcao ${ddloc==='Carga'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('edt-loc-${i}','Carga',this)">Carga</button>
-            <button type="button" class="btn-opcao ${ddloc==='Retorno'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('edt-loc-${i}','Retorno',this)">Retorno</button>
-            <button type="button" class="btn-opcao ${ddloc==='Ambos'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('edt-loc-${i}','Ambos',this)">Ambos</button>
-          </div>
-          <input type="hidden" id="edit-def-loc-${i}" value="${ddloc}">
-        </div>
-        <div class="form-grupo"><label>Criticidade</label>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button type="button" class="btn-opcao btn-opcao-verde ${ddc==='Baixo'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('edt-crit-${i}','Baixo',this)">Baixo</button>
-            <button type="button" class="btn-opcao btn-opcao-amarelo ${ddc==='Médio'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('edt-crit-${i}','Médio',this)">Médio</button>
-            <button type="button" class="btn-opcao btn-opcao-vermelho ${ddc==='Alto'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('edt-crit-${i}','Alto',this)">Alto</button>
-          </div>
-          <input type="hidden" id="edit-def-crit-${i}" value="${ddc}">
-        </div>
+          <select id="edit-def-loc-${i}">
+            <option value="">—</option>
+            <option ${d.loc==='Carga'?'selected':''}>Carga</option>
+            <option ${d.loc==='Retorno'?'selected':''}>Retorno</option>
+          </select></div>
+        <div class="check-row"><input type="checkbox" id="edit-def-novo-${i}" ${d.novo?'checked':''}><label for="edit-def-novo-${i}">Novo evento</label></div>
+        <div class="form-grupo" style="margin-top:6px;"><label>Criticidade</label>
+          <select id="edit-def-crit-${i}">
+            <option value="" ${!d.crit?'selected':''}>—</option>
+            <option ${d.crit==='Baixo'?'selected':''}>Baixo</option>
+            <option ${d.crit==='Médio'?'selected':''}>Médio</option>
+            <option ${d.crit==='Alto'?'selected':''}>Alto</option>
+          </select></div>
         <div class="form-grupo"><label>Status</label>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button type="button" class="btn-opcao btn-opcao-azul ${dds==='ac'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('edt-status-${i}','ac',this)">Acompanhando</button>
-            <button type="button" class="btn-opcao btn-opcao-verde ${dds==='co'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('edt-status-${i}','co',this)">Concluído</button>
-          </div>
-          <input type="hidden" id="edit-def-status-${i}" value="${dds}">
-        </div>
+          <select id="edit-def-status-${i}">
+            <option value="em" ${d.status==='em'?'selected':''}>Em andamento</option>
+            <option value="ac" ${d.status==='ac'?'selected':''}>Acompanhando</option>
+            <option value="co" ${d.status==='co'?'selected':''}>Concluído</option>
+          </select></div>
         <div class="form-grupo"><label>Descrição</label><textarea id="edit-def-desc-${i}">${d.desc||''}</textarea></div>
         ${buildGaleriaField(nsD)}
       </div>`;
     });
   }
 
-  c+=`<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
-    <button class="btn-prim" onclick="salvarEdicao()"><i class="ti ti-device-floppy"></i> Salvar alterações</button>
-    <button class="btn-sec" onclick="fecharModal()"><i class="ti ti-x"></i> Cancelar</button>
-    <button class="btn-danger" onclick="excluirRegistro('${regId}')"><i class="ti ti-trash"></i> Excluir registro</button>
-  </div>`;
+  c+=`<button class="btn-prim" onclick="salvarEdicao()">Salvar alterações</button>
+      <button class="btn-danger" onclick="excluirRegistro('${regId}')"><i class="ti ti-trash"></i> Excluir registro</button>`;
 
   document.getElementById('modal-titulo-txt').textContent='Editar — '+SECAO_LABELS[r.tipo];
   document.getElementById('modal-corpo').innerHTML=c;
@@ -2708,43 +1799,8 @@ function abrirEdicao(regId){
     else if(r.tipo==='defeito') (r.campos.defeitos||[]).forEach((_,i)=>renderGaleriaGrid(ns+'-d'+i));
     else renderGaleriaGrid(ns);
   },0);
-  // Para rasp-K: iniciar barra se já tem % salvo
-  if(isRaspK) setTimeout(()=>editAtualizarBarra(),50);
 }
 
-function editSetPct(btnIdx, val, btn){
-  const inp=document.getElementById('edit-pct');
-  if(inp)inp.value=val;
-  [0,1,2,3].forEach(i=>{const b=document.getElementById('edit-pct-btn-'+i);if(b)b.classList.remove('btn-opcao-ativo');});
-  if(btn)btn.classList.add('btn-opcao-ativo');
-  editAtualizarBarra();
-}
-function editAtualizarBarra(){
-  const val=parseInt(document.getElementById('edit-pct')?.value)||0;
-  const barra=document.getElementById('edit-barra-rasp');
-  const label=document.getElementById('edit-barra-label');
-  if(!barra)return;
-  const dcor=val<=30?'#C62828':val<=50?'#E65100':val<=75?'#F9A825':'#2E7D32';
-  const dlbl=val<=30?'Crítico':val<=50?'Alto':val<=75?'Médio':'Bom';
-  barra.style.width=Math.min(val,100)+'%';
-  barra.style.background=val>0?dcor:'#E5E8ED';
-  if(label)label.textContent=val>0?val+'% — '+dlbl:'';
-}
-function editSelecionaTipoInterf(valor, btn){
-  document.querySelectorAll('#ei-tipo-i,#ei-tipo-in,#ei-tipo-ou').forEach(b=>b.classList.remove('btn-opcao-ativo'));
-  if(btn)btn.classList.add('btn-opcao-ativo');
-  document.getElementById('edit-tipo-interf').value=valor;
-  const bl=document.getElementById('edit-bloco-outros');
-  if(bl)bl.style.display=(valor==='outros'?'block':'none');
-}
-function editDefTipo(i,valor,btn){
-  ['edt-tipo-'+i+'-em','edt-tipo-'+i+'-fo','edt-tipo-'+i+'-am'].forEach(id=>{document.getElementById(id)?.classList.remove('btn-opcao-ativo');});
-  if(btn)btn.classList.add('btn-opcao-ativo');
-  const h=document.getElementById('edit-def-tipo-'+i);
-  if(h)h.value=valor;
-  const bl=document.getElementById('edit-def-emenda-'+i);
-  if(bl)bl.style.display=(valor==='emenda'||valor==='ambos'?'block':'none');
-}
 function toggleEmendaEdit(i){
   const v=document.getElementById('edit-def-tipo-'+i)?.value;
   const bl=document.getElementById('edit-def-emenda-'+i);
@@ -2753,412 +1809,13 @@ function toggleEmendaEdit(i){
 
 function fecharModal(){document.getElementById('modal-edit').classList.remove('vis');editandoReg=null;}
 
-// ════════════════════════════════════════════════════════════════
-// ATUALIZAÇÃO DE DEFEITO — linha do tempo
-// ════════════════════════════════════════════════════════════════
-let _updRegId=null, _updDefIdx=null;
-
-function abrirAtualizarDefeito(regId,defIdx){
-  _updRegId=regId; _updDefIdx=defIdx;
-  const r=DB.registros[ativoSel].find(x=>x.id===regId);
-  const d=r?.campos?.defeitos?.[defIdx];
-  if(!d)return;
-  const ns='upd-'+regId+'-'+defIdx;
-  galFotos[ns]=[];
-  const ds=(d.status==='co'?'co':'ac'); const dc=d.crit||''; const dl=d.loc||'';
-  const modal=document.createElement('div');
-  modal.id='modal-upd';
-  modal.className='upd-modal';
-  modal.innerHTML=`<div class="upd-modal-box">
-    <div class="upd-modal-titulo">
-      <span><i class="ti ti-pencil-plus" style="color:#2E75B6;"></i> Registrar Atualização</span>
-      <button onclick="fecharModalUpd()" style="background:none;border:none;font-size:20px;color:#6B7280;cursor:pointer;">✕</button>
-    </div>
-    <div class="form-grupo"><label>Data</label><input type="date" id="upd-data" value="${dataHojeISO()}"></div>
-    <div class="form-grupo"><label>Status</label>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button type="button" class="btn-opcao btn-opcao-azul ${ds==='ac'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-status','ac',this)">Acompanhando</button>
-        <button type="button" class="btn-opcao btn-opcao-verde ${ds==='co'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-status','co',this)">Concluído</button>
-      </div>
-      <input type="hidden" id="upd-status" value="${ds}">
-    </div>
-    <div class="form-grupo"><label>Criticidade</label>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button type="button" class="btn-opcao btn-opcao-verde ${dc==='Baixo'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-crit','Baixo',this)">Baixo</button>
-        <button type="button" class="btn-opcao btn-opcao-amarelo ${dc==='Médio'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-crit','Médio',this)">Médio</button>
-        <button type="button" class="btn-opcao btn-opcao-vermelho ${dc==='Alto'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-crit','Alto',this)">Alto</button>
-      </div>
-      <input type="hidden" id="upd-crit" value="${dc}">
-    </div>
-    <div class="form-grupo"><label>Localização</label>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button type="button" class="btn-opcao ${dl==='Carga'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-loc','Carga',this)">Carga</button>
-        <button type="button" class="btn-opcao ${dl==='Retorno'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-loc','Retorno',this)">Retorno</button>
-        <button type="button" class="btn-opcao ${dl==='Ambos'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-loc','Ambos',this)">Ambos</button>
-      </div>
-      <input type="hidden" id="upd-loc" value="${dl}">
-    </div>
-    ${buildMsgsRapidas('upd-desc','defeito')}
-    <div class="form-grupo"><label>Descrição da atualização</label>
-      <textarea id="upd-desc" rows="3" style="width:100%;font-size:13px;padding:8px;border:1px solid #D1D5DB;border-radius:8px;resize:vertical;" placeholder="O que foi feito? Qual a situação atual?"></textarea>
-    </div>
-    ${buildGaleriaField(ns)}
-    <button class="btn-prim" onclick="salvarAtualizacaoDefeito()" style="margin-top:4px;"><i class="ti ti-device-floppy"></i> Salvar atualização</button>
-    <button class="btn-sec" onclick="fecharModalUpd()" style="margin-top:8px;">Cancelar</button>
-  </div>`;
-  document.body.appendChild(modal);
-  setTimeout(()=>renderGaleriaGrid(ns),50);
-}
-
-function excluirAtualizacao(regId,defIdx,updIdx){
-  if(!confirm('Excluir esta entrada da linha do tempo?'))return;
-  const r=DB.registros[ativoSel].find(x=>x.id===regId);
-  if(!r?.campos?.defeitos?.[defIdx])return;
-  r.campos.defeitos[defIdx].atualizacoes?.splice(updIdx,1);
-  marcarMudanca();autoBackup();renderRelatorio();
-}
-function editarAtualizacao(regId,defIdx,updIdx){
-  const r=DB.registros[ativoSel].find(x=>x.id===regId);
-  const d=r?.campos?.defeitos?.[defIdx];
-  const u=d?.atualizacoes?.[updIdx];
-  if(!u)return;
-  _updRegId=regId;_updDefIdx=defIdx;
-  // Reutiliza o modal de atualização, mas carrega valores existentes e salva no índice
-  const ns='upd-'+regId+'-'+defIdx+'-edit';
-  galFotos[ns]=[...(u.fotos||[])];
-  const modal=document.createElement('div');
-  modal.id='modal-upd';
-  modal.className='upd-modal';
-  modal.innerHTML=`<div class="upd-modal-box">
-    <div class="upd-modal-titulo">
-      <span><i class="ti ti-edit" style="color:#2E75B6;"></i> Editar Atualização</span>
-      <button onclick="fecharModalUpd()" style="background:none;border:none;font-size:20px;color:#6B7280;cursor:pointer;">✕</button>
-    </div>
-    <div class="form-grupo"><label>Data</label><input type="date" id="upd-data" value="${u.data||dataHojeISO()}"></div>
-    <div class="form-grupo"><label>Status</label>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button type="button" class="btn-opcao btn-opcao-azul ${(u.status||'ac')==='ac'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-status','ac',this)">Acompanhando</button>
-        <button type="button" class="btn-opcao btn-opcao-verde ${u.status==='co'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-status','co',this)">Concluído</button>
-      </div>
-      <input type="hidden" id="upd-status" value="${u.status||'ac'}">
-    </div>
-    <div class="form-grupo"><label>Criticidade</label>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button type="button" class="btn-opcao btn-opcao-verde ${u.crit==='Baixo'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-crit','Baixo',this)">Baixo</button>
-        <button type="button" class="btn-opcao btn-opcao-amarelo ${u.crit==='Médio'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-crit','Médio',this)">Médio</button>
-        <button type="button" class="btn-opcao btn-opcao-vermelho ${u.crit==='Alto'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-crit','Alto',this)">Alto</button>
-      </div>
-      <input type="hidden" id="upd-crit" value="${u.crit||''}">
-    </div>
-    <div class="form-grupo"><label>Localização</label>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button type="button" class="btn-opcao ${u.loc==='Carga'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-loc','Carga',this)">Carga</button>
-        <button type="button" class="btn-opcao ${u.loc==='Retorno'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-loc','Retorno',this)">Retorno</button>
-        <button type="button" class="btn-opcao ${u.loc==='Ambos'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd-loc','Ambos',this)">Ambos</button>
-      </div>
-      <input type="hidden" id="upd-loc" value="${u.loc||''}">
-    </div>
-    ${buildMsgsRapidas('upd-desc','defeito')}
-    <div class="form-grupo"><label>Descrição</label>
-      <textarea id="upd-desc" rows="3" style="width:100%;font-size:13px;padding:8px;border:1px solid #D1D5DB;border-radius:8px;resize:vertical;">${u.desc&&u.desc!=='Sem relato'?u.desc:''}</textarea>
-    </div>
-    ${buildGaleriaField(ns)}
-    <button class="btn-prim" onclick="salvarEdicaoAtualizacao('${regId}',${defIdx},${updIdx},'${ns}')" style="margin-top:4px;"><i class="ti ti-device-floppy"></i> Salvar alterações</button>
-    <button class="btn-sec" onclick="fecharModalUpd()" style="margin-top:8px;">Cancelar</button>
-  </div>`;
-  document.body.appendChild(modal);
-  setTimeout(()=>renderGaleriaGrid(ns),50);
-}
-function salvarEdicaoAtualizacao(regId,defIdx,updIdx,ns){
-  const r=DB.registros[ativoSel].find(x=>x.id===regId);
-  const d=r?.campos?.defeitos?.[defIdx];
-  if(!d?.atualizacoes?.[updIdx])return;
-  const u=d.atualizacoes[updIdx];
-  u.data=document.getElementById('upd-data')?.value||u.data;
-  u.status=document.getElementById('upd-status')?.value||u.status;
-  u.crit=document.getElementById('upd-crit')?.value||'';
-  u.loc=document.getElementById('upd-loc')?.value||'';
-  u.desc=(document.getElementById('upd-desc')?.value||'').trim()||'Sem relato';
-  u.fotos=getGalFotos(ns);
-  marcarMudanca();autoBackup();
-  fecharModalUpd();
-  mostrarToast('✓ Atualização editada','#2E7D32');
-  renderRelatorio();
-}
-function encerrarDefeito(regId,idx){
-  if(!confirm('Encerrar este defeito definitivamente?\nEle será movido para o Histórico.'))return;
-  const r=DB.registros[ativoSel].find(x=>x.id===regId);
-  if(!r||!r.campos.defeitos[idx])return;
-  r.campos.defeitos[idx]._encerrado=true;
-  // Se todos defeitos do registro estiverem encerrados, encerra o registro também
-  if(r.campos.defeitos.every(d=>d._encerrado))r._encerrado=true;
-  marcarMudanca();autoBackup();renderRelatorio();
-}
-function reabrirDefeito(regId,idx){
-  const r=DB.registros[ativoSel].find(x=>x.id===regId);
-  if(!r||!r.campos.defeitos[idx])return;
-  r.campos.defeitos[idx]._encerrado=false;
-  r.campos.defeitos[idx].status='ac';
-  r._encerrado=false;r._hist=false;
-  marcarMudanca();autoBackup();renderRelatorio();
-}
-function fecharModalUpd(){
-  document.getElementById('modal-upd')?.remove();
-  _updRegId=null; _updDefIdx=null;
-}
-
-function salvarAtualizacaoDefeito(){
-  if(_updRegId===null||_updDefIdx===null)return;
-  const r=DB.registros[ativoSel].find(x=>x.id===_updRegId);
-  const d=r?.campos?.defeitos?.[_updDefIdx];
-  if(!d)return;
-  const ns='upd-'+_updRegId+'-'+_updDefIdx;
-  const data=document.getElementById('upd-data')?.value||dataHojeISO();
-  const status=document.getElementById('upd-status')?.value||'ac';
-  const crit=document.getElementById('upd-crit')?.value||'';
-  const loc=document.getElementById('upd-loc')?.value||'';
-  const desc=(document.getElementById('upd-desc')?.value||'').trim()||'Sem relato';
-  const fotos=getGalFotos(ns);
-  if(!d.atualizacoes)d.atualizacoes=[];
-  d.atualizacoes.push({data,status,crit,loc,desc,fotos});
-  // Atualiza o status atual do defeito
-  d.status=status;
-  marcarMudanca(); autoBackup();
-  fecharModalUpd();
-  mostrarToast('✓ Atualização registrada na linha do tempo','#2E7D32');
-  renderRelatorio();
-}
-
-// ════════════════════════════════════════════════════════════════
-// MESCLAR DEFEITOS
-// ════════════════════════════════════════════════════════════════
-let _mesclarSel=[];  // [{regId, defIdx}]
-
-function iniciarMesclar(regId,defIdx){
-  const jaEsta=_mesclarSel.findIndex(s=>s.regId===regId&&s.defIdx===defIdx);
-  if(jaEsta>=0){
-    _mesclarSel.splice(jaEsta,1);
-  } else {
-    if(_mesclarSel.length>=2){mostrarToast('Selecione apenas 2 defeitos para mesclar','#E65100');return;}
-    _mesclarSel.push({regId,defIdx});
-  }
-  // Atualiza visual dos blocos
-  document.querySelectorAll('[id^="def-bloco-"]').forEach(el=>el.classList.remove('mesclar-sel'));
-  _mesclarSel.forEach(s=>{
-    const el=document.getElementById('def-bloco-'+s.regId+'-'+s.defIdx);
-    if(el)el.classList.add('mesclar-sel');
-  });
-  // Mostra/esconde banner
-  let banner=document.getElementById('mesclar-banner');
-  if(_mesclarSel.length===0){
-    banner?.remove();return;
-  }
-  if(!banner){
-    banner=document.createElement('div');
-    banner.id='mesclar-banner';
-    banner.className='mesclar-banner';
-    const rel=document.getElementById('sec-body-reg-defeito')||document.querySelector('.rel-sec-body');
-    if(rel)rel.insertBefore(banner,rel.firstChild);
-  }
-  if(_mesclarSel.length===1){
-    banner.innerHTML=`<i class="ti ti-git-merge" style="font-size:20px;opacity:.8;"></i>
-      <span style="flex:1;">Selecione mais 1 defeito para mesclar</span>
-      <button onclick="cancelarMesclar()">Cancelar</button>`;
-  } else {
-    banner.innerHTML=`<i class="ti ti-git-merge" style="font-size:20px;opacity:.8;"></i>
-      <span style="flex:1;">Mesclar os 2 defeitos selecionados?</span>
-      <button onclick="confirmarMesclar()" style="background:#2E7D32;margin-right:6px;">✓ Confirmar</button>
-      <button onclick="cancelarMesclar()">Cancelar</button>`;
-  }
-}
-
-function cancelarMesclar(){
-  _mesclarSel=[];
-  document.querySelectorAll('[id^="def-bloco-"]').forEach(el=>el.classList.remove('mesclar-sel'));
-  document.getElementById('mesclar-banner')?.remove();
-}
-
-function abrirDesfazerMescla(){
-  const snaps=_snapshotsMescla[ativoSel]||[];
-  if(!snaps.length){
-    mostrarToast('Nenhuma mesclagem recente para desfazer neste ativo','#E65100');
-    return;
-  }
-  const modal=document.createElement('div');
-  modal.id='modal-desfazer';
-  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:400;display:flex;align-items:flex-end;justify-content:center;';
-  let itens='';
-  // Mostra do mais recente para o mais antigo
-  [...snaps].reverse().forEach((s,ri)=>{
-    const idx=snaps.length-1-ri; // índice real no array
-    const hora=new Date(s.ts).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-    const data=new Date(s.ts).toLocaleDateString('pt-BR');
-    const descA=s.descA.length>30?s.descA.substring(0,30)+'…':s.descA;
-    const descB=s.descB.length>30?s.descB.substring(0,30)+'…':s.descB;
-    itens+=`<div style="background:#F8F9FB;border:1px solid #E5E8ED;border-radius:10px;padding:12px;margin-bottom:8px;">
-      <div style="font-size:11px;color:#9CA3AF;margin-bottom:6px;">${data} às ${hora}</div>
-      <div style="font-size:13px;color:#1F3864;font-weight:600;margin-bottom:4px;">Mesclagem:</div>
-      <div style="font-size:12px;color:#374151;margin-bottom:10px;">
-        <span style="background:#EBF3FF;padding:2px 7px;border-radius:5px;">"${descA}"</span>
-        <span style="color:#9CA3AF;margin:0 5px;">+</span>
-        <span style="background:#EBF3FF;padding:2px 7px;border-radius:5px;">"${descB}"</span>
-      </div>
-      <button onclick="confirmarDesfazer(${idx})" style="width:100%;padding:9px;background:#C62828;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">
-        ↩ Desfazer esta mesclagem
-      </button>
-    </div>`;
-  });
-  modal.innerHTML=`<div style="background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:18px 16px 30px;max-height:85vh;overflow-y:auto;">
-    <div style="font-size:15px;font-weight:700;color:#1F3864;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
-      <span><i class="ti ti-history" style="color:#C62828;"></i> Desfazer Mesclagem</span>
-      <button onclick="document.getElementById('modal-desfazer').remove()" style="background:none;border:none;font-size:20px;color:#6B7280;cursor:pointer;">✕</button>
-    </div>
-    <p style="font-size:12px;color:#6B7280;margin-bottom:12px;">Selecione qual mesclagem deseja reverter. Os dados voltarão exatamente como estavam antes.</p>
-    ${itens}
-    <button onclick="document.getElementById('modal-desfazer').remove()" style="width:100%;padding:10px;background:#F3F4F6;color:#374151;border:none;border-radius:8px;font-size:13px;cursor:pointer;margin-top:4px;">Cancelar</button>
-  </div>`;
-  document.body.appendChild(modal);
-}
-
-function confirmarDesfazer(idx){
-  const snaps=_snapshotsMescla[ativoSel]||[];
-  const s=snaps[idx];
-  if(!s){mostrarToast('Snapshot não encontrado','#E65100');return;}
-  if(!confirm('Desfazer esta mesclagem?\nTodos os registros voltarão ao estado anterior à mesclagem.'))return;
-  // Restaura snapshot
-  DB.registros[ativoSel]=JSON.parse(JSON.stringify(s.snapshot));
-  // Remove este snapshot e os mais recentes (que dependiam do estado mesclado)
-  _snapshotsMescla[ativoSel].splice(idx);
-  document.getElementById('modal-desfazer')?.remove();
-  marcarMudanca(); autoBackup();
-  mostrarToast('✓ Mesclagem desfeita com sucesso','#2E7D32');
-  renderRelatorio();
-}
-
-// Pilha de snapshots para desfazer mesclagem — máx 5 por ativo
-const _snapshotsMescla={};
-
-function separarMesclado(regId, defIdx, updIdx){
-  if(!confirm('Separar este item mesclado em um defeito independente?\n\nEle será removido da linha do tempo e recriado como um novo registro de defeito.'))return;
-  const r=DB.registros[ativoSel].find(x=>x.id===regId);
-  const d=r?.campos?.defeitos?.[defIdx];
-  const u=d?.atualizacoes?.[updIdx];
-  if(!u)return;
-
-  // Remove o ' [Mesclado]' do final da desc se existir
-  const descLimpa=(u.desc||'').replace(/\s*\[Mesclado\]/g,'').replace(/\s*\[Mesclado de registro separado\]/g,'').trim();
-
-  // Cria novo registro de defeito com os dados da entrada mesclada
-  const novoDefeito={
-    tipo: d.tipo||'',
-    dataEmenda: d.dataEmenda||'',
-    loc: u.loc||d.loc||'',
-    crit: u.crit||d.crit||'',
-    status: u.status==='co'?'co':'ac',
-    desc: descLimpa||'Sem relato',
-    fotos: u.fotos||[],
-    atualizacoes: [],
-    _encerrado: false
-  };
-
-  // Coletar atualizações que também vieram desta mesclagem (mesmas _origem e posteriores)
-  const outrasDoMesclado=[];
-  (d.atualizacoes||[]).forEach((uu,uui)=>{
-    if(uui!==updIdx && uu._origem==='Mesclado'){
-      outrasDoMesclado.push({idx:uui, entrada:{...uu}});
-    }
-  });
-
-  // Remove a entrada da timeline (e as outras do mesmo mesclado)
-  const idxsRemover=[updIdx,...outrasDoMesclado.map(x=>x.idx)].sort((a,b)=>b-a);
-  idxsRemover.forEach(idx=>d.atualizacoes.splice(idx,1));
-
-  // Adiciona as outras entradas mescladas como atualizações do novo defeito
-  outrasDoMesclado.forEach(x=>{
-    const desc2=(x.entrada.desc||'').replace(/\s*\[Mesclado\]/g,'').replace(/\s*\[Mesclado de registro separado\]/g,'').trim();
-    novoDefeito.atualizacoes.push({...x.entrada, desc:desc2, _origem:undefined});
-  });
-
-  // Adiciona o novo defeito ao mesmo registro de data ou cria registro novo
-  const dataAlvo=u.data||r.data;
-  // Tenta usar um registro de defeito existente da mesma data, ou cria um novo
-  let regAlvo=DB.registros[ativoSel].find(x=>x.tipo==='defeito'&&x.data===dataAlvo&&!x._encerrado&&x.id!==regId);
-  if(!regAlvo){
-    regAlvo={id:newId(),tipo:'defeito',data:dataAlvo,desc:'Defeito separado',fotos:[],campos:{defeitos:[]},_hist:false,_encerrado:false};
-    DB.registros[ativoSel].unshift(regAlvo);
-  }
-  regAlvo.campos.defeitos.push(novoDefeito);
-
-  marcarMudanca();autoBackup();
-  mostrarToast('✓ Defeito separado com sucesso — veja na seção Defeitos/Reparos','#2E7D32');
-  renderRelatorio();
-}
-
-function confirmarMesclar(){
-  if(_mesclarSel.length!==2){return;}
-  const [a,b]=_mesclarSel;
-  const rA=DB.registros[ativoSel].find(x=>x.id===a.regId);
-  const rB=DB.registros[ativoSel].find(x=>x.id===b.regId);
-  if(!rA||!rB)return;
-  const dA=rA.campos.defeitos[a.defIdx];
-  const dB=rB.campos.defeitos[b.defIdx];
-  if(!dA||!dB)return;
-
-  // ── Salva snapshot ANTES de mesclar ──────────────────────────
-  if(!_snapshotsMescla[ativoSel])_snapshotsMescla[ativoSel]=[];
-  _snapshotsMescla[ativoSel].push({
-    ts: Date.now(),
-    descA: dA.desc||'Defeito A',
-    descB: dB.desc||'Defeito B',
-    snapshot: JSON.parse(JSON.stringify(DB.registros[ativoSel]))
-  });
-  // Mantém só os últimos 5 snapshots por ativo
-  if(_snapshotsMescla[ativoSel].length>5)_snapshotsMescla[ativoSel].shift();
-
-  // ── Mescla: dA absorve dB ─────────────────────────────────────
-  if(!dA.atualizacoes)dA.atualizacoes=[];
-  (dB.atualizacoes||[]).forEach(u=>dA.atualizacoes.push({...u,_origem:'Mesclado'}));
-  dA.atualizacoes.unshift({
-    data:rB.data,
-    status:dB.status,
-    crit:dB.crit,
-    loc:dB.loc,
-    desc:(dB.desc&&dB.desc!=='Sem relato'?dB.desc:'')+' [Mesclado]',
-    fotos:dB.fotos||[],
-    _origem:'Mesclado'
-  });
-  dA.atualizacoes.sort((x,y)=>x.data.localeCompare(y.data));
-  if(a.regId===b.regId){
-    rA.campos.defeitos.splice(b.defIdx,1);
-  } else {
-    rB.campos.defeitos.splice(b.defIdx,1);
-    if(rB.campos.defeitos.length===0){
-      DB.registros[ativoSel]=DB.registros[ativoSel].filter(x=>x.id!==b.regId);
-    }
-  }
-  cancelarMesclar();
-  marcarMudanca(); autoBackup();
-  mostrarToast('✓ Defeitos mesclados — use "Desfazer mesclagem" para reverter','#2E7D32');
-  renderRelatorio();
-}
-
 function salvarEdicao(){
   const r=DB.registros[ativoSel].find(x=>x.id===editandoReg);
   if(!r)return;
   const ns='edit-'+r.id;
   r.data=document.getElementById('edit-data')?.value||r.data;
 
-  // rasp-K (formato novo individual)
-  if(r.tipo&&r.tipo.startsWith('rasp-')&&r.tipo!=='rasp'){
-    const p=document.getElementById('edit-pct')?.value||'';
-    const cr=document.getElementById('edit-rcrit')?.value||'';
-    const d=document.getElementById('edit-desc-rasp')?.value||'';
-    r.campos={pct:p,crit:cr};
-    r.desc=d||'Sem relato';
-    r.fotos=getGalFotos(ns);
-  }
-  // rasp legado agrupado
-  else if(r.tipo==='rasp'){
+  if(r.tipo==='rasp'){
     Object.keys(r.campos).forEach(k=>{
       const nsK=ns+'-'+k;
       const d=document.getElementById('edit-desc-'+k)?.value;
@@ -3176,15 +1833,15 @@ function salvarEdicao(){
     if(tipo==='outros')tipo=document.getElementById('edit-tipo-outros')?.value||'Outros';
     r.campos.tipo=tipo;
     r.campos.bal=document.getElementById('edit-bal')?.value||'';
-    r.campos.crit=document.getElementById('ei-crit')?.value||'';
-    r.campos.status=document.getElementById('ei-status')?.value||'ac';
+    r.campos.novo=document.getElementById('edit-novo')?.checked||false;
+    r.campos.crit=document.getElementById('edit-crit-interf')?.value||'';
+    r.campos.status=document.getElementById('edit-status')?.value||'em';
     r.fotos=getGalFotos(ns);
   }
   else if(r.tipo==='desal'){
     r.desc=document.getElementById('edit-desc')?.value||r.desc;
     r.campos.local=document.getElementById('edit-local')?.value||'';
-    r.campos.crit=document.getElementById('ed-crit')?.value||'';
-    r.campos.status=document.getElementById('ed-status')?.value||'ac';
+    r.campos.status=document.getElementById('edit-status-desal')?.value||'em';
     r.fotos=getGalFotos(ns);
   }
   else if(r.tipo==='contra'){
@@ -3202,9 +1859,10 @@ function salvarEdicao(){
       let tipo=document.getElementById('edit-def-tipo-'+i)?.value||d.tipo;
       d.tipo=tipo;
       d.dataEmenda=tipo==='emenda'?(document.getElementById('edit-def-data-emenda-'+i)?.value||''):'';
-      d.loc=document.getElementById('edt-loc-'+i)?.value||document.getElementById('edit-def-loc-'+i)?.value||d.loc;
-      d.crit=document.getElementById('edt-crit-'+i)?.value||document.getElementById('edit-def-crit-'+i)?.value||d.crit;
-      d.status=document.getElementById('edt-status-'+i)?.value||document.getElementById('edit-def-status-'+i)?.value||d.status;
+      d.loc=document.getElementById('edit-def-loc-'+i)?.value||d.loc;
+      d.novo=document.getElementById('edit-def-novo-'+i)?.checked||false;
+      d.crit=document.getElementById('edit-def-crit-'+i)?.value||d.crit;
+      d.status=document.getElementById('edit-def-status-'+i)?.value||d.status;
       d.desc=document.getElementById('edit-def-desc-'+i)?.value||d.desc;
       d.fotos=getGalFotos(nsD);
     });
@@ -3214,396 +1872,11 @@ function salvarEdicao(){
   marcarMudanca(); autoBackup();
   fecharModal();renderRelatorio();
 }
-// ════════════════════════════════════════════════════════════════
-// SISTEMA DE NOVIDADES
-// ════════════════════════════════════════════════════════════════
-const APP_VERSION='v0.1';
-// Só a novidade mais recente desta versão
-const APP_CHANGELOG=['Área de clique do botão Excluir normalizada'];
-// Cores do badge alternando a cada versão
-// Paleta de cores que repete infinitamente
-const _CORES_PALETA=[
-  {bg:'rgba(100,180,255,.22)',border:'rgba(100,180,255,.45)',text:'#BDD9F8'},
-  {bg:'rgba(100,220,160,.22)',border:'rgba(100,220,160,.45)',text:'#A8E6C8'},
-  {bg:'rgba(255,180,80,.22)', border:'rgba(255,180,80,.45)', text:'#FFD9A0'},
-  {bg:'rgba(200,130,255,.22)',border:'rgba(200,130,255,.45)',text:'#DDB8FF'},
-  {bg:'rgba(80,210,255,.22)', border:'rgba(80,210,255,.45)', text:'#A8EEFF'},
-];
-function _verCor(){
-  // Extrai número da versão (v0.1 → 1, v0.2 → 2, v1.3 → 13 etc)
-  const num=parseInt((APP_VERSION.match(/\d+/g)||[]).join(''))||1;
-  return _CORES_PALETA[(num-1)%_CORES_PALETA.length];
-}
-const NOVIDADES_LS_KEY='insp_novidades_visto';
-
-function verificarVersaoAtual(){
-  // Mostra versão atual em execução — para confirmar se o celular atualizou
-  const agora=new Date();
-  const hora=agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  alert('✅ Versão em execução: '+APP_VERSION+'\n\nCarregado às: '+hora+'\n\nSe esta mensagem aparecer, o app está atualizado!\n(Botão "VER" é temporário — será removido em breve)');
-}
-
-function verificarNovidades(){
-  // Adiciona v0.1 na frente da data no subtítulo
-  const sub=document.getElementById('topbar-sub');
-  if(sub&&!sub._novClick){
-    sub._novClick=true;
-    const textoAtual=sub.textContent||'';
-    sub.innerHTML=`<span onclick="mostrarNovidades()" style="cursor:pointer;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:1px 7px;font-size:10px;font-weight:700;margin-right:6px;letter-spacing:.03em;">${APP_VERSION}</span>${textoAtual}`;
-  }
-  try{
-    const visto=localStorage.getItem(NOVIDADES_LS_KEY);
-    if(visto!==APP_VERSION){
-      setTimeout(()=>mostrarNovidades(),800);
-    }
-  }catch{}
-}
-
-function mostrarNovidades(){
-  if(document.getElementById('novidades-overlay'))return;
-  // Atualiza badge com versão atual
-  const badgeNum=document.getElementById('badge-versao-num');
-  if(badgeNum)badgeNum.textContent=APP_VERSION;
-  const overlay=document.createElement('div');
-  overlay.id='novidades-overlay';
-  overlay.className='novidades-overlay';
-  const vc=_verCor();
-  const novidade=APP_CHANGELOG[0]||'';
-  overlay.onclick=(e)=>{if(e.target===overlay)fecharNovidades();};
-  overlay.innerHTML=`<div class="novidades-box" onclick="event.stopPropagation()">
-    <div class="novidades-header">
-      <div class="novidades-titulo">
-        <i class="ti ti-sparkles" style="color:#2E75B6;font-size:20px;"></i>
-        O que há de novo?
-      </div>
-      <span class="novidades-versao" style="background:${vc.bg};border:1px solid ${vc.border};color:${vc.text};">${APP_VERSION}</span>
-    </div>
-    <div style="margin:16px 0 20px;">
-      <div style="display:flex;align-items:flex-start;gap:12px;background:#F0F6FF;border-radius:10px;padding:14px;">
-        <div style="width:10px;height:10px;border-radius:50%;background:#2E75B6;flex-shrink:0;margin-top:3px;"></div>
-        <div style="font-size:14px;color:#1F3864;font-weight:500;line-height:1.5;">${novidade}</div>
-      </div>
-    </div>
-    <button class="novidades-fechar" onclick="fecharNovidades()">✓ Entendido!</button>
-  </div>`;
-  document.body.appendChild(overlay);
-}
-
-function fecharNovidades(){
-  try{localStorage.setItem(NOVIDADES_LS_KEY,APP_VERSION);}catch{}
-  document.getElementById('novidades-overlay')?.remove();
-}
-
 function excluirRegistro(regId){
   if(!confirm('Excluir este registro?'))return;
   DB.registros[ativoSel]=DB.registros[ativoSel].filter(x=>x.id!==regId);
   marcarMudanca(); autoBackup();
   fecharModal();renderRelatorio();
-}
-function excluirRegistroHist(regId){
-  const r=DB.registros[ativoSel].find(x=>x.id===regId);
-  const label=r?SECAO_LABELS[r.tipo]||r.tipo:'registro';
-  if(!confirm('Excluir permanentemente este registro de "'+label+'"?\n\nEssa ação não pode ser desfeita.'))return;
-  DB.registros[ativoSel]=DB.registros[ativoSel].filter(x=>x.id!==regId);
-  marcarMudanca(); autoBackup();
-  renderRelatorio();
-}
-// ════════════════════════════════════════════════════════════════
-// FILTROS DO HISTÓRICO
-// ════════════════════════════════════════════════════════════════
-
-// Filtro geral — aparece no topo do bloco de histórico
-// ── Coleta anos e meses únicos de uma lista de registros ──────────────────
-function _extrairAnos(regs){
-  const mapa={};
-  regs.forEach(r=>{
-    if(!r.data)return;
-    const [ano,mes]=r.data.split('-');
-    if(!mapa[ano])mapa[ano]={};
-    if(!mapa[ano][mes])mapa[ano][mes]=0;
-    mapa[ano][mes]++;
-  });
-  return mapa;
-}
-
-// ── Monta HTML da árvore ano/mês para um subId ────────────────────────────
-function buildArvoreAnos(subId, mapa){
-  const MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const anos=Object.keys(mapa).sort((a,b)=>b-a); // mais recente primeiro
-  if(!anos.length)return '';
-  let h='';
-  anos.forEach(ano=>{
-    const meses=mapa[ano];
-    const total=Object.values(meses).reduce((s,c)=>s+c,0);
-    const uid=subId+'-ano-'+ano;
-    h+=`<div>
-      <div class="hf-ano-row" onclick="toggleAnoFiltro('${uid}','${subId}','${ano}')">
-        <span class="hf-chk" id="${uid}-chk"></span>
-        <span class="hf-ano-label">${ano}</span>
-        <span class="hf-count">${total}</span>
-        <i class="ti ti-chevron-right hf-chevron" id="${uid}-chev"></i>
-      </div>
-      <div class="hf-meses" id="${uid}-meses">`;
-    Object.keys(meses).sort().forEach(mes=>{
-      const mid=uid+'-m'+mes;
-      const mesNome=MESES[parseInt(mes)-1]||mes;
-      h+=`<div class="hf-mes-row" onclick="toggleMesFiltro('${mid}','${subId}','${ano}','${mes}')">
-        <span class="hf-chk" id="${mid}-chk"></span>
-        <span class="hf-mes-label">${mesNome} <span style="color:#9CA3AF;font-size:10px;">(${meses[mes]})</span></span>
-      </div>`;
-    });
-    h+=`</div></div>`;
-  });
-  return h;
-}
-
-function buildFiltroGeralHist(){
-  const todosRegs=[];
-  Object.values(DB.registros).forEach(regs=>regs.forEach(r=>todosRegs.push(r)));
-  const mapa=_extrairAnos(todosRegs);
-  const arvore=buildArvoreAnos('fg',mapa);
-  return `<div class="hf-wrap" id="filtro-geral-hist" style="display:none;border-radius:8px;margin-bottom:8px;border:1px solid #C5D8F0;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-      <span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;"><i class="ti ti-filter" style="font-size:10px;"></i> Filtrar por data</span>
-      <button class="hf-limpar" onclick="limparFiltroGeral()">Limpar tudo</button>
-    </div>
-    ${arvore||'<span style="font-size:12px;color:#9CA3AF;">Nenhum registro no histórico</span>'}
-    <div class="hf-busca-wrap">
-      <div class="hf-busca-label"><i class="ti ti-search" style="font-size:10px;"></i> Buscar na descrição</div>
-      <div style="display:flex;gap:6px;">
-        <input class="hf-busca-input" type="text" id="fg-busca-livre" placeholder="Digite qualquer palavra..." onkeydown="if(event.key==='Enter')aplicarBuscaLivre('fg')" style="flex:1;">
-        <button onclick="aplicarBuscaLivre('fg')" style="padding:7px 12px;background:#1F3864;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;"><i class="ti ti-search" style="font-size:12px;"></i></button>
-      </div>
-    </div>
-    <div class="hf-resultado" id="fg-resultado"></div>
-  </div>`;
-}
-
-// Filtro local — árvore ano/mês + busca por subitem
-function buildFiltroLocalHist(subId,tipo,regs){
-  const mapa=_extrairAnos(regs);
-  const arvore=buildArvoreAnos(subId,mapa);
-  return `<div class="hf-wrap" id="${subId}-filtro" style="display:none;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-      <span style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;"><i class="ti ti-filter" style="font-size:10px;"></i> Filtrar por data</span>
-      <button class="hf-limpar" onclick="limparFiltroLocal('${subId}')">Limpar tudo</button>
-    </div>
-    ${arvore||'<span style="font-size:12px;color:#9CA3AF;">Sem registros</span>'}
-    <div class="hf-busca-wrap">
-      <div class="hf-busca-label"><i class="ti ti-search" style="font-size:10px;"></i> Buscar na descrição</div>
-      <div style="display:flex;gap:6px;">
-        <input class="hf-busca-input" type="text" id="${subId}-busca-livre" placeholder="Digite qualquer palavra..." onkeydown="if(event.key==='Enter')aplicarBuscaLivre('${subId}')" style="flex:1;">
-        <button onclick="aplicarBuscaLivre('${subId}')" style="padding:7px 12px;background:#1F3864;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;"><i class="ti ti-search" style="font-size:12px;"></i></button>
-      </div>
-    </div>
-    <div class="hf-resultado" id="${subId}-resultado"></div>
-  </div>`;
-}
-
-// ── Estado dos filtros de árvore por subId ───────────────────────────────
-const _filtroAnos={};  // {subId: {anosSel:Set, mesesSel:{ano:Set}}}
-
-function _getFiltroState(subId){
-  if(!_filtroAnos[subId])_filtroAnos[subId]={anosSel:new Set(),mesesSel:{}};
-  return _filtroAnos[subId];
-}
-
-function toggleAnoFiltro(uid,subId,ano){
-  const st=_getFiltroState(subId);
-  const chevEl=document.getElementById(uid+'-chev');
-  const mesesEl=document.getElementById(uid+'-meses');
-  // Abre/fecha meses
-  const estaAberto=mesesEl&&mesesEl.style.display==='block';
-  if(mesesEl)mesesEl.style.display=estaAberto?'none':'block';
-  if(chevEl)chevEl.classList.toggle('open',!estaAberto);
-  // Toggle seleção do ano inteiro
-  const chkEl=document.getElementById(uid+'-chk');
-  const anoSel=st.anosSel.has(ano);
-  if(anoSel){
-    st.anosSel.delete(ano);
-    delete st.mesesSel[ano];
-    if(chkEl){chkEl.className='hf-chk';}
-    // Desmarca todos meses
-    document.querySelectorAll(`[id^="${uid}-m"][id$="-chk"]`).forEach(el=>el.className='hf-chk');
-  } else {
-    // Não seleciona o ano inteiro ao abrir — só ao clicar no checkbox
-  }
-  _aplicarFiltroArvore(subId);
-}
-
-function toggleMesFiltro(mid,subId,ano,mes){
-  const st=_getFiltroState(subId);
-  if(!st.mesesSel[ano])st.mesesSel[ano]=new Set();
-  const chkEl=document.getElementById(mid+'-chk');
-  const uid=subId+'-ano-'+ano;
-  const anoChk=document.getElementById(uid+'-chk');
-  if(st.mesesSel[ano].has(mes)){
-    st.mesesSel[ano].delete(mes);
-    if(chkEl)chkEl.className='hf-chk';
-    // Se nenhum mês selecionado, remove o ano
-    if(st.mesesSel[ano].size===0){
-      delete st.mesesSel[ano];
-      st.anosSel.delete(ano);
-      if(anoChk)anoChk.className='hf-chk';
-    } else {
-      if(anoChk)anoChk.className='hf-chk parcial';
-    }
-  } else {
-    st.mesesSel[ano].add(mes);
-    if(chkEl)chkEl.className='hf-chk sel';
-    if(anoChk)anoChk.className='hf-chk parcial';
-  }
-  _aplicarFiltroArvore(subId);
-}
-
-// Coleta texto de busca livre para um subId
-function _getBuscaLivre(subId){
-  const id=subId==='fg'?'fg-busca-livre':subId+'-busca-livre';
-  return (document.getElementById(id)?.value||'').trim().toLowerCase();
-}
-
-// Verifica se um registro contém o texto buscado
-function _passaBuscaLivre(r,busca){
-  if(!busca)return true;
-  const textos=[r.desc||''];
-  const c=r.campos||{};
-  if(c.tipo)textos.push(c.tipo);
-  if(c.bal)textos.push(c.bal);
-  if(c.local)textos.push(c.local);
-  if(c.crit)textos.push(c.crit);
-  (c.defeitos||[]).forEach(d=>{
-    textos.push(d.desc||'');
-    textos.push(d.loc||'');
-    textos.push(d.crit||'');
-    (d.atualizacoes||[]).forEach(u=>textos.push(u.desc||''));
-  });
-  (r.campos?.pct)?textos.push(String(r.campos.pct)):'';
-  return textos.some(t=>t.toLowerCase().includes(busca));
-}
-
-function aplicarBuscaLivre(subId){_aplicarFiltroArvore(subId);}
-
-function _aplicarFiltroArvore(subId){
-  const container=document.getElementById(subId+'-cards');
-  const res=document.getElementById(subId+'-resultado');
-  if(!container)return;
-  const st=_getFiltroState(subId);
-  const busca=_getBuscaLivre(subId);
-  // Monta set de ano-mes selecionados
-  const filtros=new Set();
-  Object.entries(st.mesesSel).forEach(([ano,meses])=>{
-    meses.forEach(m=>filtros.add(ano+'-'+m.padStart(2,'0')));
-  });
-  const temDataFiltro=filtros.size>0;
-  const temBusca=busca.length>0;
-  const temFiltro=temDataFiltro||temBusca;
-  let visiveis=0,total=0;
-  container.querySelectorAll('.reg-card').forEach(card=>{
-    const regId=card.id.replace('card-','');
-    const r=DB.registros[ativoSel]?.find(x=>x.id===regId);
-    total++;
-    if(!temFiltro){card.style.display='';visiveis++;return;}
-    if(!r){card.style.display='none';return;}
-    // Filtro de data
-    let passaData=true;
-    if(temDataFiltro){
-      const anoMes=(r.data||'').substring(0,7);
-      passaData=filtros.has(anoMes);
-    }
-    // Filtro de busca livre
-    const passaBusca=_passaBuscaLivre(r,busca);
-    const passa=passaData&&passaBusca;
-    card.style.display=passa?'':'none';
-    if(passa)visiveis++;
-  });
-  const counter=document.getElementById(subId+'-count');
-  if(counter)counter.textContent=visiveis+'/'+total;
-  if(res){
-    if(temFiltro){
-      let txt=visiveis+' de '+total+' registro(s)';
-      if(temBusca)txt+=' — "'+busca+'"';
-      res.style.display='block';res.textContent=txt;
-    } else {res.style.display='none';}
-  }
-}
-
-function aplicarFiltroGeral(){
-  // Aplica filtro geral em todos os subitens visíveis
-  document.querySelectorAll('[id$="-cards"]').forEach(container=>{
-    const subId=container.id.replace('-cards','');
-    _aplicarFiltroArvore(subId);
-  });
-}
-
-function aplicarFiltroLocal(subId){_aplicarFiltroArvore(subId);}
-
-function toggleFiltroLocal(subId){
-  const f=document.getElementById(subId+'-filtro');
-  if(!f)return;
-  const open=f.style.display==='none'||f.style.display==='';
-  f.style.display=open?'block':'none';
-}
-
-function filtrarContainer(container,subId){_aplicarFiltroArvore(subId);}
-
-function limparFiltroGeral(){
-  Object.keys(_filtroAnos).forEach(k=>delete _filtroAnos[k]);
-  document.querySelectorAll('.hf-chk').forEach(el=>el.className='hf-chk');
-  document.querySelectorAll('.hf-meses').forEach(el=>el.style.display='none');
-  document.querySelectorAll('.hf-chevron').forEach(el=>el.classList.remove('open'));
-  document.querySelectorAll('.hf-busca-input').forEach(el=>el.value='');
-  document.querySelectorAll('[id$="-cards"] .reg-card').forEach(el=>el.style.display='');
-  document.querySelectorAll('.hf-resultado').forEach(el=>el.style.display='none');
-  document.querySelectorAll('[id$="-count"]').forEach(el=>{
-    const cards=document.getElementById(el.id.replace('-count','-cards'));
-    if(cards){const n=cards.querySelectorAll('.reg-card').length;el.textContent=n+'/'+n;}
-  });
-}
-
-function limparFiltroLocal(subId){
-  delete _filtroAnos[subId];
-  document.querySelectorAll(`[id^="${subId}-ano-"] .hf-chk, [id^="${subId}-ano-"][id$="-chk"]`).forEach(el=>el.className='hf-chk');
-  document.querySelectorAll(`[id^="${subId}-ano-"][id$="-meses"]`).forEach(el=>el.style.display='none');
-  document.querySelectorAll(`[id^="${subId}-ano-"][id$="-chev"]`).forEach(el=>el.classList.remove('open'));
-  const bl=document.getElementById(subId+'-busca-livre');if(bl)bl.value='';
-  const container=document.getElementById(subId+'-cards');
-  if(container)container.querySelectorAll('.reg-card').forEach(el=>el.style.display='');
-  const res=document.getElementById(subId+'-resultado');
-  if(res)res.style.display='none';
-  const counter=document.getElementById(subId+'-count');
-  if(counter&&container){const n=container.querySelectorAll('.reg-card').length;counter.textContent=n+'/'+n;}
-}
-
-// Funções legadas — mantidas para compatibilidade
-function toggleFiltroGeral(){
-  const f=document.getElementById('filtro-geral-hist');
-  if(!f)return;
-}
-function _passaFiltroData(d,de,ate,mes){return true;}
-function _passaBusca(r,b){return true;}
-function _passaCrit(r,c){return true;}
-function _passaStatus(r,s){return true;}
-function _passaLoc(r,l){return true;}
-function _passaTipo(r,t){return true;}
-function _passaPct(r,f){return true;}
-function trocarModoDataFG(){}
-function trocarModoDataLocal(){}
-
-function toggleSecaoExt(){
-  const body=document.getElementById('sec-body-extrator');
-  const btn=document.getElementById('sec-btn-extrator');
-  if(!body)return;
-  const open=body.style.display==='none';
-  body.style.display=open?'block':'none';
-  if(btn)btn.textContent=open?'−':'+';
-}
-function toggleHistSub(id){
-  const el=document.getElementById(id);
-  const btn=document.getElementById(id+'-btn');
-  if(!el)return;
-  const open=el.style.display==='none';
-  el.style.display=open?'block':'none';
-  if(btn)btn.textContent=open?'−':'+';
 }
 
 // ════════════════════════════════
@@ -3661,7 +1934,6 @@ function renderFicha(){
     <div class="rel-section" style="margin-bottom:11px;"><div class="rel-section-header"><i class="ti ti-notes"></i> OBSERVAÇÕES</div><div style="padding:11px;">
       <textarea style="width:100%;font-size:13px;padding:10px;border:1px solid #D1D5DB;border-radius:8px;min-height:70px;resize:vertical;" id="fc-obs" placeholder="Observações relevantes...">${ficha.obs||''}</textarea>
     </div></div>
-    ${buildExtratrorFichaBloco(ficha)}
     ${buildUssSecao(ficha)}
     <button class="btn-prim" onclick="salvarFicha()"><i class="ti ti-device-floppy"></i> Salvar ficha técnica</button>
     <button class="btn-sec" onclick="renderMenu()"><i class="ti ti-arrow-left"></i> Voltar ao menu</button>
@@ -3723,98 +1995,16 @@ function toggleUnica(i){
   }
 }
 {const isCabo=document.querySelector('input[name="fc-tipo-lona"]:checked')?.value==='cabo';const w=document.getElementById('breaker-wrap');if(w)w.style.display=isCabo?'':'none';}
-function buildUssGrid(vals,trechoIdx){let h='';for(let j=0;j<21;j++){const n=String(j+1).padStart(2,'0');const pv=(vals&&vals[j])||'';h+=`<div class="uss-cell"><div class="uss-num">${n}</div><input type="text" id="fc-uss-${trechoIdx}-${j}" value="" placeholder="—" inputmode="decimal"><div class="uss-prev">${pv?`<span style="font-size:9px;color:#9CA3AF;cursor:pointer;" title="Última: ${pv}">${pv}</span>`:''}</div></div>`;}return h;}
-function buildExtratrorFichaBloco(ficha){
-  const ext=ficha.extrator||{};
-  const temExt=ext.temExtrator||false;
-  const emendaOpts=['Mecânica','A frio'];
-  return `<div class="rel-section" style="margin-bottom:11px;">
-    <div class="rel-section-header" style="cursor:pointer;" onclick="toggleExtratrorFicha()">
-      <i class="ti ti-trash" style="color:#E65100;"></i> EXTRATOR DE SUCATAS
-      <span id="ext-ficha-chev" style="margin-left:auto;font-size:12px;color:#9CA3AF;">▼</span>
-    </div>
-    <div id="ext-ficha-body" style="${temExt?'':'display:none'}padding:12px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        <span style="font-size:13px;font-weight:600;color:#374151;">Este ativo possui Extrator de Sucatas?</span>
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:13px;">
-          <input type="radio" name="fc-ext-tem" value="sim" ${temExt?'checked':''} onchange="toggleExtratrorCampos(true)" style="accent-color:#E65100;"> Sim
-        </label>
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:13px;">
-          <input type="radio" name="fc-ext-tem" value="nao" ${!temExt?'checked':''} onchange="toggleExtratrorCampos(false)" style="accent-color:#6B7280;"> Não
-        </label>
-      </div>
-      <div id="ext-campos" style="${temExt?'':'display:none'}">
-        <div class="grid-3" style="gap:10px;margin-bottom:10px;">
-          <div class="form-grupo">
-            <label>Largura (mm)</label>
-            <input type="text" id="fc-ext-largura" value="${ext.largura||''}" placeholder="Ex: 1800" style="font-size:13px;padding:8px;">
-          </div>
-          <div class="form-grupo">
-            <label>Data de troca</label>
-            <input type="text" id="fc-ext-data" value="${ext.dataEmenda||''}" placeholder="Ex: 15/06/2026" style="font-size:13px;padding:8px;">
-          </div>
-          <div class="form-grupo">
-            <label>Qtd. cantoneiras</label>
-            <input type="number" id="fc-ext-cant" value="${ext.cantoneiras||''}" placeholder="Ex: 4" min="0" style="font-size:13px;padding:8px;">
-          </div>
-        </div>
-        <div class="form-grupo">
-          <label>Tipo de emenda</label>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-            <button type="button" class="btn-opcao ${ext.emenda==='Mecânica'?'btn-opcao-ativo':''}" id="fc-ext-em-mec" onclick="selecionarExtEmenda('Mecânica',this)">Mecânica</button>
-            <button type="button" class="btn-opcao ${ext.emenda==='A frio'?'btn-opcao-ativo':''}" id="fc-ext-em-frio" onclick="selecionarExtEmenda('A frio',this)">A frio</button>
-          </div>
-          <input type="hidden" id="fc-ext-emenda" value="${ext.emenda||''}">
-          <div id="fc-ext-parafusos-wrap" style="${ext.emenda==='Mecânica'?'':'display:none'}margin-top:8px;">
-            <div class="form-grupo">
-              <label>Qtd. parafusos</label>
-              <input type="number" id="fc-ext-parafusos" value="${ext.parafusos||''}" placeholder="Ex: 8" min="0" style="font-size:13px;padding:8px;">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>`;
-}
-
-function selecionarExtEmenda(val, btn){
-  document.querySelectorAll('#fc-ext-em-mec,#fc-ext-em-frio').forEach(b=>b.classList.remove('btn-opcao-ativo'));
-  if(btn)btn.classList.add('btn-opcao-ativo');
-  const h=document.getElementById('fc-ext-emenda');
-  if(h)h.value=val;
-  const pw=document.getElementById('fc-ext-parafusos-wrap');
-  if(pw)pw.style.display=val==='Mecânica'?'block':'none';
-}
-function toggleExtratrorFicha(){
-  const body=document.getElementById('ext-ficha-body');
-  const chev=document.getElementById('ext-ficha-chev');
-  if(!body)return;
-  const open=body.style.display==='none';
-  body.style.display=open?'block':'none';
-  if(chev)chev.textContent=open?'▲':'▼';
-}
-
-function toggleExtratrorCampos(show){
-  const campos=document.getElementById('ext-campos');
-  if(campos)campos.style.display=show?'block':'none';
-  const body=document.getElementById('ext-ficha-body');
-  if(body)body.style.display='block';
-}
-
+function buildUssGrid(vals,trechoIdx){let h='';for(let j=0;j<21;j++){const n=String(j+1).padStart(2,'0');const pv=(vals&&vals[j])||'';h+=`<div class="uss-cell"><div class="uss-num">${n}</div><input type="text" id="fc-uss-${trechoIdx}-${j}" value="" placeholder="${pv||'—'}" inputmode="decimal"><div class="uss-prev">${pv?'↑'+pv:''}</div></div>`;}return h;}
 function buildUssSecao(ficha){
   const trechos=ficha.trechos||[];
   let th='';
   trechos.forEach((t,i)=>{
     const l=LETRAS[i]||String(i+1);
-    const vals=t.uss_hist||t.uss||Array(21).fill(''); // usa histórico como referência
-    const temAnterior=(t.uss_hist||t.uss||[]).some(v=>v&&v!=='');
+    const vals=t.uss||Array(21).fill('');
     const remBtn=i>0?'<button type="button" class="btn-sm btn-sm-danger" onclick="removerTrechoUss('+i+')">Remover</button>':'';
-    const copiarBtn=temAnterior?'<button type="button" class="btn-sm btn-sm-sec" onclick="copiarUltimasMedidas('+i+')" title="Preenche os campos com os valores da última medição salva"><i class="ti ti-copy" style="font-size:11px;"></i> Copiar última</button>':'';
-    const limparBtn='<button type="button" class="btn-sm" style="background:#FFF3E0;color:#E65100;" onclick="limparMedidasTrecho('+i+')" title="Limpa todos os campos deste trecho"><i class="ti ti-eraser" style="font-size:11px;"></i> Limpar</button>';
-    th+='<div class="uss-trecho-hdr">Trecho '+l
-      +'<div style="display:flex;gap:5px;">'+copiarBtn+limparBtn+remBtn+'</div>'
-      +'</div>'
-      +'<div class="uss-grid" id="uss-grid-'+i+'">'+buildUssGrid(vals,i)+'</div>';
+    th+='<div class="uss-trecho-hdr">Trecho '+l+' '+remBtn+'</div>'
+      +'<div class="uss-grid">'+buildUssGrid(vals,i)+'</div>';
   });
   const addBtn=trechos.length<8?'<button type="button" class="btn-sec" style="margin-top:10px;" onclick="adicionarTrechoUss()"><i class="ti ti-plus"></i> Adicionar Trecho '+(LETRAS[trechos.length]||'')+'</button>':'';
   return '<div class="uss-sec-wrap">'
@@ -3826,26 +2016,6 @@ function buildUssSecao(ficha){
     +'<div class="uss-sec-body" id="uss-sec-body">'+th+addBtn+'</div>'
     +'</div>';
 }
-
-function limparMedidasTrecho(i){
-  for(let j=0;j<21;j++){
-    const inp=document.getElementById('fc-uss-'+i+'-'+j);
-    if(inp)inp.value='';
-  }
-}
-
-function copiarUltimasMedidas(i){
-  // Pega os valores do uss_hist (exibidos no uss-prev abaixo de cada célula)
-  const ficha=DB.fichas[ativoSel];
-  const hist=ficha.trechos[i]?.uss_hist||ficha.trechos[i]?.uss||[];
-  let copiou=false;
-  for(let j=0;j<21;j++){
-    const inp=document.getElementById('fc-uss-'+i+'-'+j);
-    const v=hist[j]||'';
-    if(inp&&v){inp.value=v;copiou=true;}
-  }
-  mostrarToast(copiou?'Última medição copiada para o Trecho '+(LETRAS[i]||String(i+1)):'Sem medida anterior para copiar','#1565C0');
-}
 function toggleUssSecao(){const b=document.getElementById('uss-sec-body');const btn=document.getElementById('uss-sec-btn');if(!b)return;const open=b.style.display!=='block';b.style.display=open?'block':'none';if(btn)btn.textContent=open?'−':'+';}
 function lerFichaAtual(){
   const ficha=DB.fichas[ativoSel];
@@ -3853,12 +2023,8 @@ function lerFichaAtual(){
   ficha.comprimento_total=document.getElementById('fc-comp-total')?.value||ficha.comprimento_total;
   ficha.trechos.forEach((_,i)=>{
     const t=ficha.trechos[i];
-    // Lê os valores digitados agora nos campos
-    const ussDigitado=Array(21).fill('');
-    for(let j=0;j<21;j++){ussDigitado[j]=document.getElementById(`fc-uss-${i}-${j}`)?.value||'';}
-    // Mescla: se digitou algo novo usa, senão mantém o histórico anterior
-    const ussHist=[...(t.uss_hist||t.uss||Array(21).fill(''))];
-    for(let j=0;j<21;j++){if(ussDigitado[j])ussHist[j]=ussDigitado[j];}
+    const ussAtual=[...(t.uss||Array(21).fill(''))];
+    for(let j=0;j<21;j++){const v=document.getElementById(`fc-uss-${i}-${j}`)?.value||'';if(v)ussAtual[j]=v;}
     const unicaVal=document.getElementById('fc-unica-'+i)?.value==='1';
     ficha.trechos[i]={
       l:LETRAS[i]||'',
@@ -3869,8 +2035,7 @@ function lerFichaAtual(){
       op:document.getElementById('fc-op-'+i)?.value??t.op,
       spec:document.getElementById('fc-spec-'+i)?.value??t.spec,
       unica:unicaVal,
-      uss:Array(21).fill(''),      // sempre em branco para próxima digitação
-      uss_hist:ussHist              // guarda o histórico da última medição
+      uss:ussAtual
     };
   });
   ficha.largura=document.getElementById('fc-largura')?.value||ficha.largura;
@@ -3881,15 +2046,6 @@ function lerFichaAtual(){
   ficha.cob_inf=document.getElementById('fc-cob-inf')?.value||ficha.cob_inf||'';
   ficha.material=document.getElementById('fc-material')?.value||ficha.material;
   ficha.obs=document.getElementById('fc-obs')?.value||ficha.obs;
-  // Salvar extrator de sucatas
-  const extTem=document.querySelector('input[name="fc-ext-tem"]:checked')?.value==='sim';
-  if(!ficha.extrator)ficha.extrator={};
-  ficha.extrator.temExtrator=extTem;
-  ficha.extrator.largura=document.getElementById('fc-ext-largura')?.value||'';
-  ficha.extrator.emenda=document.querySelector('input[name="fc-ext-emenda"]:checked')?.value||'';
-  ficha.extrator.dataEmenda=document.getElementById('fc-ext-data')?.value||'';
-  ficha.extrator.cantoneiras=document.getElementById('fc-ext-cant')?.value||'';
-  ficha.extrator.parafusos=document.getElementById('fc-ext-parafusos')?.value||'';
 }
 
 function adicionarTrechoUss(){lerFichaAtual();const ficha=DB.fichas[ativoSel];if(ficha.trechos.length<8)ficha.trechos.push({l:LETRAS[ficha.trechos.length]||'',de:'',ate:'',comp:'',fab:'',op:'',spec:'',unica:false,uss:Array(21).fill('')});renderFicha();setTimeout(()=>{const b=document.getElementById('uss-sec-body');const btn=document.getElementById('uss-sec-btn');if(b)b.style.display='block';if(btn)btn.textContent='−';},50);}
@@ -4027,14 +2183,9 @@ function importarBackup(input){
       if(Array.isArray(payload.DB_anotacoesGerais)) DB.anotacoesGerais=payload.DB_anotacoesGerais;
       if(Array.isArray(payload.DB_favoritos)) DB.favoritos=new Set(payload.DB_favoritos);
       if(payload.regCounter) regCounter=payload.regCounter+1;
-      // Salva direto no IndexedDB sem passar pelo localStorage
-      salvarLS().then(()=>{
-        mostrarToast('✓ Backup importado com sucesso!','#1565C0');
-        marcarSalvo(); renderLista();
-      }).catch(()=>{
-        mostrarToast('✓ Backup importado!','#1565C0');
-        marcarSalvo(); renderLista();
-      });
+      mostrarToast('✓ Backup importado! Dados restaurados.','#1565C0');
+      marcarSalvo();
+      renderLista();
     }catch(err){
       alert('Erro ao ler o backup: '+err.message);
     }
@@ -4257,6 +2408,10 @@ function _fallbackDownload(json){
 // NAVEGAÇÃO
 // ════════════════════════════════
 function voltar(){
+  // Avisa se estiver em formulário com possíveis dados não salvos
+  if(passo==='form'){
+    if(!confirm('Voltar agora vai perder os dados não salvos. Deseja continuar?'))return;
+  }
   if(passo==='menu'||passo==='anotacoes-gerais'||passo==='favoritos')renderLista();
   else renderMenu();
 }
@@ -4265,88 +2420,32 @@ function voltar(){
 
 
 // ══════════════════════════════════════
-// INDEXEDDB — ARMAZENAMENTO PRINCIPAL
-// Sem limite de tamanho, não afeta cache do Chrome
-// Fotos em tamanho original suportadas
+// LOCALSTORAGE — SALVA AUTOMATICAMENTE
 // ══════════════════════════════════════
-const IDB_NAME = 'inspecao_db';
-const IDB_VER  = 1;
-const IDB_STORE = 'dados';
-const IDB_KEY   = 'principal';
-const LS_KEY_FALLBACK = 'inspecao_v3'; // fallback para migração
+const LS_KEY = 'inspecao_v3';
 
-let _idb = null;
-
-function abrirIDB(){
-  return new Promise((resolve, reject) => {
-    if(_idb){ resolve(_idb); return; }
-    const req = indexedDB.open(IDB_NAME, IDB_VER);
-    req.onupgradeneeded = e => {
-      const db = e.target.result;
-      if(!db.objectStoreNames.contains(IDB_STORE)){
-        db.createObjectStore(IDB_STORE);
-      }
-    };
-    req.onsuccess = e => { _idb = e.target.result; resolve(_idb); };
-    req.onerror   = () => reject(req.error);
-  });
-}
-
-async function salvarLS(){
-  const payload = {
-    ativos: ATIVOS,
-    registros: DB.registros,
-    fichas: DB.fichas,
-    raspAtivos: DB.raspAtivos,
-    anotacoesGerais: DB.anotacoesGerais,
-    favoritos: [...DB.favoritos],
-    rc: regCounter
-  };
+function salvarLS(){
   try{
-    const db = await abrirIDB();
-    await new Promise((resolve, reject) => {
-      const tx = db.transaction(IDB_STORE, 'readwrite');
-      tx.objectStore(IDB_STORE).put(payload, IDB_KEY);
-      tx.oncomplete = resolve;
-      tx.onerror    = () => reject(tx.error);
-    });
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      ativos: ATIVOS,
+      registros: DB.registros,
+      fichas: DB.fichas,
+      raspAtivos: DB.raspAtivos,
+      anotacoesGerais: DB.anotacoesGerais,
+      favoritos: [...DB.favoritos],
+      rc: regCounter
+    }));
   }catch(e){
-    // IndexedDB falhou silenciosamente — não tenta localStorage
-    console.warn('IndexedDB save failed:', e?.message||e);
+    if(e.name==='QuotaExceededError')
+      mostrarToast('⚠ Armazenamento cheio!','#C62828');
   }
 }
 
-async function carregarLS(){
-  // 1. Tenta carregar do IndexedDB
+function carregarLS(){
   try{
-    const db = await abrirIDB();
-    const d = await new Promise((resolve, reject) => {
-      const tx = db.transaction(IDB_STORE, 'readonly');
-      const req = tx.objectStore(IDB_STORE).get(IDB_KEY);
-      req.onsuccess = () => resolve(req.result);
-      req.onerror   = () => reject(req.error);
-    });
-    if(d && _aplicarDados(d)) return true;
-  }catch(e){}
-
-  // 2. Fallback: migra do localStorage para o IndexedDB
-  try{
-    const raw = localStorage.getItem(LS_KEY_FALLBACK);
+    const raw = localStorage.getItem(LS_KEY);
     if(!raw) return false;
     const d = JSON.parse(raw);
-    if(_aplicarDados(d)){
-      // Migra para IndexedDB e limpa localStorage
-      await salvarLS();
-      try{ localStorage.removeItem(LS_KEY_FALLBACK); }catch{}
-      mostrarToast('✓ Dados migrados para armazenamento expandido','#2E7D32');
-      return true;
-    }
-  }catch(e){}
-  return false;
-}
-
-function _aplicarDados(d){
-  try{
     if(Array.isArray(d.ativos) && d.ativos.length){
       ATIVOS.length = 0;
       d.ativos.forEach(a=>{ ATIVOS.push(a); _initAtivo(a.id); });
@@ -4363,217 +2462,8 @@ function _aplicarDados(d){
   }catch(e){ return false; }
 }
 
-// autoBackup agora usa IndexedDB
-function autoBackup(){ salvarLS(); contarAlteracaoDrive(); }
-
-// ════════════════════════════════════════════════════════════════
-// INTEGRAÇÃO GOOGLE DRIVE — Backup 1 toque
-// ════════════════════════════════════════════════════════════════
-let _driveAlteracoes = 0;          // alterações desde última sincronização Drive
-let _driveUltimaSync = null;       // timestamp da última sincronização
-let _driveLembreteAtivo = false;   // lembrete visível?
-const DRIVE_LEMBRETE_APOS = 5;     // mostrar lembrete após X alterações
-const DRIVE_LS_KEY = 'insp_drive_ultima_sync';
-
-// Carrega última sync do localStorage
-(function(){
-  try{
-    const s=localStorage.getItem(DRIVE_LS_KEY);
-    if(s)_driveUltimaSync=parseInt(s);
-  }catch{}
-})();
-
-function contarAlteracaoDrive(){
-  _driveAlteracoes++;
-  atualizarFabDrive();
-  verificarNovidades();
-  if(_driveAlteracoes>=DRIVE_LEMBRETE_APOS&&!_driveLembreteAtivo){
-    mostrarLembreteDrive();
-  }
-}
-
-function atualizarFabDrive(){
-  const fab=document.getElementById('drive-fab');
-  const btn=document.getElementById('drive-fab-btn');
-  const status=document.getElementById('drive-fab-status');
-  if(!fab)return;
-  fab.style.display='flex';
-  if(_driveAlteracoes===0&&_driveUltimaSync){
-    btn.className='drive-fab-btn drive-fab-main sincronizado';
-    const mins=Math.round((Date.now()-_driveUltimaSync)/60000);
-    if(mins<1){
-      // "agora mesmo" — mostra por 4s e some
-      status.textContent='✓ Sincronizado!';
-      status.style.display='block';
-      clearTimeout(window._driveStatusTimer);
-      window._driveStatusTimer=setTimeout(()=>{if(status)status.style.display='none';},4000);
-    } else {
-      // Após 1+ min não mostra nada — o botão verde já indica sincronizado
-      status.style.display='none';
-    }
-  } else if(_driveAlteracoes>0){
-    btn.className='drive-fab-btn drive-fab-main pendente';
-    status.textContent=_driveAlteracoes+' não sincronizada(s)';
-    status.style.display='block';
-  } else {
-    btn.className='drive-fab-btn drive-fab-main';
-    status.style.display='none';
-  }
-}
-
-function mostrarLembreteDrive(){
-  _driveLembreteAtivo=true;
-  const sub=document.getElementById('drive-lembrete-sub');
-  if(sub)sub.textContent='Você tem '+_driveAlteracoes+' alteração(ões) não sincronizadas com o Drive.';
-  const el=document.getElementById('drive-lembrete');
-  if(el)el.style.display='block';
-}
-
-function fecharLembrete(){
-  _driveLembreteAtivo=false;
-  const el=document.getElementById('drive-lembrete');
-  if(el)el.style.display='none';
-}
-
-async function salvarNoDrive(viaLembrete){
-  fecharLembrete();
-  const btn=document.getElementById('drive-fab-btn');
-  const status=document.getElementById('drive-fab-status');
-  if(btn){btn.innerHTML='<i class="ti ti-loader" style="animation:spin 1s linear infinite;"></i> Salvando...';btn.disabled=true;}
-  if(status)status.textContent='Conectando ao Drive...';
-
-  try{
-    // Gera o JSON do backup
-    const payload=_gerarPayload();
-    const json=JSON.stringify(payload,null,2);
-    const blob=new Blob([json],{type:'application/json'});
-
-    // Nome do arquivo com data/hora
-    const agora=new Date();
-    const pad=n=>String(n).padStart(2,'0');
-    const nomeArq=`backup_inspecao_${agora.getFullYear()}${pad(agora.getMonth()+1)}${pad(agora.getDate())}_${pad(agora.getHours())}${pad(agora.getMinutes())}.json`;
-
-    // Celular: tenta compartilhar direto (abre menu com Google Drive, WhatsApp etc.)
-    const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if(isMobile && navigator.share){
-      try{
-        const file=new File([blob],nomeArq,{type:'application/json'});
-        const canShareFile=navigator.canShare&&navigator.canShare({files:[file]});
-        if(canShareFile){
-          await navigator.share({
-            title:'Backup Inspeção — '+agora.toLocaleDateString('pt-BR'),
-            text:'Backup do app de inspeção de correia',
-            files:[file]
-          });
-        } else {
-          // Share sem arquivo (link/texto)
-          const url=URL.createObjectURL(blob);
-          const a=document.createElement('a');a.href=url;a.download=nomeArq;a.click();
-          setTimeout(()=>URL.revokeObjectURL(url),1000);
-        }
-        _driveAlteracoes=0;_driveUltimaSync=Date.now();
-        try{localStorage.setItem(DRIVE_LS_KEY,String(_driveUltimaSync));}catch{}
-        atualizarFabDrive();
-        mostrarToast('✓ Arquivo pronto — escolha Google Drive para salvar','#2E7D32');
-        if(btn){btn.disabled=false;_atualizarBotaoDrive();}
-        return;
-      }catch(shareErr){
-        if(shareErr.name==='AbortError'){
-          mostrarToast('Cancelado','#6B7280');
-          if(btn){btn.disabled=false;_atualizarBotaoDrive();}
-          return;
-        }
-        // Se falhou no share, cai no download abaixo
-      }
-    }
-
-    // Desktop ou fallback: download direto do arquivo
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url;a.download=nomeArq;
-    document.body.appendChild(a);a.click();
-    setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
-    _driveAlteracoes=0;_driveUltimaSync=Date.now();
-    try{localStorage.setItem(DRIVE_LS_KEY,String(_driveUltimaSync));}catch{}
-    atualizarFabDrive();
-    mostrarToast('✓ Backup baixado — arraste para sua pasta do Drive','#1565C0');
-  }catch(e){
-    if(e.name!=='AbortError'){
-      // Último recurso: exportar via blob URL manual
-      try{
-        const url2=URL.createObjectURL(blob);
-        window.open(url2,'_blank');
-        setTimeout(()=>URL.revokeObjectURL(url2),3000);
-        mostrarToast('Backup aberto em nova aba — salve o arquivo','#1565C0');
-      }catch{
-        mostrarToast('Erro ao salvar. Use o botão ⬇ para exportar manualmente.','#C62828');
-      }
-    }
-  }finally{
-    if(btn){btn.disabled=false;_atualizarBotaoDrive();}
-  }
-}
-
-function _atualizarBotaoDrive(){
-  const btn=document.getElementById('drive-fab-btn');
-  if(!btn)return;
-  btn.innerHTML=`<svg width="18" height="16" viewBox="0 0 87.3 78" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5z" fill="#fff" opacity=".9"/>
-    <path d="M43.65 25L29.9 1.2C28.55 2 27.4 3.1 26.6 4.5L1.2 48.4A9 9 0 000 52.9h27.5z" fill="#fff" opacity=".9"/>
-    <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8l5.85 11.5z" fill="#fff" opacity=".9"/>
-    <path d="M43.65 25L57.4 1.2A9.06 9.06 0 0053.9 0H33.4c-1.3 0-2.6.35-3.75 1.1z" fill="#fff"/>
-    <path d="M59.8 52.9h27.5c0-1.55-.4-3.1-1.2-4.5L60.7 4.5c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25z" fill="#fff" opacity=".9"/>
-    <path d="M27.45 52.9l-13.7 23.8c1.35.8 2.9 1.2 4.5 1.2h51c1.6 0 3.1-.45 4.5-1.2L59.8 52.9z" fill="#fff"/>
-  </svg> Drive`;
-  atualizarFabDrive();
-}
-
-// Atualiza o status do FAB a cada minuto (para "há X min")
-setInterval(()=>{if(_driveUltimaSync&&_driveAlteracoes===0)atualizarFabDrive();},60000);
-
-// Atualiza indicador de memória a cada 30s e ao iniciar
-async function atualizarMemoriaDrive(){
-  const wrap=document.getElementById('drive-mem-wrap');
-  const pct=document.getElementById('drive-mem-pct');
-  if(!wrap)return;
-
-  try{
-    if('storage' in navigator && 'estimate' in navigator.storage){
-      const est=await navigator.storage.estimate();
-      const usado=est.usage||0;
-      const total=est.quota||0;
-      if(total===0){wrap.style.display='none';return;}
-      const perc=Math.min(Math.round((usado/total)*100),100);
-      const usadoMB=(usado/1024/1024).toFixed(0);
-      const totalMB=total>1073741824
-        ?(total/1073741824).toFixed(1)+' GB'
-        :(total/1024/1024).toFixed(0)+' MB';
-
-      // Cor da bateria por nível
-      let cor='#2E7D32';   // verde — ok
-      if(perc>=50) cor='#F9A825';  // amarelo
-      if(perc>=75) cor='#E65100';  // laranja
-      if(perc>=90) cor='#C62828';  // vermelho crítico
-
-      // Anel SVG: circunferência = 2π×12 ≈ 75.4
-      const circ=75.4;
-      const ring=document.getElementById('drive-mem-ring');
-      if(ring){
-        ring.style.strokeDashoffset=circ-(circ*perc/100);
-        ring.style.stroke=cor;
-      }
-      if(pct){pct.textContent=perc+'%';pct.style.fill=perc>=75?'#FFD54F':'#fff';}
-      wrap.title='Armazenamento: '+usadoMB+'MB de '+totalMB+' usados';
-      wrap.style.display='flex';
-    } else {
-      wrap.style.display='none';
-    }
-  }catch{wrap.style.display='none';}
-}
-
-// Atualiza memória ao carregar e a cada 30s
-atualizarMemoriaDrive();
-setInterval(atualizarMemoriaDrive, 30000);
+// Sobrescreve autoBackup para salvar no localStorage (sem download automático)
+function autoBackup(){ salvarLS(); }
 
 // Hooks de salvamento — chamados após cada operação
 const _ls_hooks = ['renderSucesso','salvarFicha','salvarEdicao','salvarEdicaoAnotacao','excluirRegistro','excluirAnotacaoGeralModal','mudaStatus','mudaStatusDefeito','toggleFavorito','novoAtivo','editarAtivo','excluirAtivo','salvarAnotacaoGeral'];
@@ -4587,32 +2477,23 @@ window.marcarMudanca = function(){
 // Também garante que marcarMudanca global aponta para a nova versão
 // (necessário pois funções já declaradas referenciam o nome global)
 
-// Registra Service Worker (PWA)
+// Carrega dados salvos
+const _lsOk = carregarLS();
+
+// Service Worker
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('./sw.js')
-      .then(()=>console.log('SW registrado'))
-      .catch(()=>{});
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
   });
 }
 
-// Carrega dados salvos (async — IndexedDB) e inicia o app
-(async function iniciarApp(){
-  renderLista(); // mostra tela inicial imediatamente (sem dados)
-  const ok = await carregarLS();
-  if(ok){
-    renderLista(); // re-renderiza com os dados carregados
-    mostrarToast('✓ Dados carregados!','#2E7D32');
-  }
-  marcarSalvo();
-  // Migração: avisa se veio do localStorage
-  if(ok && !localStorage.getItem('inspecao_v3')){
-    // dados já estavam no IDB, tudo normal
-  }
-})();
+// Re-renderiza com dados carregados
+renderLista();
+if(_lsOk) mostrarToast('✓ Dados restaurados!','#2E7D32');
+marcarSalvo();
 
-// Salva a cada 2 minutos como segurança extra (IndexedDB — sem risco de quota)
-setInterval(()=>salvarLS().catch(()=>{}), 120000);
+// Salva a cada 5 segundos como segurança extra
+setInterval(salvarLS, 5000);
 
 </script>
 </body>
