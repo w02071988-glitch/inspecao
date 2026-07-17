@@ -2409,6 +2409,10 @@ function buildRegCard(r,isHist){
       </div>`;
     }
     if(r.fotos&&r.fotos.length) extras+=buildGaleriaDisplay(r.fotos,'rr-'+r.id);
+    extras+=buildTimelineRegistro(v.atualizacoes,r.id,isHist,'rasp');
+    if(!isHist){
+      extras+=`<div style="margin-top:8px;"><button class="btn-atualizar" onclick="abrirAtualizarRegistro('${r.id}')"><i class="ti ti-pencil-plus"></i> Registrar atualização</button></div>`;
+    }
   }
   else if(r.tipo==='rasp'){
     // registros antigos agrupados (legado)
@@ -2432,7 +2436,10 @@ function buildRegCard(r,isHist){
       ${r.campos.tipo?`<span class="pill pill-neu">${r.campos.tipo}</span>`:''}
       ${r.campos.crit?`<span class="pill pill-vn">${r.campos.crit}</span>`:''}
       ${r.campos.bal?`<span class="pill pill-neu">📍 ${r.campos.bal}</span>`:''}
-    </div>`+buildStatusBtns(r,isHist);
+    </div>`
+    +buildTimelineRegistro(r.campos.atualizacoes,r.id,isHist,'interf')
+    +(!isHist&&!r._encerrado?`<div style="margin-top:8px;"><button class="btn-atualizar" onclick="abrirAtualizarRegistro('${r.id}')"><i class="ti ti-pencil-plus"></i> Registrar atualização</button></div>`:'')
+    +buildStatusBtns(r,isHist);
   }
   else if(r.tipo==='desal'||r.tipo==='ext-desal'){
     extras=`<div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
@@ -2440,7 +2447,10 @@ function buildRegCard(r,isHist){
       <span class="pill ${stCls[r.campos.status]||''}">${stMap[r.campos.status]||''}</span>
       ${r.campos.crit?`<span class="pill pill-vn">${r.campos.crit}</span>`:''}
       ${r.campos.local?`<span class="pill pill-neu">📍 ${r.campos.local}</span>`:''}
-    </div>`+buildStatusBtns(r,isHist);
+    </div>`
+    +buildTimelineRegistro(r.campos.atualizacoes,r.id,isHist,'desal')
+    +(!isHist&&!r._encerrado?`<div style="margin-top:8px;"><button class="btn-atualizar" onclick="abrirAtualizarRegistro('${r.id}')"><i class="ti ti-pencil-plus"></i> Registrar atualização</button></div>`:'')
+    +buildStatusBtns(r,isHist);
   }
   else if(r.tipo==='contra'&&r.campos.pos){
     extras=`<div style="margin-top:5px;font-size:12px;color:#6B7280;">Posição: ${r.campos.pos}</div>`;
@@ -3028,6 +3038,209 @@ function salvarAtualizacaoDefeito(){
 }
 
 // ════════════════════════════════════════════════════════════════
+// ATUALIZAÇÃO DE REGISTROS (Interferências / Desalinhamento / Raspadores)
+// Permite, ao reinspecionar um ativo e encontrar uma situação que já está
+// no relatório, inserir uma nova entrada que fica mesclada no mesmo card
+// (linha do tempo), em vez de criar um registro novo separado.
+// ════════════════════════════════════════════════════════════════
+function _tipoGrupoRegistro(tipo){
+  if(!tipo)return null;
+  if(tipo.startsWith('rasp-'))return'rasp';
+  if(tipo==='interf'||tipo==='ext-interf')return'interf';
+  if(tipo==='desal'||tipo==='ext-desal')return'desal';
+  return null;
+}
+
+function buildTimelineRegistro(atualizacoes,regId,isHist,grp){
+  if(!atualizacoes||!atualizacoes.length)return'';
+  let h='<div class="def-timeline">';
+  atualizacoes.forEach((u,ui)=>{
+    const stDot=grp==='rasp'?'dot-new':({em:'dot-em',ac:'dot-ac',co:'dot-co'}[u.status]||'dot-new');
+    const stLabel=grp==='rasp'?'':(stMap[u.status]||'');
+    h+=`<div class="def-tl-item">
+      <div class="def-tl-dot ${stDot}"></div>
+      <div class="def-tl-meta"><i class="ti ti-calendar" style="font-size:10px;"></i>${fmtData(u.data)}${stLabel?' — <span style="font-weight:600;">'+stLabel+'</span>':''}</div>
+      <div class="def-tl-body">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">
+          <div style="flex:1;">
+            <div class="def-tl-tags">
+              ${grp==='rasp'&&u.pct?`<span class="pill pill-neu" style="font-size:10px;">${u.pct}% desgaste</span>`:''}
+              ${u.crit?`<span class="pill pill-vn" style="font-size:10px;">${u.crit}</span>`:''}
+            </div>
+            ${u.desc&&u.desc!=='Sem relato'?`<div>${u.desc}</div>`:'<span style="color:#9CA3AF;font-style:italic;font-size:11px;">Sem relato</span>'}
+            ${u.fotos&&u.fotos.length?buildGaleriaDisplay(u.fotos,'atureg-'+regId+'-'+ui):''}
+          </div>
+          ${!isHist?`<div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0;">
+            <button class="btn-sm btn-sm-sec" style="font-size:10px;padding:3px 6px;" onclick="editarAtualizacaoRegistro('${regId}',${ui})"><i class="ti ti-edit" style="font-size:10px;"></i></button>
+            <button class="btn-sm btn-sm-danger" style="font-size:10px;padding:3px 6px;" onclick="excluirAtualizacaoRegistro('${regId}',${ui})"><i class="ti ti-trash" style="font-size:10px;"></i></button>
+          </div>`:''}
+        </div>
+      </div>
+    </div>`;
+  });
+  h+='</div>';
+  return h;
+}
+
+function _htmlModalAtualizacaoRegistro(grp,ns,onSalvar,titulo,dataVal,prefill){
+  prefill=prefill||{};
+  const ds=prefill.status||'ac';
+  const dc=prefill.crit||'';
+  const dp=prefill.pct!==undefined?prefill.pct:'';
+  const dd=prefill.desc||'';
+  const ddata=dataVal||dataHojeISO();
+  let camposEspecificos='';
+  if(grp==='rasp'){
+    camposEspecificos=`
+    <div class="form-grupo"><label>% Desgaste</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#C62828;" onclick="document.getElementById('upd2-pct').value=15;">🔴 0–30%</button>
+        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#E65100;" onclick="document.getElementById('upd2-pct').value=40;">🟠 31–50%</button>
+        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#F9A825;" onclick="document.getElementById('upd2-pct').value=63;">🟡 51–75%</button>
+        <button type="button" class="btn-opcao" style="font-size:11px;padding:5px 8px;border-color:#2E7D32;" onclick="document.getElementById('upd2-pct').value=88;">🟢 76–100%</button>
+      </div>
+      <input type="number" id="upd2-pct" min="0" max="100" value="${dp}" placeholder="Ou digitar %" style="width:140px;font-size:13px;padding:7px 10px;border:1px solid #D1D5DB;border-radius:8px;">
+    </div>
+    <div class="form-grupo"><label>Criticidade</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="btn-opcao btn-opcao-verde ${dc==='Baixo'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd2-crit','Baixo',this)">Baixo</button>
+        <button type="button" class="btn-opcao btn-opcao-amarelo ${dc==='Médio'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd2-crit','Médio',this)">Médio</button>
+        <button type="button" class="btn-opcao btn-opcao-vermelho ${dc==='Alto'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd2-crit','Alto',this)">Alto</button>
+      </div>
+      <input type="hidden" id="upd2-crit" value="${dc}">
+    </div>`;
+  } else {
+    camposEspecificos=`
+    <div class="form-grupo"><label>Status</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="btn-opcao btn-opcao-azul ${ds==='ac'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd2-status','ac',this)">Acompanhando</button>
+        <button type="button" class="btn-opcao btn-opcao-verde ${ds==='co'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd2-status','co',this)">Concluído</button>
+      </div>
+      <input type="hidden" id="upd2-status" value="${ds}">
+    </div>
+    <div class="form-grupo"><label>Criticidade</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="btn-opcao btn-opcao-verde ${dc==='Baixo'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd2-crit','Baixo',this)">Baixo</button>
+        <button type="button" class="btn-opcao btn-opcao-amarelo ${dc==='Médio'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd2-crit','Médio',this)">Médio</button>
+        <button type="button" class="btn-opcao btn-opcao-vermelho ${dc==='Alto'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('upd2-crit','Alto',this)">Alto</button>
+      </div>
+      <input type="hidden" id="upd2-crit" value="${dc}">
+    </div>`;
+  }
+  return `<div class="upd-modal-box">
+    <div class="upd-modal-titulo">
+      <span><i class="ti ti-pencil-plus" style="color:#2E75B6;"></i> ${titulo}</span>
+      <button onclick="fecharModalUpd()" style="background:none;border:none;font-size:20px;color:#6B7280;cursor:pointer;">✕</button>
+    </div>
+    <div class="form-grupo"><label>Data</label><input type="date" id="upd2-data" value="${ddata}"></div>
+    ${camposEspecificos}
+    ${buildMsgsRapidas('upd2-desc','upd')}
+    <div class="form-grupo"><label>Descrição da atualização</label>
+      <textarea id="upd2-desc" rows="3" style="width:100%;font-size:13px;padding:8px;border:1px solid #D1D5DB;border-radius:8px;resize:vertical;" placeholder="A situação continua a mesma? O que mudou?">${dd}</textarea>
+    </div>
+    ${buildGaleriaField(ns)}
+    <button class="btn-prim" onclick="${onSalvar}" style="margin-top:4px;"><i class="ti ti-device-floppy"></i> Salvar atualização</button>
+    <button class="btn-sec" onclick="fecharModalUpd()" style="margin-top:8px;">Cancelar</button>
+  </div>`;
+}
+
+function abrirAtualizarRegistro(regId){
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  if(!r)return;
+  const grp=_tipoGrupoRegistro(r.tipo);
+  if(!grp)return;
+  _updRegId=regId; _updDefIdx=null;
+  const ns='upd-reg-'+regId;
+  galFotos[ns]=[];
+  const modal=document.createElement('div');
+  modal.id='modal-upd';
+  modal.className='upd-modal';
+  modal.innerHTML=_htmlModalAtualizacaoRegistro(grp,ns,'salvarAtualizacaoRegistro()','Registrar Atualização','',{});
+  document.body.appendChild(modal);
+  setTimeout(()=>renderGaleriaGrid(ns),50);
+}
+
+function salvarAtualizacaoRegistro(){
+  if(_updRegId===null)return;
+  const r=DB.registros[ativoSel].find(x=>x.id===_updRegId);
+  if(!r)return;
+  const grp=_tipoGrupoRegistro(r.tipo);
+  if(!grp)return;
+  const ns='upd-reg-'+_updRegId;
+  const data=document.getElementById('upd2-data')?.value||dataHojeISO();
+  const crit=document.getElementById('upd2-crit')?.value||'';
+  const desc=(document.getElementById('upd2-desc')?.value||'').trim()||'Sem relato';
+  const fotos=getGalFotos(ns);
+  const entry={data,desc,fotos,crit};
+  if(!r.campos)r.campos={};
+  if(grp==='rasp'){
+    const pct=document.getElementById('upd2-pct')?.value||'';
+    entry.pct=pct;
+    if(pct)r.campos.pct=pct;
+    if(crit)r.campos.crit=crit;
+  } else {
+    const status=document.getElementById('upd2-status')?.value||'ac';
+    entry.status=status;
+    r.campos.status=status;
+    if(crit)r.campos.crit=crit;
+  }
+  if(!r.campos.atualizacoes)r.campos.atualizacoes=[];
+  r.campos.atualizacoes.push(entry);
+  marcarMudanca();autoBackup();
+  fecharModalUpd();
+  mostrarToast('✓ Atualização registrada na linha do tempo','#2E7D32');
+  renderRelatorio();
+}
+
+function editarAtualizacaoRegistro(regId,idx){
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  const u=r?.campos?.atualizacoes?.[idx];
+  if(!u)return;
+  const grp=_tipoGrupoRegistro(r.tipo);
+  if(!grp)return;
+  const ns='upd-reg-'+regId+'-edit';
+  galFotos[ns]=[...(u.fotos||[])];
+  const modal=document.createElement('div');
+  modal.id='modal-upd';
+  modal.className='upd-modal';
+  modal.innerHTML=_htmlModalAtualizacaoRegistro(grp,ns,`salvarEdicaoAtualizacaoRegistro('${regId}',${idx},'${ns}')`,'Editar Atualização',u.data,{status:u.status,crit:u.crit,pct:u.pct,desc:u.desc&&u.desc!=='Sem relato'?u.desc:''});
+  document.body.appendChild(modal);
+  setTimeout(()=>renderGaleriaGrid(ns),50);
+}
+
+function salvarEdicaoAtualizacaoRegistro(regId,idx,ns){
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  const u=r?.campos?.atualizacoes?.[idx];
+  if(!u)return;
+  const grp=_tipoGrupoRegistro(r.tipo);
+  u.data=document.getElementById('upd2-data')?.value||u.data;
+  u.crit=document.getElementById('upd2-crit')?.value||'';
+  u.desc=(document.getElementById('upd2-desc')?.value||'').trim()||'Sem relato';
+  u.fotos=getGalFotos(ns);
+  if(grp==='rasp'){
+    u.pct=document.getElementById('upd2-pct')?.value||'';
+    if(u.pct)r.campos.pct=u.pct;
+    if(u.crit)r.campos.crit=u.crit;
+  } else {
+    u.status=document.getElementById('upd2-status')?.value||'ac';
+    r.campos.status=u.status;
+    if(u.crit)r.campos.crit=u.crit;
+  }
+  marcarMudanca();autoBackup();
+  fecharModalUpd();
+  mostrarToast('✓ Atualização editada','#2E7D32');
+  renderRelatorio();
+}
+
+function excluirAtualizacaoRegistro(regId,idx){
+  if(!confirm('Excluir esta entrada da linha do tempo?'))return;
+  const r=DB.registros[ativoSel].find(x=>x.id===regId);
+  if(!r?.campos?.atualizacoes)return;
+  r.campos.atualizacoes.splice(idx,1);
+  marcarMudanca();autoBackup();renderRelatorio();
+}
+
+// ════════════════════════════════════════════════════════════════
 // MESCLAR DEFEITOS
 // ════════════════════════════════════════════════════════════════
 let _mesclarSel=[];  // [{regId, defIdx}]
@@ -3315,9 +3528,9 @@ function salvarEdicao(){
 // ════════════════════════════════════════════════════════════════
 // SISTEMA DE NOVIDADES
 // ════════════════════════════════════════════════════════════════
-const APP_VERSION='v0.2';
+const APP_VERSION='v0.3';
 // Só a novidade mais recente desta versão
-const APP_CHANGELOG=['Raspadores: botão para copiar % e fotos da última inspeção. Anotações: histórico por ativo. Corrigido zoom de fotos no relatório. Novo aviso ao tentar sair com dados não salvos.'];
+const APP_CHANGELOG=['Novo: botão "Registrar atualização" em Interferências, Desalinhamento e Raspadores — ao reinspecionar uma condição já existente, insira a nova informação direto no mesmo relato (linha do tempo), sem criar registro duplicado.','Raspadores: botão para copiar % e fotos da última inspeção. Anotações: histórico por ativo. Corrigido zoom de fotos no relatório. Novo aviso ao tentar sair com dados não salvos.'];
 // Cores do badge alternando a cada versão
 // Paleta de cores que repete infinitamente
 const _CORES_PALETA=[
