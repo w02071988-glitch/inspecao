@@ -1,9 +1,9 @@
 // ══════════════════════════════════════════════════
 // Service Worker — Inspeção de Correia PWA
-// Versão: 0.2
+// Versão: 0.3
 // ══════════════════════════════════════════════════
 
-const CACHE_NAME = 'inspecao-v4'; // atualizado para forçar refresh (v0.2)
+const CACHE_NAME = 'inspecao-v5'; // atualizado para forçar refresh (v0.3 — atualização de registros)
 
 // Arquivos que ficam disponíveis offline
 const ARQUIVOS_CACHE = [
