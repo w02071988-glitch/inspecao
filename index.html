@@ -84,6 +84,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .fav-card i{font-size:26px;color:#BDD9F8;}
 .fav-card .ag-titulo{font-size:14px;font-weight:700;color:#fff;}
 .fav-card .ag-sub{font-size:11px;color:#BDD9F8;margin-top:1px;}
+.cat-card{background:#374151;border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.cat-card:active{opacity:.88;}
+.cat-card i{font-size:26px;color:#BDD9F8;}
+.cat-card .ag-titulo{font-size:14px;font-weight:700;color:#fff;}
+.cat-card .ag-sub{font-size:11px;color:#BDD9F8;margin-top:1px;}
+.catalogo-lista{display:flex;flex-direction:column;gap:1px;background:#E5E8ED;border-radius:10px;overflow:hidden;border:1px solid #E5E8ED;}
+.catalogo-item{background:#fff;padding:12px 14px;display:flex;align-items:center;gap:6px;position:relative;}
+.catalogo-item-nome{font-size:14px;font-weight:600;color:#1F3864;cursor:pointer;flex:1;}
+.catalogo-item-mais{background:#F3F4F6;border:none;color:#6B7280;width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:15px;flex-shrink:0;}
 /* ATIVO CARD 3 PONTOS */
 .ativo-card-wrap{position:relative;}
 .ativo-card-dots{position:absolute;top:6px;right:6px;background:none;border:none;font-size:18px;color:#C4C9D4;cursor:pointer;padding:2px 4px;border-radius:5px;z-index:2;line-height:1;}
@@ -107,6 +116,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* MENU DO ATIVO */
 .ativo-banner{background:#fff;border:1px solid #E5E8ED;border-radius:12px;padding:12px 14px;margin-bottom:13px;display:flex;align-items:center;gap:12px;}
 .ativo-banner i{font-size:22px;color:#2E75B6;}
+.banner-icon-btn{background:#F3F4F6;border:1px solid #E5E8ED;color:#6B7280;width:28px;height:28px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;padding:0;}
+.banner-icon-btn:active{background:#E5E8ED;}
+.banner-icon-btn i{font-size:13px;color:#6B7280;}
 .ab-id{font-size:15px;font-weight:700;color:#1F3864;}
 .ab-nome{font-size:12px;color:#6B7280;margin-top:1px;}
 .card-btn{background:#fff;border:1px solid #E5E8ED;border-radius:12px;padding:13px 8px;text-align:center;cursor:pointer;}
@@ -327,6 +339,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .topbar-actions{display:flex;gap:4px;margin-left:6px;}
 .topbar-icon-btn{background:rgba(255,255,255,.18);border:none;color:#fff;width:32px;height:32px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
 .topbar-icon-btn:active{background:rgba(255,255,255,.35);}
+.topbar-layout-thumb{width:34px;height:34px;border-radius:8px;border:1.5px dashed rgba(255,255,255,.5);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;overflow:hidden;padding:0;color:#fff;font-size:15px;}
+.topbar-layout-thumb.tem-foto{border-style:solid;border-color:rgba(255,255,255,.4);}
+.topbar-layout-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
 /* PRINT */
 @media print{
   .topbar,.step-bar,.step-labels,.btn-prim,.btn-sec,.btn-danger,.btn-sm,
@@ -376,6 +391,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <h1 id="topbar-titulo">Inspeção de Correia</h1>
     <p id="topbar-sub"></p>
   </div>
+  <button class="topbar-layout-thumb" id="topbar-layout-thumb" style="display:none;" onclick="onClickLayoutThumb()" title="Layout do ativo">
+    <i class="ti ti-photo-plus" id="topbar-layout-icon"></i>
+  </button>
+  <input type="file" id="layout-foto-input" accept="image/*" style="display:none" onchange="onLayoutFotoSelecionada(this)">
+  <input type="file" id="import-ativo-input" accept=".json,.zip" style="display:none" onchange="onArquivoAtivoSelecionado(this)">
   <button class="topbar-home" id="btn-home" onclick="renderLista()" title="Ir para início" style="display:none;">
     <i class="ti ti-home"></i><span>Início</span>
   </button>
@@ -516,7 +536,7 @@ const LETRAS=['A','B','C','D','E','F','G','H'];
 const POR_PAGINA=20;
 
 // DB principal
-const DB={registros:{},fichas:{},raspAtivos:{},anotacoesGerais:[],favoritos:new Set(),ativos:null};
+const DB={registros:{},fichas:{},raspAtivos:{},anotacoesGerais:[],favoritos:new Set(),ativos:null,layoutFotos:{},rotaOverrides:{}};
 // DB.ativos será sincronizado com ATIVOS
 ATIVOS.forEach(a=>_initAtivo(a.id));
 
@@ -651,7 +671,17 @@ function svgAtivo(t){
   return _SVG_ATIVOS[t]||_SVG_ATIVOS['Transportador'];
 }
 function newId(){return 'r'+(regCounter++);}
-function ultimaAlteracao(id){const r=DB.registros[id];if(!r.length)return null;return r.map(x=>x.data).sort().reverse()[0];}
+function _datasRegistro(r){
+  const datas=[r.data];
+  if(r.campos?.atualizacoes)datas.push(...r.campos.atualizacoes.map(u=>u.data));
+  if(r.campos?.defeitos)r.campos.defeitos.forEach(d=>{if(d.atualizacoes)datas.push(...d.atualizacoes.map(u=>u.data));});
+  return datas.filter(Boolean);
+}
+function dataMaisRecenteRegistro(r){
+  const datas=_datasRegistro(r);
+  return datas.length?datas.sort().reverse()[0]:r.data;
+}
+function ultimaAlteracao(id){const r=DB.registros[id];if(!r.length)return null;let datas=[];r.forEach(reg=>datas.push(..._datasRegistro(reg)));return datas.length?datas.sort().reverse()[0]:null;}
 function pillUltima(id){
   const ult=ultimaAlteracao(id);
   if(!ult)return{cls:'pill-neu',txt:'—'};
@@ -682,6 +712,83 @@ function setTopbar(titulo,sub,back,showPrint){
   if(btnP)btnP.style.display=showPrint?'flex':'none';
   const btnS=document.getElementById('btn-share-pdf');
   if(btnS)btnS.style.display=showPrint?'flex':'none';
+  atualizarTopbarLayoutThumb();
+}
+
+// ── Foto de Layout do ativo (uma por ativo, disponível em todas as seções) ──
+function atualizarTopbarLayoutThumb(){
+  const btn=document.getElementById('topbar-layout-thumb');
+  if(!btn)return;
+  if(!ativoSel){btn.style.display='none';return;}
+  btn.style.display='flex';
+  const foto=DB.layoutFotos[ativoSel];
+  if(foto){
+    btn.classList.add('tem-foto');
+    btn.innerHTML=`<img src="${foto}" alt="Layout">`;
+    btn.title='Ver layout do ativo';
+  } else {
+    btn.classList.remove('tem-foto');
+    btn.innerHTML=`<i class="ti ti-photo-plus" id="topbar-layout-icon"></i>`;
+    btn.title='Adicionar imagem de layout do ativo';
+  }
+}
+
+function onClickLayoutThumb(){
+  if(!ativoSel)return;
+  const foto=DB.layoutFotos[ativoSel];
+  if(foto){
+    abrirLightboxLayout();
+  } else {
+    document.getElementById('layout-foto-input').click();
+  }
+}
+
+function onLayoutFotoSelecionada(input){
+  const file=input.files[0];
+  if(!file||!ativoSel){input.value='';return;}
+  _redimensionarFoto(file, b64=>{
+    DB.layoutFotos[ativoSel]=b64;
+    marcarMudanca();autoBackup();
+    atualizarTopbarLayoutThumb();
+    fecharLightbox();
+    mostrarToast('✓ Imagem de layout salva','#2E7D32');
+  });
+  input.value='';
+}
+
+function abrirLightboxLayout(){
+  const foto=DB.layoutFotos[ativoSel];
+  if(!foto)return;
+  const uid='layout_'+ativoSel;
+  window['_lb_'+uid]=[foto];
+  lbOpenSaved(uid,0);
+  setTimeout(()=>{
+    const box=document.getElementById('lightbox');
+    if(!box)return;
+    let barra=document.getElementById('lb-layout-acoes');
+    if(!barra){
+      barra=document.createElement('div');
+      barra.id='lb-layout-acoes';
+      barra.style.cssText='position:absolute;bottom:18px;left:0;right:0;display:flex;justify-content:center;gap:10px;z-index:2;';
+      barra.onclick=e=>e.stopPropagation();
+      box.appendChild(barra);
+    }
+    barra.innerHTML=`
+      <button class="btn-sm" style="background:#EBF3FF;color:#1F3864;padding:7px 14px;" onclick="document.getElementById('layout-foto-input').click()"><i class="ti ti-replace"></i> Trocar</button>
+      <button class="btn-sm" style="background:#FFEBEE;color:#C62828;padding:7px 14px;" onclick="removerLayoutFoto()"><i class="ti ti-trash"></i> Remover</button>
+    `;
+  },50);
+}
+
+function removerLayoutFoto(){
+  if(!ativoSel)return;
+  if(!confirm('Remover a imagem de layout deste ativo?'))return;
+  delete DB.layoutFotos[ativoSel];
+  marcarMudanca();autoBackup();
+  atualizarTopbarLayoutThumb();
+  const barra=document.getElementById('lb-layout-acoes');
+  if(barra)barra.remove();
+  fecharLightbox();
 }
 function setStepBar(show,step){
   document.getElementById('step-bar-wrap').style.display=show?'block':'none';
@@ -700,6 +807,7 @@ function setStepBar(show,step){
 function renderLista(){
   _formSujo=false;
   passo='lista';
+  ativoSel=null;
   const dataFormatada=hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'});
   setTopbar('Inspeção de Correia — Washington Sales',dataFormatada,false,false);
   // Injeta badge v0.1 na frente da data
@@ -714,20 +822,25 @@ function renderLista(){
   setStepBar(true,1);
   const favCount=DB.favoritos.size;
   let h=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-      <div class="anotacoes-gerais-card" style="margin-bottom:0;" onclick="renderAnotacoesGerais()">
-        <i class="ti ti-notebook" style="font-size:22px;"></i>
-        <div><div class="ag-titulo" style="font-size:13px;">Anotações Gerais</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div class="anotacoes-gerais-card" style="margin-bottom:0;flex-direction:column;align-items:flex-start;gap:6px;padding:12px 10px;" onclick="renderAnotacoesGerais()">
+        <i class="ti ti-notebook" style="font-size:20px;"></i>
+        <div><div class="ag-titulo" style="font-size:12px;">Anotações Gerais</div>
         <div class="ag-sub">${DB.anotacoesGerais.length} anotação(ões)</div></div>
       </div>
-      <div class="fav-card" style="margin-bottom:0;" onclick="renderFavoritos()">
-        <i class="ti ti-star" style="font-size:22px;"></i>
-        <div><div class="ag-titulo" style="font-size:13px;">Favoritos</div>
+      <div class="cat-card" style="margin-bottom:0;flex-direction:column;align-items:flex-start;gap:6px;padding:12px 10px;" onclick="renderCatalogoAtivos()">
+        <i class="ti ti-list" style="font-size:20px;"></i>
+        <div><div class="ag-titulo" style="font-size:12px;">Ativos</div>
+        <div class="ag-sub">Lista completa</div></div>
+      </div>
+      <div class="fav-card" style="margin-bottom:0;flex-direction:column;align-items:flex-start;gap:6px;padding:12px 10px;" onclick="renderFavoritos()">
+        <i class="ti ti-star" style="font-size:20px;"></i>
+        <div><div class="ag-titulo" style="font-size:12px;">Favoritos</div>
         <div class="ag-sub">${favCount} ativo(s)</div></div>
       </div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <span class="bloco-titulo" style="margin-bottom:0;">Ativos (${ATIVOS.length}/50)</span>
+      <span class="bloco-titulo" style="margin-bottom:0;">Ativos selecionados (${ATIVOS.length}/50)</span>
       <div style="display:flex;gap:6px;align-items:center;">
         <div style="display:flex;border:1px solid #E5E8ED;border-radius:8px;overflow:hidden;">
           <button id="btn-layout-2" class="layout-toggle-btn${_layoutAtivos===2?' ativo':''}" onclick="setLayoutAtivos(2)" title="2 por linha">
@@ -844,7 +957,9 @@ function editarAtivo(id){
   DB.registros[novoNome]=DB.registros[id]||[];
   DB.fichas[novoNome]=DB.fichas[id]||{};
   DB.raspAtivos[novoNome]=DB.raspAtivos[id]||{prim:true,p2:false,s1:false,s2:false,s3:false,s4:false,s5:false};
-  delete DB.registros[id];delete DB.fichas[id];delete DB.raspAtivos[id];
+  if(DB.layoutFotos[id])DB.layoutFotos[novoNome]=DB.layoutFotos[id];
+  if(DB.rotaOverrides[id])DB.rotaOverrides[novoNome]=DB.rotaOverrides[id];
+  delete DB.registros[id];delete DB.fichas[id];delete DB.raspAtivos[id];delete DB.layoutFotos[id];delete DB.rotaOverrides[id];
   if(DB.favoritos.has(id)){DB.favoritos.delete(id);DB.favoritos.add(novoNome);}
   if(ativoSel===id)ativoSel=novoNome;
   a.id=novoNome;
@@ -857,7 +972,7 @@ function excluirAtivo(id){
   fecharMenusAtivo();
   if(!confirm('Excluir '+id+'?\nTodos os dados serão apagados.'))return;
   ATIVOS.splice(ATIVOS.findIndex(a=>a.id===id),1);
-  delete DB.registros[id];delete DB.fichas[id];delete DB.raspAtivos[id];
+  delete DB.registros[id];delete DB.fichas[id];delete DB.raspAtivos[id];delete DB.layoutFotos[id];delete DB.rotaOverrides[id];
   DB.favoritos.delete(id);
   if(ativoSel===id)ativoSel=null;
   marcarMudanca();autoBackup();
@@ -870,6 +985,685 @@ function toggleFavorito(id){
   marcarMudanca();autoBackup();
   renderLista();
 }
+// ════════════════════════════════
+// CATÁLOGO COMPLETO DE ATIVOS
+// Lista de todos os equipamentos existentes na planta, além dos que já
+// estão "selecionados" (visíveis como blocos na tela principal). Permite
+// favoritar ou inserir na tela principal qualquer um deles, ou entrar
+// diretamente nas opções de inspeção de um ativo ainda não selecionado.
+// ════════════════════════════════
+const CATALOGO_RAW=['TRF01','1PA0TC','3PA1TC','3PP8TC','3PP9TC','5PA1TC','5PA2TC','5PA3TC','6PP10TC','6PP16TC','6PP17TC','AM01','AM02','AM03','AM04','CN02A','TRA01','TRA02','TRA02A','TRA02B','TRA03C','TRA03D','TRA03E','TRA03F','TRA04A','TRB01','TRB03A','TRB03B','TRB03C','TRB03G','TRC01','TRC02A','TRC03C','TRC03D','TRC03E','TRC03F','TRC04A','TRC05','TRC05A','TRC06','TRD01','TRD04','TRD05','TRD08','TRD10','TRF03','TRF04','TRF05','TRF06','TRF07','TRF08','TRG01','TRG02','TRG03','TRG04','TRG05','TRH01','TRH02','TRH07','TRH14','TRH15','TRH16','TRH17','TRH18','TRH19','TRH21','TRH22','TRH23','TRH24','TRH26','TRH27','TRH28','TRH29','TRH30','TRH31','TRH32','TRH32A','TRH34','TRH35','TRH35A','TRH36','TRH37','TRH37A','TRN02','TRN03','TRN04','TRN05','TRN06',
+'1PA2AEF','3PP7RP','5PA4EF','6PP10TC','6PP8RP','6PP9TC','CN01A','EE01','EE02','EP01','EP02','EP03','EP09','EP10','ER01','ER02','ER03','RC01','RC02A','RC03','RC04','RC05','RCP09','TRA03C','TRB06','TRC03C','TRD03','TRD06','TRD07','TRD09','TRD11','TRF02','TRH14','TRH20','TRH24','TRH38A','TRN01','TRT12'];
+
+// Mapa Ativo → [Rota Agrupada, Embarque/Descarregamento], conforme planilha da planta
+const ROTA_ATIVOS={"CN03":["P02","EMB"],"CN04":["P02","EMB"],"TRD15":["P02","EMB"],"TRD13":["P02","EMB"],"TRD12":["P02","EMB"],"TRD11":["P02","EMB"],"TRH24":["P02","EMB"],"AM03":["P02","EMB"],"CN01A":["P01","EMB"],"TRA04A":["P01","EMB"],"AM01":["P01","EMB"],"CN02A":["P01","EMB"],"TRC04A":["P01","EMB"],"AM02":["P01","EMB"],"TRA03F":["P01","EMB"],"TRA03E":["P01","EMB"],"TRA03D":["P01","EMB"],"TRA03C":["P01","EMB"],"TRC03F":["P01","EMB"],"TRC03E":["P01","EMB"],"TRC03D":["P01","EMB"],"TRC03C":["P01","EMB"],"TRD03":["TRD03","EMB"],"TRD06":["TRD06","EMB"],"TRD07":["TRD07","EMB"],"TRD09":["TRD09","EMB"],"RCP09":["RCP09","EMB"],"TRH38A":["US8P","EMB"],"TRH37":["US8P","EMB"],"TRH37A":["US8P","EMB"],"TRH36":["US8P","EMB"],"TRH35A":["US8P","EMB"],"TRH35":["US8P","EMB"],"TRH34":["US8P","EMB"],"TRH32":["US8P","EMB"],"TRH32A":["US8P","EMB"],"TRH31":["US8P","EMB"],"TRH29":["US8P","EMB"],"6PP8RP":["RCP08","EMB"],"6PP9TC":["6PP9TC","EMB"],"6PP10TC":["6PP9TC","EMB"],"6PP16TC":["6PP9TC","EMB"],"6PP17TC":["6PP9TC","EMB"],"SILO":["6PP9TC","EMB"],"AM04":["6PP9TC","EMB"],"3PP7RP":["RCP07","EMB"],"3PP8TC":["RCP07","EMB"],"3PP9TC":["RCP07","EMB"],"TRB06":["TRB06","EMB"],"TRC05":["TRB06","EMB"],"TRC05A":["TRB06","EMB"],"RC01":["RC01","EMB"],"TRA02A":["RC01","EMB"],"TRA02B":["RC01","EMB"],"RC02A":["RC02A","EMB"],"TRB03G":["RC02A","EMB"],"RC03":["RC03","EMB"],"TRB01":["RC03","EMB"],"TRC02A":["RC03","EMB"],"TRC06":["RC03","EMB"],"RC04":["RC04","EMB"],"TRD04":["RC04","EMB"],"TRD05":["RC04","EMB"],"RC05":["RC05","EMB"],"TRD08":["RC05","EMB"],"TRD10":["RC05","EMB"],"ER01":["ER01","EMB"],"TRH22":["ER01","EMB"],"TRH23":["ER01","EMB"],"TRH30":["ER01","EMB"],"ER02":["ER02","EMB"],"TRH21":["ER02","EMB"],"ER03":["ER03E","EMB"],"TRN05":["ER03E","EMB"],"TRN06":["ER03E","EMB"],"EP03":["T1.1","DESC"],"TRD01":["T1.1","DESC"],"TRF01":["T1.1","DESC"],"TRF03":["T1.1","DESC"],"TRF04":["T1.1","DESC"],"EE01":["EE01","DESC"],"EE02":["EE02","DESC"],"TRG01":["VV01","DESC"],"TRG02":["VV02","DESC"],"TRG03":["VV03","DESC"],"TRG04":["VV04","DESC"],"TRG05":["VV05","DESC"],"EP09":["EP09","DESC"],"TRH26":["EP09","DESC"],"TRH27":["EP09","DESC"],"TRH28":["EP09","DESC"],"EP01":["EP01","DESC"],"TRA01":["EP01","DESC"],"TRA02":["EP01","DESC"],"EP02":["EP02A","DESC"],"TRB03B":["EP02A","DESC"],"TRB03C":["EP02A","DESC"],"TRC01":["EP02A","DESC"],"TRB03A":["EP02A","DESC"],"TRT12":["TRT12","DESC"],"EP10":["TL","DESC"],"TRH07":["TL","DESC"],"TRH02":["TL","DESC"],"1PA2AEF":["TV","DESC"],"3PA1TC":["TV","DESC"],"1PA0TC":["TV","DESC"],"TRF05":["TV","DESC"],"5PA4EF":["TN","DESC"],"5PA3TC":["TN","DESC"],"5PA2TC":["TN","DESC"],"5PA1TC":["TN","DESC"],"TRH01":["TN","DESC"],"TRF02":["T1.2","DESC"],"TRF06":["T1.2","DESC"],"TRF07":["T1.2","DESC"],"TRF08":["T1.2","DESC"],"TRH14":["T1.2","DESC"],"TRH15":["T1.2","DESC"],"TRH16":["T1.2","DESC"],"TRH17":["T1.2","DESC"],"TRH18":["T1.2","DESC"],"TRH19":["T1.2","DESC"],"TRH20":["TRH20","DESC"],"TRN01":["ER03D","DESC"],"TRN02":["ER03D","DESC"],"TRN03":["ER03D","DESC"],"TRN04":["ER03D","DESC"]};
+function _rotaAtivo(id){return DB.rotaOverrides[id]?DB.rotaOverrides[id][0]:(ROTA_ATIVOS[id]?ROTA_ATIVOS[id][0]:'');}
+function _embDescAtivo(id){return DB.rotaOverrides[id]?DB.rotaOverrides[id][1]:(ROTA_ATIVOS[id]?ROTA_ATIVOS[id][1]:'');}
+function _rotasUnicas(){
+  const set=new Set(Object.values(ROTA_ATIVOS).map(v=>v[0]));
+  Object.values(DB.rotaOverrides).forEach(v=>{if(v[0])set.add(v[0]);});
+  return[...set].sort((a,b)=>a.localeCompare(b));
+}
+
+function _guessTipoAtivo(id){
+  if(id.startsWith('EP'))return'Empilhadeira';
+  if(id.startsWith('RC'))return'Recuperadora';
+  return'Transportador';
+}
+
+function _catalogoIdsCompleto(){
+  const set=new Set(CATALOGO_RAW);
+  ATIVOS.forEach(a=>set.add(a.id));
+  return[...set].sort((a,b)=>a.localeCompare(b));
+}
+
+// Garante que um ativo do catálogo exista em ATIVOS (com dados inicializados),
+// respeitando o limite de 50 na tela principal. Não sobrescreve dados existentes.
+function _garantirAtivoSelecionado(id){
+  if(ATIVOS.some(a=>a.id===id))return true;
+  if(ATIVOS.length>=50){
+    mostrarToast('Limite de 50 ativos na tela principal atingido','#C62828');
+    return false;
+  }
+  ATIVOS.push({id,tipo:_guessTipoAtivo(id)});
+  ATIVOS.sort((a,b)=>a.id.localeCompare(b.id));
+  _initAtivo(id);
+  return true;
+}
+
+function renderCatalogoAtivos(){
+  passo='catalogo';
+  window._catalogoIds=_catalogoIdsCompleto();
+  setTopbar('Ativos','',true,false);
+  setStepBar(false);
+  document.getElementById('content').innerHTML=_buildCatalogoHtml('');
+  filtrarCatalogo('');
+}
+
+function _buildCatalogoHtml(filtro){
+  const rotas=_rotasUnicas();
+  return`<div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+    <button onclick="abrirExportarAtivos()" style="background:#fff;color:#1F3864;border:1px solid #D1D5DB;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;"><i class="ti ti-file-export"></i> Exportar</button>
+    <button onclick="abrirImportarAtivo(null)" style="background:#fff;color:#1F3864;border:1px solid #D1D5DB;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;"><i class="ti ti-file-import"></i> Importar</button>
+    <button onclick="abrirModalAtivo(null)" style="background:#1F3864;color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;"><i class="ti ti-plus"></i> Criar ativo</button>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:8px;">
+    <input type="text" id="catalogo-busca" placeholder="Buscar ativo..." value="${filtro?filtro.replace(/"/g,'&quot;'):''}" oninput="filtrarCatalogo(this.value)" style="flex:1.3;min-width:0;font-size:13px;padding:9px 8px;border:1px solid #D1D5DB;border-radius:8px;">
+    <select id="catalogo-filtro-rota" onchange="_refrescarCatalogoLista()" style="flex:1;min-width:0;font-size:13px;padding:9px 4px;border:1px solid #D1D5DB;border-radius:8px;background:#fff;">
+      <option value="">Rota</option>
+      ${rotas.map(r=>`<option value="${r}">${r}</option>`).join('')}
+    </select>
+    <select id="catalogo-filtro-embdesc" onchange="_refrescarCatalogoLista()" style="flex:.8;min-width:0;font-size:13px;padding:9px 4px;border:1px solid #D1D5DB;border-radius:8px;background:#fff;">
+      <option value="">Emb/Desc</option>
+      <option value="EMB">Embarque</option>
+      <option value="DESC">Descarga</option>
+    </select>
+  </div>
+  <div style="display:flex;padding:0 14px;font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;margin-bottom:6px;">
+    <span id="catalogo-contagem" style="flex:1;">Ativo</span><span style="width:70px;">Rota</span><span style="width:56px;text-align:right;">Emb/Desc</span>
+  </div>
+  <div class="catalogo-lista" id="catalogo-lista"></div>`;
+}
+
+function _buildCatalogoItensHtml(ids){
+  if(!ids.length)return`<div class="empty-state" style="padding:30px 10px;text-align:center;color:#9CA3AF;background:#fff;">Nenhum ativo encontrado</div>`;
+  let h='';
+  ids.forEach(id=>{
+    const sel=ATIVOS.some(a=>a.id===id);
+    const fav=DB.favoritos.has(id);
+    const rota=_rotaAtivo(id);
+    const embDesc=_embDescAtivo(id);
+    const embDescCor=embDesc==='EMB'?'#2E75B6':embDesc==='DESC'?'#E65100':'#9CA3AF';
+    h+=`<div class="catalogo-item">
+      <div style="flex:1;min-width:0;">
+        <span class="catalogo-item-nome" onclick="entrarCatalogoAtivo('${id}')">${id}</span>
+        ${fav?' <i class="ti ti-star-filled" style="color:#F59E0B;font-size:11px;"></i>':''}
+        ${sel?' <span class="pill pill-ok" style="font-size:9px;padding:1px 5px;">Na tela inicial</span>':''}
+      </div>
+      <span style="width:70px;font-size:11px;color:#6B7280;flex-shrink:0;">${rota||'—'}</span>
+      <span style="width:56px;text-align:right;font-size:10px;font-weight:700;color:${embDescCor};flex-shrink:0;">${embDesc||'—'}</span>
+      <button class="catalogo-item-mais" style="margin-left:6px;flex-shrink:0;" onclick="event.stopPropagation();toggleCatalogoMenu('${id}')">⋯</button>
+      <div class="ativo-dropdown" id="catmenu-${id}" style="display:none;right:8px;top:40px;">
+        <div class="ativo-dropdown-item" onclick="event.stopPropagation();toggleFavoritoCatalogo('${id}')"><i class="ti ti-star${fav?'-filled':''}" style="color:#F59E0B;"></i> ${fav?'Remover favorito':'Favoritar'}</div>
+        <div class="ativo-dropdown-item" onclick="event.stopPropagation();toggleTelaPrincipalCatalogo('${id}')"><i class="ti ti-${sel?'square-minus':'square-plus'}" style="color:#2E75B6;"></i> ${sel?'Remover da tela principal':'Inserir na tela principal'}</div>
+        <div class="ativo-dropdown-item" onclick="event.stopPropagation();fecharMenusAtivo();exportarBackupAtivo('${id}')"><i class="ti ti-file-export" style="color:#2E75B6;"></i> Exportar ativo</div>
+        <div class="ativo-dropdown-item" onclick="event.stopPropagation();fecharMenusAtivo();abrirModalAtivo('${id}')"><i class="ti ti-edit" style="color:#2E75B6;"></i> Editar ativo</div>
+        <div class="ativo-dropdown-item danger" onclick="event.stopPropagation();excluirAtivoCatalogo('${id}')"><i class="ti ti-trash"></i> Excluir ativo</div>
+      </div>
+    </div>`;
+  });
+  return h;
+}
+
+function filtrarCatalogo(v){
+  const ids=window._catalogoIds||_catalogoIdsCompleto();
+  const f=(v||'').trim().toUpperCase();
+  const rotaSel=document.getElementById('catalogo-filtro-rota')?.value||'';
+  const embSel=document.getElementById('catalogo-filtro-embdesc')?.value||'';
+  let filtrados=ids;
+  if(f)filtrados=filtrados.filter(id=>id.includes(f));
+  if(rotaSel)filtrados=filtrados.filter(id=>_rotaAtivo(id)===rotaSel);
+  if(embSel)filtrados=filtrados.filter(id=>_embDescAtivo(id)===embSel);
+  const lista=document.getElementById('catalogo-lista');
+  const cont=document.getElementById('catalogo-contagem');
+  if(lista)lista.innerHTML=_buildCatalogoItensHtml(filtrados);
+  const semFiltro=!f&&!rotaSel&&!embSel;
+  if(cont)cont.textContent=semFiltro?`Ativo: (${ids.length}/140 ativos)`:`Ativo: (${filtrados.length} de ${ids.length}/140)`;
+}
+
+function _refrescarCatalogoLista(){
+  window._catalogoIds=_catalogoIdsCompleto();
+  const inp=document.getElementById('catalogo-busca');
+  filtrarCatalogo(inp?inp.value:'');
+}
+
+function toggleCatalogoMenu(id){
+  fecharMenusAtivo();
+  const m=document.getElementById('catmenu-'+id);
+  if(m)m.style.display='block';
+  setTimeout(()=>document.addEventListener('click',fecharMenusAtivo,{once:true,capture:true}),50);
+}
+
+function toggleFavoritoCatalogo(id){
+  fecharMenusAtivo();
+  if(DB.favoritos.has(id)){
+    DB.favoritos.delete(id);
+  } else {
+    if(!_garantirAtivoSelecionado(id))return;
+    DB.favoritos.add(id);
+  }
+  marcarMudanca();autoBackup();
+  _refrescarCatalogoLista();
+}
+
+function toggleTelaPrincipalCatalogo(id){
+  fecharMenusAtivo();
+  const jaSel=ATIVOS.some(a=>a.id===id);
+  if(jaSel){
+    if(!confirm('Remover '+id+' da tela principal?\nOs dados já registrados não serão apagados — você pode readicioná-lo depois.'))return;
+    ATIVOS.splice(ATIVOS.findIndex(a=>a.id===id),1);
+  } else {
+    if(!_garantirAtivoSelecionado(id))return;
+    mostrarToast('✓ '+id+' adicionado à tela principal','#2E7D32');
+  }
+  marcarMudanca();autoBackup();
+  _refrescarCatalogoLista();
+}
+
+function entrarCatalogoAtivo(id){
+  if(!_garantirAtivoSelecionado(id))return;
+  marcarMudanca();autoBackup();
+  selAtivo(id);
+}
+
+function excluirAtivoCatalogo(id){
+  fecharMenusAtivo();
+  if(!confirm('Excluir '+id+' permanentemente?\n\nTodos os dados registrados (relatórios, fotos, histórico) serão apagados e não poderão ser recuperados.'))return;
+  const idx=ATIVOS.findIndex(a=>a.id===id);
+  if(idx>=0)ATIVOS.splice(idx,1);
+  delete DB.registros[id];delete DB.fichas[id];delete DB.raspAtivos[id];delete DB.layoutFotos[id];delete DB.rotaOverrides[id];
+  DB.favoritos.delete(id);
+  if(ativoSel===id)ativoSel=null;
+  marcarMudanca();autoBackup();
+  mostrarToast('Ativo '+id+' excluído permanentemente','#6B7280');
+  window._catalogoIds=_catalogoIdsCompleto();
+  _refrescarCatalogoLista();
+}
+
+// ── Modal de Criar/Editar ativo (nome, rota, embarque/descarga) ──
+function abrirModalAtivo(idOriginal){
+  const editando=!!idOriginal;
+  if(!editando&&_catalogoIdsCompleto().length>=140){
+    mostrarToast('Limite de 140 ativos atingido. Exclua um ativo para inserir outro.','#C62828');
+    return;
+  }
+  const rota=editando?_rotaAtivo(idOriginal):'';
+  const embDesc=editando?_embDescAtivo(idOriginal):'';
+  const rotas=_rotasUnicas();
+  const modal=document.createElement('div');
+  modal.id='modal-upd';
+  modal.className='upd-modal';
+  modal.innerHTML=`<div class="upd-modal-box">
+    <div class="upd-modal-titulo">
+      <span><i class="ti ti-${editando?'edit':'plus'}" style="color:#2E75B6;"></i> ${editando?'Editar Ativo':'Criar Ativo'}</span>
+      <button onclick="fecharModalUpd()" style="background:none;border:none;font-size:20px;color:#6B7280;cursor:pointer;">✕</button>
+    </div>
+    <div class="form-grupo"><label>Nome do ativo</label>
+      <input type="text" id="ativo-modal-nome" value="${editando?idOriginal:''}" placeholder="Ex: TRH99" style="width:100%;font-size:14px;padding:9px 10px;border:1px solid #D1D5DB;border-radius:8px;text-transform:uppercase;">
+    </div>
+    <div class="form-grupo"><label>Rota</label>
+      <input type="text" id="ativo-modal-rota" value="${rota||''}" list="ativo-modal-rotas-lista" placeholder="Ex: TV, RC02A, T1.2..." style="width:100%;font-size:14px;padding:9px 10px;border:1px solid #D1D5DB;border-radius:8px;">
+      <datalist id="ativo-modal-rotas-lista">${rotas.map(r=>`<option value="${r}">`).join('')}</datalist>
+    </div>
+    <div class="form-grupo"><label>Embarque ou Descarga</label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button type="button" class="btn-opcao ${embDesc==='EMB'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ativo-modal-embdesc','EMB',this)">Embarque</button>
+        <button type="button" class="btn-opcao ${embDesc==='DESC'?'btn-opcao-ativo':''}" onclick="selecionarOpcao('ativo-modal-embdesc','DESC',this)">Descarga</button>
+      </div>
+      <input type="hidden" id="ativo-modal-embdesc" value="${embDesc||''}">
+    </div>
+    <button class="btn-prim" onclick="salvarModalAtivo(${editando?`'${idOriginal}'`:'null'})" style="margin-top:4px;"><i class="ti ti-device-floppy"></i> Salvar</button>
+    <button class="btn-sec" onclick="fecharModalUpd()" style="margin-top:8px;">Cancelar</button>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+function salvarModalAtivo(idOriginal){
+  const editando=!!idOriginal;
+  if(!editando&&_catalogoIdsCompleto().length>=140){
+    mostrarToast('Limite de 140 ativos atingido. Exclua um ativo para inserir outro.','#C62828');
+    return;
+  }
+  const novoNome=(document.getElementById('ativo-modal-nome')?.value||'').trim().toUpperCase();
+  const rota=(document.getElementById('ativo-modal-rota')?.value||'').trim();
+  const embDesc=document.getElementById('ativo-modal-embdesc')?.value||'';
+  if(!novoNome){mostrarToast('Informe o nome do ativo','#E65100');return;}
+  if(!editando){
+    // Criar novo ativo
+    if(ATIVOS.some(a=>a.id===novoNome)||CATALOGO_RAW.includes(novoNome)){mostrarToast('Ativo já existe!','#E65100');return;}
+    if(!_garantirAtivoSelecionado(novoNome))return;
+    if(rota||embDesc)DB.rotaOverrides[novoNome]=[rota,embDesc];
+    marcarMudanca();autoBackup();
+    fecharModalUpd();
+    mostrarToast('✓ Ativo '+novoNome+' criado','#2E7D32');
+  } else {
+    // Editar (possivelmente renomear)
+    if(novoNome!==idOriginal){
+      if(ATIVOS.some(a=>a.id===novoNome)||CATALOGO_RAW.includes(novoNome)){mostrarToast('Já existe um ativo com esse nome!','#E65100');return;}
+      const a=ATIVOS.find(x=>x.id===idOriginal);
+      if(a){
+        DB.registros[novoNome]=DB.registros[idOriginal]||[];
+        DB.fichas[novoNome]=DB.fichas[idOriginal]||{};
+        DB.raspAtivos[novoNome]=DB.raspAtivos[idOriginal]||{prim:true,p2:false,s1:false,s2:false,s3:false,s4:false,s5:false};
+        if(DB.layoutFotos[idOriginal])DB.layoutFotos[novoNome]=DB.layoutFotos[idOriginal];
+        delete DB.registros[idOriginal];delete DB.fichas[idOriginal];delete DB.raspAtivos[idOriginal];delete DB.layoutFotos[idOriginal];
+        if(DB.favoritos.has(idOriginal)){DB.favoritos.delete(idOriginal);DB.favoritos.add(novoNome);}
+        if(ativoSel===idOriginal)ativoSel=novoNome;
+        a.id=novoNome;
+        ATIVOS.sort((x,y)=>x.id.localeCompare(y.id));
+      }
+      delete DB.rotaOverrides[idOriginal];
+    }
+    if(rota||embDesc)DB.rotaOverrides[novoNome]=[rota,embDesc];
+    else delete DB.rotaOverrides[novoNome];
+    marcarMudanca();autoBackup();
+    fecharModalUpd();
+    mostrarToast('✓ Ativo atualizado','#2E7D32');
+  }
+  window._catalogoIds=_catalogoIdsCompleto();
+  _refrescarCatalogoLista();
+}
+
+// ════════════════════════════════
+// BACKUP / IMPORTAÇÃO DE UM ÚNICO ATIVO
+// Permite que um inspetor exporte os dados de apenas um ativo (por exemplo
+// antes de sair de férias) e outra pessoa importe esse arquivo dentro de um
+// ativo já existente (mesclando) ou criando um ativo novo — sem tocar no
+// restante do banco de dados.
+// ════════════════════════════════
+function _gerarPayloadAtivo(id){
+  const a=ATIVOS.find(x=>x.id===id);
+  const rota=_rotaAtivo(id),embDesc=_embDescAtivo(id);
+  return{
+    tipoArquivo:'backup_ativo_unico',
+    versao:1,
+    exportadoEm:new Date().toISOString(),
+    ativoId:id,
+    ativoTipo:a?a.tipo:_guessTipoAtivo(id),
+    registros:DB.registros[id]||[],
+    ficha:DB.fichas[id]||null,
+    raspAtivos:DB.raspAtivos[id]||null,
+    layoutFoto:DB.layoutFotos[id]||null,
+    rota:(rota||embDesc)?[rota,embDesc]:null
+  };
+}
+
+function exportarBackupAtivo(id){
+  const payload=_gerarPayloadAtivo(id);
+  const json=JSON.stringify(payload,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const aTag=document.createElement('a');
+  aTag.href=url;
+  aTag.download=`backup_ativo_${id}.json`;
+  aTag.click();
+  URL.revokeObjectURL(url);
+  mostrarToast('✓ Backup de '+id+' exportado','#2E7D32');
+}
+
+// Carrega a JSZip sob demanda (só quando o recurso de lote é usado)
+function _carregarJSZip(){
+  if(typeof JSZip!=='undefined')return Promise.resolve();
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    s.onload=res;s.onerror=rej;
+    document.head.appendChild(s);
+  });
+}
+
+// ── Exportar VÁRIOS ativos de uma vez (.zip) ──
+function abrirExportarAtivos(){
+  passo='export-ativos';
+  setTopbar('Exportar Ativos','',true,false);
+  setStepBar(false);
+  window._exportAtivosSel=new Set();
+  document.getElementById('content').innerHTML=_buildExportAtivosHtml();
+}
+
+function _buildExportAtivosHtml(){
+  const sel=window._exportAtivosSel||new Set();
+  const lista=ATIVOS.slice().sort((a,b)=>a.id.localeCompare(b.id));
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <span class="bloco-titulo" id="export-ativos-titulo" style="margin:0;">Selecione os ativos (${sel.size}/${lista.length})</span>
+    <div style="display:flex;gap:6px;">
+      <button class="btn-sm btn-sm-sec" onclick="_marcarTodosExportAtivos(true)">Todos</button>
+      <button class="btn-sm btn-sm-sec" onclick="_marcarTodosExportAtivos(false)">Nenhum</button>
+    </div>
+  </div>
+  <div class="catalogo-lista">`;
+  lista.forEach(a=>{
+    const marcado=sel.has(a.id);
+    const qtd=(DB.registros[a.id]||[]).length;
+    h+=`<label class="catalogo-item" style="cursor:pointer;">
+      <input type="checkbox" ${marcado?'checked':''} onchange="_toggleExportAtivo('${a.id}',this.checked)" style="width:17px;height:17px;accent-color:#1F3864;flex-shrink:0;">
+      <div style="flex:1;margin-left:10px;min-width:0;">
+        <div style="font-size:13px;font-weight:600;color:#1F3864;">${a.id}</div>
+        <div style="font-size:11px;color:#9CA3AF;">${qtd} registro(s)</div>
+      </div>
+    </label>`;
+  });
+  h+=`</div>
+  <button class="btn-prim" style="margin-top:14px;" onclick="confirmarExportarAtivos()"><i class="ti ti-file-zip"></i> Exportar selecionados (.zip)</button>
+  <button class="btn-sec" style="margin-top:8px;" onclick="renderCatalogoAtivos()">Cancelar</button>`;
+  return h;
+}
+
+function _toggleExportAtivo(id,checked){
+  if(!window._exportAtivosSel)window._exportAtivosSel=new Set();
+  if(checked)window._exportAtivosSel.add(id);else window._exportAtivosSel.delete(id);
+  const titulo=document.getElementById('export-ativos-titulo');
+  if(titulo)titulo.textContent=`Selecione os ativos (${window._exportAtivosSel.size}/${ATIVOS.length})`;
+}
+
+function _marcarTodosExportAtivos(v){
+  window._exportAtivosSel=new Set(v?ATIVOS.map(a=>a.id):[]);
+  document.getElementById('content').innerHTML=_buildExportAtivosHtml();
+}
+
+async function confirmarExportarAtivos(){
+  const sel=window._exportAtivosSel||new Set();
+  if(!sel.size){mostrarToast('Selecione ao menos um ativo','#E65100');return;}
+  try{
+    mostrarToast('Gerando arquivo compactado...','#1565C0');
+    await _carregarJSZip();
+    const zip=new JSZip();
+    sel.forEach(id=>{
+      zip.file(`backup_ativo_${id}.json`, JSON.stringify(_gerarPayloadAtivo(id),null,2));
+    });
+    const blob=await zip.generateAsync({type:'blob'});
+    const url=URL.createObjectURL(blob);
+    const aTag=document.createElement('a');
+    const ts=new Date().toLocaleDateString('pt-BR').replace(/\//g,'-');
+    aTag.href=url;
+    aTag.download=`backup_ativos_${ts}.zip`;
+    aTag.click();
+    URL.revokeObjectURL(url);
+    mostrarToast('✓ '+sel.size+' ativo(s) exportado(s)','#2E7D32');
+  }catch(e){
+    mostrarToast('Sem conexão para gerar o arquivo compactado','#C62828');
+  }
+}
+
+let _importAtivoPayload=null,_importAtivoSelecionados=new Set(),_importAtivoDestino='novo',_importAtivoFicha=false,_importAtivoLayout=false,_importAtivoOrigem=null;
+
+function abrirImportarAtivo(origemAtivoId){
+  _importAtivoOrigem=origemAtivoId||null;
+  document.getElementById('import-ativo-input').click();
+}
+
+function onArquivoAtivoSelecionado(input){
+  const file=input.files[0];
+  if(!file)return;
+  const nomeArq=(file.name||'').toLowerCase();
+  if(nomeArq.endsWith('.zip')){
+    processarZipAtivos(file);
+    input.value='';
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const payload=JSON.parse(e.target.result);
+      if(payload.tipoArquivo!=='backup_ativo_unico'){
+        if(payload.DB_registros){
+          alert('Este arquivo é um backup COMPLETO (todos os ativos), não de um ativo único.\n\nPara restaurar tudo, use "Importar backup" na tela inicial. Usar aqui foi bloqueado de propósito para não substituir seus dados atuais por engano.');
+        } else {
+          alert('Arquivo inválido para importação de ativo.');
+        }
+        return;
+      }
+      if(!payload.ativoId||!Array.isArray(payload.registros)){
+        alert('Arquivo de ativo incompleto ou corrompido.');
+        return;
+      }
+      _importAtivoDestino='novo';_importAtivoFicha=false;_importAtivoLayout=false;
+      abrirPreviaImportarAtivo(payload);
+    }catch(err){
+      alert('Erro ao ler o arquivo: '+err.message);
+    }
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
+// ── Importar VÁRIOS ativos de uma vez (.zip com um .json por ativo) ──
+async function processarZipAtivos(file){
+  try{
+    mostrarToast('Lendo arquivo compactado...','#1565C0');
+    await _carregarJSZip();
+    const zip=await JSZip.loadAsync(file);
+    const arquivos=Object.values(zip.files).filter(f=>!f.dir&&f.name.toLowerCase().endsWith('.json'));
+    if(!arquivos.length){alert('Nenhum arquivo .json de ativo encontrado dentro do .zip.');return;}
+    const payloads=[];
+    for(const f of arquivos){
+      try{
+        const texto=await f.async('text');
+        const p=JSON.parse(texto);
+        if(p.tipoArquivo==='backup_ativo_unico'&&p.ativoId&&Array.isArray(p.registros))payloads.push(p);
+      }catch(e){/* ignora arquivo inválido dentro do zip */}
+    }
+    if(!payloads.length){alert('Nenhum backup de ativo válido encontrado dentro do .zip.');return;}
+    abrirPreviaImportarLote(payloads);
+  }catch(e){
+    alert('Erro ao ler o arquivo compactado: '+e.message);
+  }
+}
+
+let _importLotePayloads=null,_importLoteSelecionados=new Set(),_importLoteFicha=false,_importLoteLayout=false;
+
+function abrirPreviaImportarLote(payloads){
+  _importLotePayloads=payloads;
+  _importLoteSelecionados=new Set(payloads.map(p=>p.ativoId));
+  _importLoteFicha=false;_importLoteLayout=false;
+  passo='import-lote-previa';
+  setTopbar('Importar Ativos',payloads.length+' encontrado(s) no arquivo',true,false);
+  setStepBar(false);
+  document.getElementById('content').innerHTML=_buildImportLoteHtml();
+}
+
+function _buildImportLoteHtml(){
+  const payloads=_importLotePayloads||[];
+  let h=`<div style="font-size:12px;color:#6B7280;margin-bottom:10px;">Ativos que já existem no seu app serão <b>mesclados</b> (os registros do arquivo somam-se aos que você já tem, nada é apagado). Ativos que ainda não existem serão criados automaticamente.</div>
+  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#374151;cursor:pointer;">
+      <input type="checkbox" onchange="_importLoteFicha=this.checked" ${_importLoteFicha?'checked':''}> Também atualizar ficha técnica dos ativos já existentes
+    </label>
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#374151;cursor:pointer;">
+      <input type="checkbox" onchange="_importLoteLayout=this.checked" ${_importLoteLayout?'checked':''}> Também atualizar foto de layout dos ativos já existentes
+    </label>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+    <span class="bloco-titulo" style="margin:0;">Ativos encontrados (${payloads.length})</span>
+    <div style="display:flex;gap:6px;">
+      <button class="btn-sm btn-sm-sec" onclick="_marcarTodosImportLote(true)">Todos</button>
+      <button class="btn-sm btn-sm-sec" onclick="_marcarTodosImportLote(false)">Nenhum</button>
+    </div>
+  </div>
+  <div class="catalogo-lista">`;
+  payloads.forEach(p=>{
+    const marcado=_importLoteSelecionados.has(p.ativoId);
+    const existeLocal=ATIVOS.some(a=>a.id===p.ativoId);
+    h+=`<label class="catalogo-item" style="cursor:pointer;">
+      <input type="checkbox" ${marcado?'checked':''} onchange="_toggleImportLote('${p.ativoId}',this.checked)" style="width:17px;height:17px;accent-color:#1F3864;flex-shrink:0;">
+      <div style="flex:1;margin-left:10px;min-width:0;">
+        <div style="font-size:13px;font-weight:600;color:#1F3864;">${p.ativoId}</div>
+        <div style="font-size:11px;color:#9CA3AF;">${(p.registros||[]).length} registro(s) — ${existeLocal?'já existe (será mesclado)':'novo (será criado)'}</div>
+      </div>
+    </label>`;
+  });
+  h+=`</div>
+  <button class="btn-prim" style="margin-top:14px;" onclick="confirmarImportarLote()"><i class="ti ti-file-import"></i> Importar selecionados</button>
+  <button class="btn-sec" style="margin-top:8px;" onclick="renderCatalogoAtivos()">Cancelar</button>`;
+  return h;
+}
+
+function _toggleImportLote(id,checked){if(checked)_importLoteSelecionados.add(id);else _importLoteSelecionados.delete(id);}
+function _marcarTodosImportLote(v){
+  _importLoteSelecionados=new Set(v?(_importLotePayloads||[]).map(p=>p.ativoId):[]);
+  document.getElementById('content').innerHTML=_buildImportLoteHtml();
+}
+
+function confirmarImportarLote(){
+  const payloads=(_importLotePayloads||[]).filter(p=>_importLoteSelecionados.has(p.ativoId));
+  if(!payloads.length){mostrarToast('Selecione ao menos um ativo','#E65100');return;}
+  let criados=0,mesclados=0,totalRegs=0,pulados=0;
+  payloads.forEach(p=>{
+    const id=p.ativoId;
+    const existeLocal=ATIVOS.some(a=>a.id===id);
+    if(!existeLocal){
+      if(ATIVOS.length>=50){pulados++;return;}
+      ATIVOS.push({id,tipo:p.ativoTipo||_guessTipoAtivo(id)});
+      _initAtivo(id);
+      if(p.ficha)DB.fichas[id]=p.ficha;
+      if(p.raspAtivos)DB.raspAtivos[id]=p.raspAtivos;
+      if(p.layoutFoto)DB.layoutFotos[id]=p.layoutFoto;
+      if(p.rota)DB.rotaOverrides[id]=p.rota;
+      criados++;
+    } else {
+      if(_importLoteFicha&&p.ficha)DB.fichas[id]=p.ficha;
+      if(_importLoteLayout&&p.layoutFoto)DB.layoutFotos[id]=p.layoutFoto;
+      mesclados++;
+    }
+    if(!DB.registros[id])DB.registros[id]=[];
+    (p.registros||[]).forEach(r=>{
+      const copia=JSON.parse(JSON.stringify(r));
+      copia.id=newId();
+      DB.registros[id].push(copia);
+      totalRegs++;
+    });
+  });
+  ATIVOS.sort((a,b)=>a.id.localeCompare(b.id));
+  marcarMudanca();autoBackup();
+  mostrarToast(`✓ ${criados} criado(s), ${mesclados} mesclado(s), ${totalRegs} registro(s)${pulados?' — '+pulados+' pulado(s) por limite de 50':''}`,'#2E7D32');
+  _importLotePayloads=null;
+  renderCatalogoAtivos();
+}
+
+function abrirPreviaImportarAtivo(payload){
+  _importAtivoPayload=payload;
+  _importAtivoSelecionados=new Set((payload.registros||[]).map(r=>r.id));
+  passo='import-ativo-previa';
+  setTopbar('Importar Ativo',payload.ativoId,true,false);
+  setStepBar(false);
+  document.getElementById('content').innerHTML=_buildImportAtivoHtml();
+}
+
+function _tituloRegistroResumo(r){
+  const descCurto=r.desc&&r.desc!=='Sem relato'?': '+r.desc:'';
+  if(r.tipo&&r.tipo.startsWith('rasp-'))return(SECAO_LABELS[r.tipo]||r.tipo)+descCurto;
+  if(r.tipo==='defeito'||r.tipo==='ext-defeito')return(SECAO_LABELS[r.tipo]||'Defeitos/Reparos')+' — '+(r.campos?.defeitos?.length||0)+' item(ns)';
+  if(SECAO_LABELS[r.tipo])return SECAO_LABELS[r.tipo]+descCurto;
+  return(r.tipo||'Registro')+descCurto;
+}
+
+function _buildImportAtivoHtml(){
+  const p=_importAtivoPayload;
+  const regs=p.registros||[];
+  const destino=_importAtivoDestino||'novo';
+  const existeLocal=ATIVOS.some(a=>a.id===p.ativoId);
+  const nomeDefault=destino==='novo'?(existeLocal?p.ativoId+'_2':p.ativoId):(existeLocal?p.ativoId:'');
+  const listaAtivosLocais=ATIVOS.map(a=>a.id);
+  let h=`<div class="ativo-banner">
+    <i class="ti ti-file-import" style="font-size:20px;color:#2E75B6;"></i>
+    <div><div class="ab-id">${p.ativoId}</div><div class="ab-nome">${regs.length} registro(s) — exportado em ${p.exportadoEm?fmtData(p.exportadoEm.slice(0,10)):'—'}</div></div>
+  </div>
+  <div class="form-grupo"><label>Importar como</label>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button type="button" class="btn-opcao ${destino==='novo'?'btn-opcao-ativo':''}" onclick="_setDestinoImportAtivo('novo')">Criar ativo novo</button>
+      <button type="button" class="btn-opcao ${destino==='existente'?'btn-opcao-ativo':''}" onclick="_setDestinoImportAtivo('existente')">Ativo já existente</button>
+    </div>
+  </div>`;
+  if(destino==='novo'){
+    h+=`<div class="form-grupo"><label>Nome do novo ativo</label>
+      <input type="text" id="import-ativo-nome" value="${nomeDefault}" style="width:100%;font-size:14px;padding:9px 10px;border:1px solid #D1D5DB;border-radius:8px;text-transform:uppercase;">
+    </div>`;
+  } else {
+    h+=`<div class="form-grupo"><label>Ativo de destino</label>
+      <input type="text" id="import-ativo-nome" value="${nomeDefault}" list="import-ativo-lista" style="width:100%;font-size:14px;padding:9px 10px;border:1px solid #D1D5DB;border-radius:8px;text-transform:uppercase;">
+      <datalist id="import-ativo-lista">${listaAtivosLocais.map(id=>`<option value="${id}">`).join('')}</datalist>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#374151;cursor:pointer;">
+        <input type="checkbox" onchange="_importAtivoFicha=this.checked" ${_importAtivoFicha?'checked':''}> Também atualizar ficha técnica (dimensões, especificações)
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#374151;cursor:pointer;">
+        <input type="checkbox" onchange="_importAtivoLayout=this.checked" ${_importAtivoLayout?'checked':''}> Também atualizar foto de layout
+      </label>
+    </div>`;
+  }
+  h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 6px;">
+    <span class="bloco-titulo" style="margin:0;">Registros (${regs.length})</span>
+    <div style="display:flex;gap:6px;">
+      <button class="btn-sm btn-sm-sec" onclick="_marcarTodosImportAtivo(true)">Todos</button>
+      <button class="btn-sm btn-sm-sec" onclick="_marcarTodosImportAtivo(false)">Nenhum</button>
+    </div>
+  </div>`;
+  if(!regs.length){
+    h+=`<div class="empty-state" style="padding:30px 10px;text-align:center;color:#9CA3AF;">Este ativo não tem registros no arquivo.</div>`;
+  } else {
+    h+='<div class="catalogo-lista">';
+    regs.forEach(r=>{
+      const marcado=_importAtivoSelecionados.has(r.id);
+      h+=`<label class="catalogo-item" style="cursor:pointer;">
+        <input type="checkbox" ${marcado?'checked':''} onchange="_toggleImportAtivoReg('${r.id}',this.checked)" style="width:17px;height:17px;accent-color:#1F3864;flex-shrink:0;">
+        <div style="flex:1;margin-left:10px;min-width:0;">
+          <div style="font-size:13px;font-weight:600;color:#1F3864;">${_tituloRegistroResumo(r)}</div>
+          <div style="font-size:11px;color:#9CA3AF;">${fmtData(r.data)}</div>
+        </div>
+      </label>`;
+    });
+    h+='</div>';
+  }
+  h+=`<button class="btn-prim" style="margin-top:14px;" onclick="confirmarImportarAtivo()"><i class="ti ti-file-import"></i> Importar selecionados</button>
+  <button class="btn-sec" style="margin-top:8px;" onclick="cancelarImportarAtivo()">Cancelar</button>`;
+  return h;
+}
+
+function _setDestinoImportAtivo(v){_importAtivoDestino=v;document.getElementById('content').innerHTML=_buildImportAtivoHtml();}
+function _toggleImportAtivoReg(id,checked){if(checked)_importAtivoSelecionados.add(id);else _importAtivoSelecionados.delete(id);}
+function _marcarTodosImportAtivo(v){
+  const regs=_importAtivoPayload?.registros||[];
+  _importAtivoSelecionados=new Set(v?regs.map(r=>r.id):[]);
+  document.getElementById('content').innerHTML=_buildImportAtivoHtml();
+}
+
+function cancelarImportarAtivo(){
+  _importAtivoPayload=null;
+  if(_importAtivoOrigem&&ATIVOS.some(a=>a.id===_importAtivoOrigem)){ativoSel=_importAtivoOrigem;renderMenu();}
+  else renderCatalogoAtivos();
+}
+
+function confirmarImportarAtivo(){
+  const payload=_importAtivoPayload;
+  if(!payload)return;
+  const destino=_importAtivoDestino||'novo';
+  const alvoNome=(document.getElementById('import-ativo-nome')?.value||'').trim().toUpperCase();
+  if(!alvoNome){mostrarToast('Informe o nome do ativo de destino','#E65100');return;}
+  const selecionados=(payload.registros||[]).filter(r=>_importAtivoSelecionados.has(r.id));
+  if(!selecionados.length){mostrarToast('Selecione ao menos um registro para importar','#E65100');return;}
+
+  if(destino==='novo'){
+    if(ATIVOS.some(a=>a.id===alvoNome)){mostrarToast('Já existe um ativo com esse nome. Escolha outro nome ou importe como "ativo já existente".','#E65100');return;}
+    if(ATIVOS.length>=50){mostrarToast('Limite de 50 ativos na tela principal atingido','#C62828');return;}
+    ATIVOS.push({id:alvoNome,tipo:payload.ativoTipo||_guessTipoAtivo(alvoNome)});
+    ATIVOS.sort((a,b)=>a.id.localeCompare(b.id));
+    _initAtivo(alvoNome);
+    if(payload.ficha)DB.fichas[alvoNome]=payload.ficha;
+    if(payload.raspAtivos)DB.raspAtivos[alvoNome]=payload.raspAtivos;
+    if(payload.layoutFoto)DB.layoutFotos[alvoNome]=payload.layoutFoto;
+    if(payload.rota)DB.rotaOverrides[alvoNome]=payload.rota;
+  } else {
+    if(!ATIVOS.some(a=>a.id===alvoNome)){mostrarToast('Ativo "'+alvoNome+'" não encontrado na sua tela principal. Verifique o nome ou importe como "ativo novo".','#E65100');return;}
+    if(_importAtivoFicha&&payload.ficha)DB.fichas[alvoNome]=payload.ficha;
+    if(_importAtivoLayout&&payload.layoutFoto)DB.layoutFotos[alvoNome]=payload.layoutFoto;
+  }
+
+  if(!DB.registros[alvoNome])DB.registros[alvoNome]=[];
+  // Cada registro recebe um novo ID local para nunca colidir com IDs já existentes
+  selecionados.forEach(r=>{
+    const copia=JSON.parse(JSON.stringify(r));
+    copia.id=newId();
+    DB.registros[alvoNome].push(copia);
+  });
+
+  marcarMudanca();autoBackup();
+  mostrarToast('✓ '+selecionados.length+' registro(s) importado(s) em '+alvoNome,'#2E7D32');
+  _importAtivoPayload=null;
+  ativoSel=alvoNome;
+  renderMenu();
+}
+
 function renderFavoritos(){
   passo='favoritos';
   setTopbar('Favoritos','',true,false);
@@ -1070,6 +1864,8 @@ function renderMenu(){
       <span style="display:flex;align-items:center;justify-content:center;">${svgAtivo(a.tipo)}</span>
       <div><div class="ab-id">${a.id}</div><div class="ab-nome">${a.tipo}</div></div>
       <span class="pill ${cls}" style="margin-left:auto;">${txt}</span>
+      <button class="banner-icon-btn" title="Exportar este ativo" onclick="exportarBackupAtivo('${a.id}')"><i class="ti ti-file-export"></i></button>
+      <button class="banner-icon-btn" title="Importar ativo" onclick="abrirImportarAtivo('${a.id}')"><i class="ti ti-file-import"></i></button>
     </div>
     <div class="grid-2" style="margin-bottom:13px;gap:8px;">
       <div class="card-btn destaque" onclick="renderRelatorio()">
@@ -1328,7 +2124,7 @@ function atualizarLightbox(){
   document.getElementById('lb-next').disabled=lbIdx===fotos.length-1;
 }
 function navLightbox(dir){lbIdx+=dir;atualizarLightbox();}
-function fecharLightbox(){document.getElementById('lightbox').classList.remove('vis');}
+function fecharLightbox(){document.getElementById('lightbox').classList.remove('vis');const barra=document.getElementById('lb-layout-acoes');if(barra)barra.remove();}
 
 // Lightbox para fotos já salvas (array de b64)
 let lbArrCurrent=[];
@@ -1595,13 +2391,23 @@ function buildRaspForm(){
   return h;
 }
 
+function pctCritAtualRasp(rU){
+  const atus=rU?.campos?.atualizacoes||[];
+  const ultima=atus.length?atus[atus.length-1]:null;
+  return{
+    pct:(ultima&&ultima.pct)?ultima.pct:(rU?.campos?.pct||''),
+    crit:(ultima&&ultima.crit)?ultima.crit:(rU?.campos?.crit||'')
+  };
+}
+
 function buildRaspBloco(chave){
   const rU=ultimoRaspChave(ativoSel,chave);
-  const ultPct=rU?.campos?.pct||'';
-  const ultCrit=rU?.campos?.crit||'';
+  const _atualRU=pctCritAtualRasp(rU);
+  const ultPct=_atualRU.pct;
+  const ultCrit=_atualRU.crit;
   const ultDesc=(rU?.desc&&rU.desc!=='Sem relato')?rU.desc:'';
   const ultFotos=rU?.fotos||[];
-  const ultData=rU?fmtData(rU.data):'';
+  const ultData=rU?fmtData(dataMaisRecenteRegistro(rU)):'';
   // Barra visual de desgaste
   function desgasteCor(p){
     const n=parseInt(p)||0;
@@ -1705,8 +2511,9 @@ function atualizarBarraRasp(chave){
 function copiarUltimaRasp(chave){
   const rU=ultimoRaspChave(ativoSel,chave);
   if(!rU){mostrarToast('Nenhuma inspeção anterior encontrada','#6B7280');return;}
-  const pct=rU.campos?.pct||'';
-  const crit=rU.campos?.crit||'';
+  const _atualRU=pctCritAtualRasp(rU);
+  const pct=_atualRU.pct;
+  const crit=_atualRU.crit;
   const desc=(rU.desc&&rU.desc!=='Sem relato')?rU.desc:'';
   const fotos=rU.fotos||[];
 
@@ -2398,18 +3205,23 @@ function buildRegCard(r,isHist){
 
   if(isRaspK){
     const v=r.campos||{};
-    if(v.pct||v.crit){
-      const pn=parseInt(v.pct)||0;
+    const atus=v.atualizacoes||[];
+    const ultima=atus.length?atus[atus.length-1]:null;
+    const pctShow=ultima&&ultima.pct?ultima.pct:v.pct;
+    const critShow=ultima&&ultima.crit?ultima.crit:v.crit;
+    if(pctShow||critShow){
+      const pn=parseInt(pctShow)||0;
       const dcor=pn<=30?'#C62828':pn<=50?'#E65100':pn<=75?'#F9A825':'#2E7D32';
       const dlbl=pn<=30?'Crítico':pn<=50?'Alto':pn<=75?'Médio':'Bom';
-      extras=`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;align-items:center;">
-        ${v.pct?`<span class="pill" style="background:${dcor}20;color:${dcor};border:1px solid ${dcor}40;">${v.pct}% — ${dlbl}</span>`:''}
-        ${v.pct?`<div style="flex:1;min-width:60px;background:#E5E8ED;border-radius:4px;height:8px;overflow:hidden;"><div style="height:100%;width:${Math.min(pn,100)}%;background:${dcor};border-radius:4px;"></div></div>`:''}
-        ${v.crit?`<span class="pill pill-vn">${v.crit}</span>`:''}
+      extras=`<div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-top:4px;">Desgaste atual</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;align-items:center;">
+        ${pctShow?`<span class="pill" style="background:${dcor}20;color:${dcor};border:1px solid ${dcor}40;">${pctShow}% — ${dlbl}</span>`:''}
+        ${pctShow?`<div style="flex:1;min-width:60px;background:#E5E8ED;border-radius:4px;height:8px;overflow:hidden;"><div style="height:100%;width:${Math.min(pn,100)}%;background:${dcor};border-radius:4px;"></div></div>`:''}
+        ${critShow?`<span class="pill pill-vn">${critShow}</span>`:''}
       </div>`;
     }
-    if(r.fotos&&r.fotos.length) extras+=buildGaleriaDisplay(r.fotos,'rr-'+r.id);
-    extras+=buildTimelineRegistro(v.atualizacoes,r.id,isHist,'rasp');
+    extras+=`<div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-top:12px;margin-bottom:2px;">Atualização</div>`;
+    extras+=buildTimelineRegistro(atus,r.id,isHist,'rasp',{data:r.data,desc:r.desc,fotos:r.fotos,pct:v.pct,crit:v.crit});
     if(!isHist){
       extras+=`<div style="margin-top:8px;"><button class="btn-atualizar" onclick="abrirAtualizarRegistro('${r.id}')"><i class="ti ti-pencil-plus"></i> Registrar atualização</button></div>`;
     }
@@ -2437,6 +3249,7 @@ function buildRegCard(r,isHist){
       ${r.campos.crit?`<span class="pill pill-vn">${r.campos.crit}</span>`:''}
       ${r.campos.bal?`<span class="pill pill-neu">📍 ${r.campos.bal}</span>`:''}
     </div>`
+    +(r.fotos&&r.fotos.length?buildGaleriaDisplay(r.fotos,'rg-'+r.id):(r.foto?`<img src="${r.foto}" style="width:100%;border-radius:6px;margin-top:8px;">`:''))
     +buildTimelineRegistro(r.campos.atualizacoes,r.id,isHist,'interf')
     +(!isHist&&!r._encerrado?`<div style="margin-top:8px;"><button class="btn-atualizar" onclick="abrirAtualizarRegistro('${r.id}')"><i class="ti ti-pencil-plus"></i> Registrar atualização</button></div>`:'')
     +buildStatusBtns(r,isHist);
@@ -2448,6 +3261,7 @@ function buildRegCard(r,isHist){
       ${r.campos.crit?`<span class="pill pill-vn">${r.campos.crit}</span>`:''}
       ${r.campos.local?`<span class="pill pill-neu">📍 ${r.campos.local}</span>`:''}
     </div>`
+    +(r.fotos&&r.fotos.length?buildGaleriaDisplay(r.fotos,'rg-'+r.id):(r.foto?`<img src="${r.foto}" style="width:100%;border-radius:6px;margin-top:8px;">`:''))
     +buildTimelineRegistro(r.campos.atualizacoes,r.id,isHist,'desal')
     +(!isHist&&!r._encerrado?`<div style="margin-top:8px;"><button class="btn-atualizar" onclick="abrirAtualizarRegistro('${r.id}')"><i class="ti ti-pencil-plus"></i> Registrar atualização</button></div>`:'')
     +buildStatusBtns(r,isHist);
@@ -2528,24 +3342,23 @@ function buildRegCard(r,isHist){
   }
 
   const showDesc=!isRaspK&&r.tipo!=='rasp'&&r.tipo!=='defeito'&&r.tipo!=='ext-defeito';
-  // Para rasp-K mostra a descrição abaixo dos pills
-  const descRaspK=isRaspK?(r.desc==='Sem relato'?'<span style="color:#9CA3AF;font-style:italic;">Sem relato</span>':(r.desc||'')):'';
   const desc=showDesc?(r.desc==='Sem relato'?'<span style="color:#9CA3AF;font-style:italic;">Sem relato</span>':r.desc||''):'';
   const titulo=isRaspK?SECAO_LABELS[r.tipo]||r.tipo:'';
+  const dataHeaderVal=isRaspK?dataMaisRecenteRegistro(r):r.data;
+  const dataHeaderLbl=isRaspK?'última atualização: ':'';
 
   return `<div class="reg-card" id="card-${r.id}">
     <div class="reg-card-header">
       ${titulo?`<span style="font-size:11px;font-weight:700;color:#1F3864;">${titulo}</span>`:''}
-      <span class="rc-data" style="${titulo?'':''}"><i class="ti ti-calendar" style="vertical-align:-2px;"></i> ${fmtData(r.data)}</span>
+      <span class="rc-data" style="${titulo?'':''}"><i class="ti ti-calendar" style="vertical-align:-2px;"></i> ${dataHeaderLbl}${fmtData(dataHeaderVal)}</span>
       <span style="flex:1;"></span>
       <input type="checkbox" class="item-print-chk no-print" checked title="Incluir na impressão" onclick="event.stopPropagation()">
       <button class="btn-sm btn-sm-sec no-print" onclick="abrirEdicao('${r.id}')"><i class="ti ti-edit"></i> Editar</button>
       ${isHist?`<button class="btn-sm no-print" style="background:#FFEBEE;color:#C62828;padding:4px 7px;" onclick="excluirRegistroHist('${r.id}')" title="Excluir permanentemente"><i class="ti ti-trash"></i></button>`:''}
     </div>
     ${desc?`<div class="reg-card-body">${desc}</div>`:''}
-    ${descRaspK?`<div class="reg-card-body" style="font-size:12px;color:#374151;margin-top:4px;">${descRaspK}</div>`:''}
     ${extras}
-    ${!isRaspK&&r.fotos&&r.fotos.length?buildGaleriaDisplay(r.fotos,'rg-'+r.id):(r.foto?`<img src="${r.foto}" style="width:100%;border-radius:6px;margin-top:8px;">`:'')}</div>`;
+    ${!isRaspK&&r.tipo!=='interf'&&r.tipo!=='ext-interf'&&r.tipo!=='desal'&&r.tipo!=='ext-desal'&&r.fotos&&r.fotos.length?buildGaleriaDisplay(r.fotos,'rg-'+r.id):(!isRaspK&&r.tipo!=='interf'&&r.tipo!=='ext-interf'&&r.tipo!=='desal'&&r.tipo!=='ext-desal'&&r.foto?`<img src="${r.foto}" style="width:100%;border-radius:6px;margin-top:8px;">`:'')}</div>`;
 }
 
 function buildStatusBtns(r,isHist){
@@ -2874,6 +3687,11 @@ function abrirAtualizarDefeito(regId,defIdx){
   const ns='upd-'+regId+'-'+defIdx;
   galFotos[ns]=[];
   const ds=(d.status==='co'?'co':'ac'); const dc=d.crit||''; const dl=d.loc||'';
+  const atus=d.atualizacoes||[];
+  const ultima=atus.length?atus[atus.length-1]:null;
+  const relatoAnterior=ultima?(ultima.desc||''):(d.desc||'');
+  const temRelatoAnterior=relatoAnterior&&relatoAnterior!=='Sem relato';
+  window._relatoAnteriorAtual=relatoAnterior||'';
   const modal=document.createElement('div');
   modal.id='modal-upd';
   modal.className='upd-modal';
@@ -2907,8 +3725,16 @@ function abrirAtualizarDefeito(regId,defIdx){
       <input type="hidden" id="upd-loc" value="${dl}">
     </div>
     ${buildMsgsRapidas('upd-desc','defeito')}
-    <div class="form-grupo"><label>Descrição da atualização</label>
-      <textarea id="upd-desc" rows="3" style="width:100%;font-size:13px;padding:8px;border:1px solid #D1D5DB;border-radius:8px;resize:vertical;" placeholder="O que foi feito? Qual a situação atual?"></textarea>
+    <div style="background:#F3F4F6;border:1px solid #E5E7EB;border-radius:8px;padding:8px;margin-bottom:8px;">
+      <div style="font-size:10px;font-weight:700;color:#6B7280;margin-bottom:3px;text-transform:uppercase;">Relato anterior</div>
+      <div style="font-size:12px;color:${temRelatoAnterior?'#4B5563':'#9CA3AF'};white-space:pre-wrap;${temRelatoAnterior?'':'font-style:italic;'}">${temRelatoAnterior?escHtml(relatoAnterior):'Nenhum relato anterior registrado'}</div>
+    </div>
+    <div class="form-grupo">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
+        <label style="margin:0;">Descrição da atualização</label>
+        ${temRelatoAnterior?`<button type="button" class="btn-sm btn-sm-sec" style="font-size:10px;padding:3px 7px;" onclick="copiarRelatoAnteriorUpd('upd-desc')"><i class="ti ti-copy" style="font-size:10px;"></i> Copiar relato anterior</button>`:''}
+      </div>
+      <textarea id="upd-desc" rows="3" style="width:100%;font-size:13px;padding:8px;border:1px solid #D1D5DB;border-radius:8px;resize:vertical;margin-top:4px;" placeholder="O que mudou? Ou copie a descrição anterior"></textarea>
     </div>
     ${buildGaleriaField(ns)}
     <button class="btn-prim" onclick="salvarAtualizacaoDefeito()" style="margin-top:4px;"><i class="ti ti-device-floppy"></i> Salvar atualização</button>
@@ -3051,10 +3877,27 @@ function _tipoGrupoRegistro(tipo){
   return null;
 }
 
-function buildTimelineRegistro(atualizacoes,regId,isHist,grp){
-  if(!atualizacoes||!atualizacoes.length)return'';
+function buildTimelineRegistro(atualizacoes,regId,isHist,grp,original){
+  const temAtus=atualizacoes&&atualizacoes.length;
+  if(!temAtus&&!original)return'';
   let h='<div class="def-timeline">';
-  atualizacoes.forEach((u,ui)=>{
+  if(original){
+    h+=`<div class="def-tl-item">
+      <div class="def-tl-dot dot-new"></div>
+      <div class="def-tl-meta"><i class="ti ti-calendar" style="font-size:10px;"></i>${fmtData(original.data)} — <span style="font-weight:600;">Inspeção inicial</span></div>
+      <div class="def-tl-body">
+        <div style="flex:1;">
+          <div class="def-tl-tags">
+            ${grp==='rasp'&&original.pct?`<span class="pill pill-neu" style="font-size:10px;">${original.pct}% desgaste</span>`:''}
+            ${original.crit?`<span class="pill pill-vn" style="font-size:10px;">${original.crit}</span>`:''}
+          </div>
+          ${original.desc&&original.desc!=='Sem relato'?`<div>${original.desc}</div>`:'<span style="color:#9CA3AF;font-style:italic;font-size:11px;">Sem relato</span>'}
+          ${original.fotos&&original.fotos.length?buildGaleriaDisplay(original.fotos,'atureg-orig-'+regId):''}
+        </div>
+      </div>
+    </div>`;
+  }
+  (atualizacoes||[]).forEach((u,ui)=>{
     const stDot=grp==='rasp'?'dot-new':({em:'dot-em',ac:'dot-ac',co:'dot-co'}[u.status]||'dot-new');
     const stLabel=grp==='rasp'?'':(stMap[u.status]||'');
     h+=`<div class="def-tl-item">
@@ -3082,13 +3925,19 @@ function buildTimelineRegistro(atualizacoes,regId,isHist,grp){
   return h;
 }
 
-function _htmlModalAtualizacaoRegistro(grp,ns,onSalvar,titulo,dataVal,prefill){
+function escHtml(s){
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function _htmlModalAtualizacaoRegistro(grp,ns,onSalvar,titulo,dataVal,prefill,relatoAnterior){
   prefill=prefill||{};
   const ds=prefill.status||'ac';
   const dc=prefill.crit||'';
   const dp=prefill.pct!==undefined?prefill.pct:'';
   const dd=prefill.desc||'';
   const ddata=dataVal||dataHojeISO();
+  window._relatoAnteriorAtual=relatoAnterior||'';
+  const temRelatoAnterior=relatoAnterior&&relatoAnterior!=='Sem relato';
   let camposEspecificos='';
   if(grp==='rasp'){
     camposEspecificos=`
@@ -3135,13 +3984,28 @@ function _htmlModalAtualizacaoRegistro(grp,ns,onSalvar,titulo,dataVal,prefill){
     <div class="form-grupo"><label>Data</label><input type="date" id="upd2-data" value="${ddata}"></div>
     ${camposEspecificos}
     ${buildMsgsRapidas('upd2-desc','upd')}
-    <div class="form-grupo"><label>Descrição da atualização</label>
-      <textarea id="upd2-desc" rows="3" style="width:100%;font-size:13px;padding:8px;border:1px solid #D1D5DB;border-radius:8px;resize:vertical;" placeholder="A situação continua a mesma? O que mudou?">${dd}</textarea>
+    <div style="background:#F3F4F6;border:1px solid #E5E7EB;border-radius:8px;padding:8px;margin-bottom:8px;">
+      <div style="font-size:10px;font-weight:700;color:#6B7280;margin-bottom:3px;text-transform:uppercase;">Relato anterior</div>
+      <div style="font-size:12px;color:${temRelatoAnterior?'#4B5563':'#9CA3AF'};white-space:pre-wrap;${temRelatoAnterior?'':'font-style:italic;'}">${temRelatoAnterior?escHtml(relatoAnterior):'Nenhum relato anterior registrado'}</div>
+    </div>
+    <div class="form-grupo">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
+        <label style="margin:0;">Descrição da atualização</label>
+        ${temRelatoAnterior?`<button type="button" class="btn-sm btn-sm-sec" style="font-size:10px;padding:3px 7px;" onclick="copiarRelatoAnteriorUpd()"><i class="ti ti-copy" style="font-size:10px;"></i> Copiar relato anterior</button>`:''}
+      </div>
+      <textarea id="upd2-desc" rows="3" style="width:100%;font-size:13px;padding:8px;border:1px solid #D1D5DB;border-radius:8px;resize:vertical;margin-top:4px;" placeholder="O que mudou? Ou copie a descrição anterior">${escHtml(dd)}</textarea>
     </div>
     ${buildGaleriaField(ns)}
     <button class="btn-prim" onclick="${onSalvar}" style="margin-top:4px;"><i class="ti ti-device-floppy"></i> Salvar atualização</button>
     <button class="btn-sec" onclick="fecharModalUpd()" style="margin-top:8px;">Cancelar</button>
   </div>`;
+}
+
+function copiarRelatoAnteriorUpd(taId){
+  const ta=document.getElementById(taId||'upd2-desc');
+  if(!ta)return;
+  ta.value=window._relatoAnteriorAtual||'';
+  ta.focus();
 }
 
 function abrirAtualizarRegistro(regId){
@@ -3152,10 +4016,16 @@ function abrirAtualizarRegistro(regId){
   _updRegId=regId; _updDefIdx=null;
   const ns='upd-reg-'+regId;
   galFotos[ns]=[];
+  const atus=r.campos?.atualizacoes||[];
+  const ultima=atus.length?atus[atus.length-1]:null;
+  const relatoAnterior=ultima?(ultima.desc||''):(r.desc||'');
+  const prefillAtual=ultima
+    ?{status:ultima.status,crit:ultima.crit,pct:ultima.pct}
+    :{status:r.campos?.status,crit:r.campos?.crit,pct:r.campos?.pct};
   const modal=document.createElement('div');
   modal.id='modal-upd';
   modal.className='upd-modal';
-  modal.innerHTML=_htmlModalAtualizacaoRegistro(grp,ns,'salvarAtualizacaoRegistro()','Registrar Atualização','',{});
+  modal.innerHTML=_htmlModalAtualizacaoRegistro(grp,ns,'salvarAtualizacaoRegistro()','Registrar Atualização','',prefillAtual,relatoAnterior);
   document.body.appendChild(modal);
   setTimeout(()=>renderGaleriaGrid(ns),50);
 }
@@ -3176,8 +4046,6 @@ function salvarAtualizacaoRegistro(){
   if(grp==='rasp'){
     const pct=document.getElementById('upd2-pct')?.value||'';
     entry.pct=pct;
-    if(pct)r.campos.pct=pct;
-    if(crit)r.campos.crit=crit;
   } else {
     const status=document.getElementById('upd2-status')?.value||'ac';
     entry.status=status;
@@ -3200,10 +4068,12 @@ function editarAtualizacaoRegistro(regId,idx){
   if(!grp)return;
   const ns='upd-reg-'+regId+'-edit';
   galFotos[ns]=[...(u.fotos||[])];
+  const atus=r.campos?.atualizacoes||[];
+  const relatoAnterior=idx>0?(atus[idx-1].desc||''):(r.desc||'');
   const modal=document.createElement('div');
   modal.id='modal-upd';
   modal.className='upd-modal';
-  modal.innerHTML=_htmlModalAtualizacaoRegistro(grp,ns,`salvarEdicaoAtualizacaoRegistro('${regId}',${idx},'${ns}')`,'Editar Atualização',u.data,{status:u.status,crit:u.crit,pct:u.pct,desc:u.desc&&u.desc!=='Sem relato'?u.desc:''});
+  modal.innerHTML=_htmlModalAtualizacaoRegistro(grp,ns,`salvarEdicaoAtualizacaoRegistro('${regId}',${idx},'${ns}')`,'Editar Atualização',u.data,{status:u.status,crit:u.crit,pct:u.pct,desc:u.desc&&u.desc!=='Sem relato'?u.desc:''},relatoAnterior);
   document.body.appendChild(modal);
   setTimeout(()=>renderGaleriaGrid(ns),50);
 }
@@ -3219,8 +4089,6 @@ function salvarEdicaoAtualizacaoRegistro(regId,idx,ns){
   u.fotos=getGalFotos(ns);
   if(grp==='rasp'){
     u.pct=document.getElementById('upd2-pct')?.value||'';
-    if(u.pct)r.campos.pct=u.pct;
-    if(u.crit)r.campos.crit=u.crit;
   } else {
     u.status=document.getElementById('upd2-status')?.value||'ac';
     r.campos.status=u.status;
@@ -3528,9 +4396,9 @@ function salvarEdicao(){
 // ════════════════════════════════════════════════════════════════
 // SISTEMA DE NOVIDADES
 // ════════════════════════════════════════════════════════════════
-const APP_VERSION='v0.3';
+const APP_VERSION='v2.1';
 // Só a novidade mais recente desta versão
-const APP_CHANGELOG=['Novo: botão "Registrar atualização" em Interferências, Desalinhamento e Raspadores — ao reinspecionar uma condição já existente, insira a nova informação direto no mesmo relato (linha do tempo), sem criar registro duplicado.','Raspadores: botão para copiar % e fotos da última inspeção. Anotações: histórico por ativo. Corrigido zoom de fotos no relatório. Novo aviso ao tentar sair com dados não salvos.'];
+const APP_CHANGELOG=['Dentro do ativo, os botões de Exportar/Importar ativo agora são ícones pequenos e discretos no cantinho do banner, em vez de botões grandes em destaque.','Novo: exportar VÁRIOS ativos de uma vez. Na tela "Ativos", botão "Exportar" abre uma lista com checkbox para escolher quais ativos entram, e gera um único arquivo .zip com um .json para cada ativo selecionado.','Novo: importar um .zip com vários ativos de uma vez. O app lê todos os arquivos dentro do .zip, mostra uma prévia com a quantidade de registros de cada um (avisando se vai criar ou mesclar), e você escolhe quais importar de uma vez.','Backup de um ativo só: disponível dentro do próprio ativo e na tela "Ativos" (exportar/importar), com prévia dos registros antes de confirmar.'];
 // Cores do badge alternando a cada versão
 // Paleta de cores que repete infinitamente
 const _CORES_PALETA=[
@@ -4319,6 +5187,10 @@ function importarBackup(input){
   reader.onload=e=>{
     try{
       const payload=JSON.parse(e.target.result);
+      if(payload.tipoArquivo==='backup_ativo_unico'){
+        alert('Este arquivo é um backup de UM ATIVO SÓ ('+(payload.ativoId||'?')+'), não um backup completo.\n\nPara importar este arquivo, use o botão "Importar ativo" dentro da tela de um ativo ou na tela "Ativos".');
+        return;
+      }
       if(!payload.versao||!payload.DB_registros){
         alert('Arquivo de backup inválido.');return;
       }
@@ -4336,6 +5208,8 @@ function importarBackup(input){
       });
       if(Array.isArray(payload.DB_anotacoesGerais)) DB.anotacoesGerais=payload.DB_anotacoesGerais;
       if(Array.isArray(payload.DB_favoritos)) DB.favoritos=new Set(payload.DB_favoritos);
+      if(payload.DB_layoutFotos) DB.layoutFotos=payload.DB_layoutFotos;
+      if(payload.DB_rotaOverrides) DB.rotaOverrides=payload.DB_rotaOverrides;
       if(payload.regCounter) regCounter=payload.regCounter+1;
       // Salva direto no IndexedDB sem passar pelo localStorage
       salvarLS().then(()=>{
@@ -4432,6 +5306,8 @@ function _gerarPayload(){
     DB_raspAtivos: DB.raspAtivos,
     DB_anotacoesGerais: DB.anotacoesGerais,
     DB_favoritos: [...DB.favoritos],
+    DB_layoutFotos: DB.layoutFotos,
+    DB_rotaOverrides: DB.rotaOverrides,
     regCounter
   };
 }
@@ -4567,7 +5443,9 @@ function _fallbackDownload(json){
 // NAVEGAÇÃO
 // ════════════════════════════════
 function voltar(){
-  if(passo==='menu'||passo==='anotacoes-gerais'||passo==='favoritos')renderLista();
+  if(passo==='import-ativo-previa'){cancelarImportarAtivo();return;}
+  if(passo==='export-ativos'||passo==='import-lote-previa'){renderCatalogoAtivos();return;}
+  if(passo==='menu'||passo==='anotacoes-gerais'||passo==='favoritos'||passo==='catalogo')renderLista();
   else renderMenu();
 }
 
@@ -4610,6 +5488,8 @@ async function salvarLS(){
     raspAtivos: DB.raspAtivos,
     anotacoesGerais: DB.anotacoesGerais,
     favoritos: [...DB.favoritos],
+    layoutFotos: DB.layoutFotos,
+    rotaOverrides: DB.rotaOverrides,
     rc: regCounter
   };
   try{
@@ -4668,6 +5548,8 @@ function _aplicarDados(d){
     });
     if(Array.isArray(d.anotacoesGerais)) DB.anotacoesGerais = d.anotacoesGerais;
     if(Array.isArray(d.favoritos))       DB.favoritos = new Set(d.favoritos);
+    if(d.layoutFotos)                    DB.layoutFotos = d.layoutFotos;
+    if(d.rotaOverrides)                  DB.rotaOverrides = d.rotaOverrides;
     if(d.rc) regCounter = d.rc + 1;
     return true;
   }catch(e){ return false; }
