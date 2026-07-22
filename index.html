@@ -870,6 +870,7 @@ function renderLista(){
       <div class="ativo-dropdown" id="menu-${a.id}" style="display:none;">
         <div class="ativo-dropdown-item" onclick="editarAtivo('${a.id}')"><i class="ti ti-edit" style="color:#2E75B6;"></i> Editar nome</div>
         <div class="ativo-dropdown-item" onclick="toggleFavorito('${a.id}')"><i class="ti ti-star${isFav?'-filled':''}" style="color:#F59E0B;"></i> ${isFav?'Remover favorito':'Favoritar'}</div>
+        <div class="ativo-dropdown-item" onclick="retirarDaTelaPrincipal('${a.id}')"><i class="ti ti-square-minus" style="color:#6B7280;"></i> Retirar da tela inicial</div>
         <div class="ativo-dropdown-item danger" onclick="excluirAtivo('${a.id}')"><i class="ti ti-trash"></i> Excluir</div>
       </div>
     </div>`;
@@ -983,6 +984,15 @@ function toggleFavorito(id){
   fecharMenusAtivo();
   if(DB.favoritos.has(id))DB.favoritos.delete(id);else DB.favoritos.add(id);
   marcarMudanca();autoBackup();
+  renderLista();
+}
+function retirarDaTelaPrincipal(id){
+  fecharMenusAtivo();
+  const idx=ATIVOS.findIndex(a=>a.id===id);
+  if(idx>=0)ATIVOS.splice(idx,1);
+  if(ativoSel===id)ativoSel=null;
+  marcarMudanca();autoBackup();
+  mostrarToast(id+' retirado da tela inicial','#6B7280');
   renderLista();
 }
 // ════════════════════════════════
@@ -1126,12 +1136,7 @@ function toggleCatalogoMenu(id){
 
 function toggleFavoritoCatalogo(id){
   fecharMenusAtivo();
-  if(DB.favoritos.has(id)){
-    DB.favoritos.delete(id);
-  } else {
-    if(!_garantirAtivoSelecionado(id))return;
-    DB.favoritos.add(id);
-  }
+  if(DB.favoritos.has(id))DB.favoritos.delete(id);else DB.favoritos.add(id);
   marcarMudanca();autoBackup();
   _refrescarCatalogoLista();
 }
@@ -1140,8 +1145,8 @@ function toggleTelaPrincipalCatalogo(id){
   fecharMenusAtivo();
   const jaSel=ATIVOS.some(a=>a.id===id);
   if(jaSel){
-    if(!confirm('Remover '+id+' da tela principal?\nOs dados já registrados não serão apagados — você pode readicioná-lo depois.'))return;
     ATIVOS.splice(ATIVOS.findIndex(a=>a.id===id),1);
+    mostrarToast(id+' removido da tela principal','#6B7280');
   } else {
     if(!_garantirAtivoSelecionado(id))return;
     mostrarToast('✓ '+id+' adicionado à tela principal','#2E7D32');
@@ -1668,27 +1673,31 @@ function renderFavoritos(){
   passo='favoritos';
   setTopbar('Favoritos','',true,false);
   setStepBar(false);
-  const favs=ATIVOS.filter(a=>DB.favoritos.has(a.id)).sort((a,b)=>a.id.localeCompare(b.id));
+  const favs=[...DB.favoritos].sort((a,b)=>a.localeCompare(b)).map(id=>{
+    const a=ATIVOS.find(x=>x.id===id);
+    return{id,tipo:a?a.tipo:_guessTipoAtivo(id),naTelaInicial:!!a};
+  });
   let h='';
   if(!favs.length){
     h=`<div class="empty-state" style="padding:40px 20px;text-align:center;">
       <i class="ti ti-star" style="font-size:40px;display:block;margin-bottom:10px;opacity:.3;color:#F59E0B;"></i>
       <div style="font-size:15px;font-weight:600;color:#374151;margin-bottom:6px;">Nenhum favorito ainda</div>
-      <div style="font-size:13px;color:#9CA3AF;">Toque nos ⋯ de um ativo e escolha Favoritar</div>
+      <div style="font-size:13px;color:#9CA3AF;">Toque nos ⋯ de um ativo (tela inicial ou tela Ativos) e escolha Favoritar</div>
     </div>`;
   } else {
     h+='<div class="ativo-grid">';
-    favs.forEach(a=>{
-      const{cls,txt}=pillUltima(a.id);
+    favs.forEach(f=>{
+      const{cls,txt}=pillUltima(f.id);
       h+=`<div class="ativo-card-wrap" style="position:relative;">
         <span class="ativo-fav-star"><i class="ti ti-star-filled"></i></span>
-        <div class="ativo-card" onclick="selAtivo('${a.id}')">
-          <span class="ac-icon" style="display:flex;align-items:center;justify-content:center;">${svgAtivo(a.tipo)}</span>
-          <div class="ac-id">${a.id}</div>
-          <div class="ac-tipo">${a.tipo}</div>
+        <div class="ativo-card" onclick="selAtivo('${f.id}')">
+          <span class="ac-icon" style="display:flex;align-items:center;justify-content:center;">${svgAtivo(f.tipo)}</span>
+          <div class="ac-id">${f.id}</div>
+          <div class="ac-tipo">${f.tipo}</div>
           <span class="pill ${cls}" style="margin-top:3px;">${txt}</span>
+          ${!f.naTelaInicial?'<span class="pill pill-neu" style="margin-top:3px;font-size:9px;">Fora da tela inicial</span>':''}
         </div>
-        <button class="ativo-card-dots" title="Remover favorito" onclick="event.stopPropagation();toggleFavorito('${a.id}');renderFavoritos()">✕</button>
+        <button class="ativo-card-dots" title="Remover favorito" onclick="event.stopPropagation();toggleFavorito('${f.id}');renderFavoritos()">✕</button>
       </div>`;
     });
     h+='</div>';
@@ -1826,7 +1835,7 @@ function mudaPagAnotacoes(p){
 // ════════════════════════════════
 // MENU DO ATIVO
 // ════════════════════════════════
-function selAtivo(id){ativoSel=id;renderMenu();}
+function selAtivo(id){if(!_garantirAtivoSelecionado(id))return;ativoSel=id;renderMenu();}
 function renderMenu(){
   _formSujo=false;
   passo='menu';
@@ -4396,9 +4405,9 @@ function salvarEdicao(){
 // ════════════════════════════════════════════════════════════════
 // SISTEMA DE NOVIDADES
 // ════════════════════════════════════════════════════════════════
-const APP_VERSION='v2.1';
+const APP_VERSION='v2.2';
 // Só a novidade mais recente desta versão
-const APP_CHANGELOG=['Dentro do ativo, os botões de Exportar/Importar ativo agora são ícones pequenos e discretos no cantinho do banner, em vez de botões grandes em destaque.','Novo: exportar VÁRIOS ativos de uma vez. Na tela "Ativos", botão "Exportar" abre uma lista com checkbox para escolher quais ativos entram, e gera um único arquivo .zip com um .json para cada ativo selecionado.','Novo: importar um .zip com vários ativos de uma vez. O app lê todos os arquivos dentro do .zip, mostra uma prévia com a quantidade de registros de cada um (avisando se vai criar ou mesclar), e você escolhe quais importar de uma vez.','Backup de um ativo só: disponível dentro do próprio ativo e na tela "Ativos" (exportar/importar), com prévia dos registros antes de confirmar.'];
+const APP_CHANGELOG=['Corrigido: Favoritar um ativo na tela "Ativos" não insere mais ele automaticamente na tela inicial — favoritos e "tela inicial" agora são independentes. Para colocar na tela inicial, use a opção "Inserir na tela principal".','Removida a mensagem de confirmação ao retirar um ativo da tela inicial pelo catálogo (os dados continuam intactos, só some o bloco).','Novo: no menu ⋯ de cada ativo na tela inicial, opção "Retirar da tela inicial" (sem apagar nenhum dado — o ativo continua na tela "Ativos" e nos Favoritos, se estiver).','Tela Favoritos agora mostra também favoritos que não estão na tela inicial (com a etiqueta "Fora da tela inicial"), e abrir um deles funciona normalmente.'];
 // Cores do badge alternando a cada versão
 // Paleta de cores que repete infinitamente
 const _CORES_PALETA=[
