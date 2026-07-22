@@ -1,9 +1,9 @@
 // ══════════════════════════════════════════════════
 // Service Worker — Inspeção de Correia PWA
-// Versão: 0.5
+// Versão: 0.6
 // ══════════════════════════════════════════════════
 
-const CACHE_NAME = 'inspecao-v7'; // atualizado para forçar refresh (v0.5 — favoritar não insere mais na tela inicial; retirar da tela inicial sem apagar dados)
+const CACHE_NAME = 'inspecao-v8'; // atualizado para forçar refresh (v0.6 — botão para limpar todos os favoritos de uma vez)
 
 // Arquivos que ficam disponíveis offline
 const ARQUIVOS_CACHE = [

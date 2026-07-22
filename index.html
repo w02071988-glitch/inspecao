@@ -986,6 +986,15 @@ function toggleFavorito(id){
   marcarMudanca();autoBackup();
   renderLista();
 }
+function limparTodosFavoritos(){
+  if(!DB.favoritos.size)return;
+  if(!confirm('Remover TODOS os '+DB.favoritos.size+' favoritos?\n\nOs ativos e todos os dados registrados continuam intactos — só a marcação de favorito é removida.'))return;
+  DB.favoritos.clear();
+  marcarMudanca();autoBackup();
+  mostrarToast('✓ Favoritos limpos','#6B7280');
+  renderFavoritos();
+}
+
 function retirarDaTelaPrincipal(id){
   fecharMenusAtivo();
   const idx=ATIVOS.findIndex(a=>a.id===id);
@@ -1685,7 +1694,10 @@ function renderFavoritos(){
       <div style="font-size:13px;color:#9CA3AF;">Toque nos ⋯ de um ativo (tela inicial ou tela Ativos) e escolha Favoritar</div>
     </div>`;
   } else {
-    h+='<div class="ativo-grid">';
+    h+=`<div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+      <button class="btn-sm" style="background:#FFEBEE;color:#C62828;padding:6px 12px;" onclick="limparTodosFavoritos()"><i class="ti ti-star-off"></i> Limpar todos os favoritos</button>
+    </div>
+    <div class="ativo-grid">`;
     favs.forEach(f=>{
       const{cls,txt}=pillUltima(f.id);
       h+=`<div class="ativo-card-wrap" style="position:relative;">
@@ -4405,9 +4417,9 @@ function salvarEdicao(){
 // ════════════════════════════════════════════════════════════════
 // SISTEMA DE NOVIDADES
 // ════════════════════════════════════════════════════════════════
-const APP_VERSION='v2.2';
+const APP_VERSION='v2.3';
 // Só a novidade mais recente desta versão
-const APP_CHANGELOG=['Corrigido: Favoritar um ativo na tela "Ativos" não insere mais ele automaticamente na tela inicial — favoritos e "tela inicial" agora são independentes. Para colocar na tela inicial, use a opção "Inserir na tela principal".','Removida a mensagem de confirmação ao retirar um ativo da tela inicial pelo catálogo (os dados continuam intactos, só some o bloco).','Novo: no menu ⋯ de cada ativo na tela inicial, opção "Retirar da tela inicial" (sem apagar nenhum dado — o ativo continua na tela "Ativos" e nos Favoritos, se estiver).','Tela Favoritos agora mostra também favoritos que não estão na tela inicial (com a etiqueta "Fora da tela inicial"), e abrir um deles funciona normalmente.'];
+const APP_CHANGELOG=['Novo: botão "Limpar todos os favoritos" na tela Favoritos, para remover de uma vez favoritos antigos que ficaram marcados sem querer (nenhum dado do ativo é apagado, só a marcação de favorito).','Corrigido: Favoritar um ativo na tela "Ativos" não insere mais ele automaticamente na tela inicial — favoritos e "tela inicial" agora são independentes.'];
 // Cores do badge alternando a cada versão
 // Paleta de cores que repete infinitamente
 const _CORES_PALETA=[
