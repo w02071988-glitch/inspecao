@@ -90,7 +90,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .cat-card .ag-titulo{font-size:14px;font-weight:700;color:#fff;}
 .cat-card .ag-sub{font-size:11px;color:#BDD9F8;margin-top:1px;}
 .catalogo-lista{display:flex;flex-direction:column;gap:1px;background:#E5E8ED;border-radius:10px;overflow:hidden;border:1px solid #E5E8ED;}
-.catalogo-item{background:#fff;padding:12px 14px;display:flex;align-items:center;gap:6px;position:relative;}
+.catalogo-item{background:#fff;padding:12px 14px;display:flex;align-items:center;gap:6px;position:relative;transition:background-color .1s;}
+.catalogo-item:nth-child(even){background:#F6F8FB;}
+.catalogo-item:active{background:#E3ECFA;}
 .catalogo-item-nome{font-size:14px;font-weight:600;color:#1F3864;cursor:pointer;flex:1;}
 .catalogo-item-mais{background:#F3F4F6;border:none;color:#6B7280;width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:15px;flex-shrink:0;}
 /* ATIVO CARD 3 PONTOS */
@@ -210,6 +212,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .rel-ficha-label{background:#F8F9FB;padding:8px 10px;color:#6B7280;font-weight:500;min-width:95px;flex-shrink:0;}
 .rel-ficha-val{padding:8px 10px;color:#1F2937;font-weight:500;flex:1;}
 .reg-card{background:#F8F9FB;border:1px solid #E5E8ED;border-radius:8px;padding:11px;margin-bottom:8px;}
+.reg-card-destaque{animation:regCardPulse 1.6s ease;}
+@keyframes regCardPulse{0%{box-shadow:0 0 0 3px #2E75B6;}100%{box-shadow:0 0 0 0 transparent;}}
 .reg-card-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .rc-data{font-size:11px;color:#6B7280;}
 .reg-card-body{font-size:13px;color:#374151;line-height:1.5;}
@@ -691,6 +695,11 @@ function pillUltima(id){
   if(d<=30)return{cls:'pill-at',txt:d+'d'};
   return{cls:'pill-vn',txt:d+'d'};
 }
+function pillUltimaCatalogo(id){
+  const regs=DB.registros[id];
+  if(!regs||!regs.length)return{cls:'pill-neu',txt:'—'};
+  return pillUltima(id);
+}
 function ultimoReg(ativoId,tipo){
   const r=DB.registros[ativoId].filter(x=>x.tipo===tipo);
   return r.length?r.sort((a,b)=>b.data.localeCompare(a.data))[0]:null;
@@ -1062,6 +1071,7 @@ function renderCatalogoAtivos(){
 function _buildCatalogoHtml(filtro){
   const rotas=_rotasUnicas();
   return`<div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+    <button onclick="abrirImprimirAtivos()" style="background:#fff;color:#1F3864;border:1px solid #D1D5DB;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;"><i class="ti ti-printer"></i> Imprimir</button>
     <button onclick="abrirExportarAtivos()" style="background:#fff;color:#1F3864;border:1px solid #D1D5DB;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;"><i class="ti ti-file-export"></i> Exportar</button>
     <button onclick="abrirImportarAtivo(null)" style="background:#fff;color:#1F3864;border:1px solid #D1D5DB;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;"><i class="ti ti-file-import"></i> Importar</button>
     <button onclick="abrirModalAtivo(null)" style="background:#1F3864;color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;"><i class="ti ti-plus"></i> Criar ativo</button>
@@ -1079,7 +1089,7 @@ function _buildCatalogoHtml(filtro){
     </select>
   </div>
   <div style="display:flex;padding:0 14px;font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;margin-bottom:6px;">
-    <span id="catalogo-contagem" style="flex:1;">Ativo</span><span style="width:70px;">Rota</span><span style="width:56px;text-align:right;">Emb/Desc</span>
+    <span id="catalogo-contagem" style="flex:1;">Ativo</span><span style="width:56px;">Rota</span><span style="width:50px;">Emb/Desc</span><span style="width:38px;text-align:right;">Últ.</span>
   </div>
   <div class="catalogo-lista" id="catalogo-lista"></div>`;
 }
@@ -1093,14 +1103,16 @@ function _buildCatalogoItensHtml(ids){
     const rota=_rotaAtivo(id);
     const embDesc=_embDescAtivo(id);
     const embDescCor=embDesc==='EMB'?'#2E75B6':embDesc==='DESC'?'#E65100':'#9CA3AF';
+    const ultPill=pillUltimaCatalogo(id);
     h+=`<div class="catalogo-item">
       <div style="flex:1;min-width:0;">
         <span class="catalogo-item-nome" onclick="entrarCatalogoAtivo('${id}')">${id}</span>
         ${fav?' <i class="ti ti-star-filled" style="color:#F59E0B;font-size:11px;"></i>':''}
         ${sel?' <span class="pill pill-ok" style="font-size:9px;padding:1px 5px;">Na tela inicial</span>':''}
       </div>
-      <span style="width:70px;font-size:11px;color:#6B7280;flex-shrink:0;">${rota||'—'}</span>
-      <span style="width:56px;text-align:right;font-size:10px;font-weight:700;color:${embDescCor};flex-shrink:0;">${embDesc||'—'}</span>
+      <span style="width:56px;font-size:11px;color:#6B7280;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${rota||'—'}</span>
+      <span style="width:50px;font-size:10px;font-weight:700;color:${embDescCor};flex-shrink:0;">${embDesc||'—'}</span>
+      <span style="width:38px;text-align:right;flex-shrink:0;"><span class="pill ${ultPill.cls}" style="font-size:9px;padding:1px 5px;">${ultPill.txt}</span></span>
       <button class="catalogo-item-mais" style="margin-left:6px;flex-shrink:0;" onclick="event.stopPropagation();toggleCatalogoMenu('${id}')">⋯</button>
       <div class="ativo-dropdown" id="catmenu-${id}" style="display:none;right:8px;top:40px;">
         <div class="ativo-dropdown-item" onclick="event.stopPropagation();toggleFavoritoCatalogo('${id}')"><i class="ti ti-star${fav?'-filled':''}" style="color:#F59E0B;"></i> ${fav?'Remover favorito':'Favoritar'}</div>
@@ -1165,8 +1177,6 @@ function toggleTelaPrincipalCatalogo(id){
 }
 
 function entrarCatalogoAtivo(id){
-  if(!_garantirAtivoSelecionado(id))return;
-  marcarMudanca();autoBackup();
   selAtivo(id);
 }
 
@@ -1389,7 +1399,139 @@ async function confirmarExportarAtivos(){
   }
 }
 
+// ── Imprimir relatório de VÁRIOS ativos de uma vez (.zip com um .pdf por ativo) ──
+function abrirImprimirAtivos(){
+  passo='print-ativos';
+  setTopbar('Imprimir Ativos','',true,false);
+  setStepBar(false);
+  window._printAtivosSel=new Set();
+  document.getElementById('content').innerHTML=_buildPrintAtivosHtml();
+}
+
+function _buildPrintAtivosHtml(){
+  const sel=window._printAtivosSel||new Set();
+  const lista=(window._catalogoIds||_catalogoIdsCompleto()).slice();
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <span class="bloco-titulo" id="print-ativos-titulo" style="margin:0;">Selecione os ativos (${sel.size}/${lista.length})</span>
+    <div style="display:flex;gap:6px;">
+      <button class="btn-sm btn-sm-sec" onclick="_marcarTodosImprimirAtivos(true)">Todos</button>
+      <button class="btn-sm btn-sm-sec" onclick="_marcarTodosImprimirAtivos(false)">Nenhum</button>
+    </div>
+  </div>
+  <div class="catalogo-lista">`;
+  lista.forEach(id=>{
+    const marcado=sel.has(id);
+    const ultPill=pillUltimaCatalogo(id);
+    h+=`<label class="catalogo-item" style="cursor:pointer;">
+      <input type="checkbox" ${marcado?'checked':''} onchange="_toggleImprimirAtivo('${id}',this.checked)" style="width:17px;height:17px;accent-color:#1F3864;flex-shrink:0;">
+      <div style="flex:1;margin-left:10px;min-width:0;">
+        <div style="font-size:13px;font-weight:600;color:#1F3864;">${id}</div>
+      </div>
+      <span class="pill ${ultPill.cls}" style="flex-shrink:0;">${ultPill.txt}</span>
+    </label>`;
+  });
+  h+=`</div>
+  <button class="btn-prim" style="margin-top:14px;" onclick="confirmarImprimirAtivos()"><i class="ti ti-file-zip"></i> Gerar relatórios (.zip)</button>
+  <button class="btn-sec" style="margin-top:8px;" onclick="renderCatalogoAtivos()">Cancelar</button>`;
+  return h;
+}
+
+function _toggleImprimirAtivo(id,checked){
+  if(!window._printAtivosSel)window._printAtivosSel=new Set();
+  if(checked)window._printAtivosSel.add(id);else window._printAtivosSel.delete(id);
+  const titulo=document.getElementById('print-ativos-titulo');
+  const lista=(window._catalogoIds||_catalogoIdsCompleto());
+  if(titulo)titulo.textContent=`Selecione os ativos (${window._printAtivosSel.size}/${lista.length})`;
+}
+
+function _marcarTodosImprimirAtivos(v){
+  const lista=(window._catalogoIds||_catalogoIdsCompleto());
+  window._printAtivosSel=new Set(v?lista:[]);
+  document.getElementById('content').innerHTML=_buildPrintAtivosHtml();
+}
+
+// Gera o PDF do relatório de um único ativo (reaproveita a lógica de compartilharPDF) e devolve o Blob
+async function _gerarPdfBlobAtivo(id){
+  _initAtivo(id);
+  const ativoAnterior=ativoSel;
+  ativoSel=id;
+  renderRelatorio();
+  await new Promise(r=>setTimeout(r,30));
+  // Expande seções recolhidas e ultrassom para sair completo no PDF
+  document.querySelectorAll('.rel-sec-body.recolhido').forEach(el=>el.classList.remove('recolhido'));
+  document.querySelectorAll('[id^="uss-rel-"]').forEach(el=>{if(el.style.display==='none')el.style.display='block';});
+  let cssText='';document.querySelectorAll('style').forEach(s=>{cssText+=s.textContent;});
+  const content=document.getElementById('content');
+  const clone=content.cloneNode(true);
+  clone.querySelectorAll('.no-print,.rel-sec-toggle,.rel-sec-chk,.item-print-chk,.btn-prim,.btn-sec,.btn-sm,.galeria-add-btn').forEach(el=>el.remove());
+  clone.querySelectorAll('.rel-sec-body.recolhido').forEach(el=>el.classList.remove('recolhido'));
+  clone.querySelectorAll('[style*="display:none"]').forEach(el=>{if(el.id&&el.id.startsWith('uss-rel-'))el.style.display='block';});
+  const wrapper=document.createElement('div');
+  wrapper.innerHTML=`<style>${cssText}.no-print,.rel-sec-toggle,.rel-sec-chk,.item-print-chk,.btn-prim,.btn-sec,.btn-sm,.galeria-add-btn{display:none!important;}.rel-sec-body.recolhido{display:block!important;}.rel-sec-wrap{border:1px solid #ccc;border-radius:4px;margin-bottom:8px;page-break-inside:avoid;}.rel-sec-hdr{background:#1F3864!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}</style>`;
+  wrapper.appendChild(clone);
+  wrapper.style.cssText='padding:8px;background:#fff;max-width:794px;';
+  document.body.appendChild(wrapper);
+  const opt={margin:[10,8,10,8],filename:`relatorio_${id}.pdf`,image:{type:'jpeg',quality:0.88},html2canvas:{scale:1.5,useCORS:true,backgroundColor:'#fff',logging:false,allowTaint:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:'avoid-all'}};
+  let pdfBlob=null;
+  try{
+    pdfBlob=await html2pdf().set(opt).from(wrapper).outputPdf('blob');
+  } finally {
+    document.body.removeChild(wrapper);
+    ativoSel=ativoAnterior;
+  }
+  return pdfBlob;
+}
+
+async function confirmarImprimirAtivos(){
+  const sel=[...(window._printAtivosSel||new Set())];
+  if(!sel.length){mostrarToast('Selecione ao menos um ativo','#E65100');return;}
+  const btns=document.querySelectorAll('#content .btn-prim,#content .btn-sec');
+  btns.forEach(b=>b.disabled=true);
+  try{
+    mostrarToast('Gerando relatórios em PDF...','#1565C0');
+    if(!window.html2pdf){
+      await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+    }
+    await _carregarJSZip();
+    const zip=new JSZip();
+    const d=new Date();
+    const dataStr=String(d.getDate()).padStart(2,'0')+String(d.getMonth()+1).padStart(2,'0')+d.getFullYear();
+    for(let i=0;i<sel.length;i++){
+      const id=sel[i];
+      mostrarToast(`Gerando ${i+1}/${sel.length}: ${id}...`,'#1565C0');
+      const blob=await _gerarPdfBlobAtivo(id);
+      if(blob)zip.file(`${id}-${dataStr}.pdf`,blob);
+    }
+    mostrarToast('Compactando arquivo...','#1565C0');
+    const zipBlob=await zip.generateAsync({type:'blob'});
+    _downloadBlob(zipBlob,`relatorios_${dataStr}.zip`);
+    mostrarToast('✓ '+sel.length+' relatório(s) gerado(s)','#2E7D32');
+  }catch(e){
+    mostrarToast('Erro ao gerar relatórios — verifique a conexão','#C62828');
+  }
+  renderCatalogoAtivos();
+}
+
 let _importAtivoPayload=null,_importAtivoSelecionados=new Set(),_importAtivoDestino='novo',_importAtivoFicha=false,_importAtivoLayout=false,_importAtivoOrigem=null;
+
+// ── Baixar UM relato (principal + atualizações) em .zip: 1 PDF do card + fotos separadas em pastas por ID ──
+function _adicionarFotosZip(zip,pastaId,fotos){
+  if(!fotos||!fotos.length)return;
+  const validas=fotos.filter(Boolean);
+  if(!validas.length)return;
+  const pasta=zip.folder('#'+pastaId);
+  validas.forEach((b64,i)=>{
+    const m=/^data:image\/(\w+);base64,(.+)$/.exec(b64);
+    if(!m)return;
+    const ext=m[1]==='jpeg'?'jpg':m[1];
+    pasta.file(`foto${i+1}.${ext}`,m[2],{base64:true});
+  });
+}
+
+async function baixarRelatoUnico_OLD_UNUSED(regId){
+  // Substituída pela versão baseada em jsPDF, mais abaixo no arquivo — mantido
+  // aqui só o comentário de referência.
+}
 
 function abrirImportarAtivo(origemAtivoId){
   _importAtivoOrigem=origemAtivoId||null;
@@ -1559,6 +1701,144 @@ function _tituloRegistroResumo(r){
   if(r.tipo==='defeito'||r.tipo==='ext-defeito')return(SECAO_LABELS[r.tipo]||'Defeitos/Reparos')+' — '+(r.campos?.defeitos?.length||0)+' item(ns)';
   if(SECAO_LABELS[r.tipo])return SECAO_LABELS[r.tipo]+descCurto;
   return(r.tipo||'Registro')+descCurto;
+}
+
+// ════════════════════════════════
+// VÍNCULO ENTRE RELATOS (IDs relacionadas)
+// Cada registro pode referenciar outro(s) registro(s) do MESMO ativo que o
+// originaram (ex: perda de cobertura causada pelo defeito de um rolo já
+// registrado). O campo r.vinculos guarda os ids referenciados; a relação
+// reversa ("gerou") é calculada na hora, sem duplicar dado.
+// ════════════════════════════════
+function _dispId(id){return(id||'').toString().replace(/^[^0-9]+/,'')||id;}
+function _idNum(id){return parseInt((id||'').toString().replace(/\D/g,''))||0;}
+
+// Rótulo curto para uma atualização (linha do tempo) dentro de um contexto (registro pai)
+function _tituloAtualizacao(r,extraCtx){
+  const base=r.tipo&&r.tipo.startsWith('rasp-')?SECAO_LABELS[r.tipo]||r.tipo:(SECAO_LABELS[r.tipo]||r.tipo||'Registro');
+  return 'Atualização · '+base+(extraCtx?' — '+extraCtx:'');
+}
+
+// Lista TODOS os itens vinculáveis de um ativo: cada registro (relato principal)
+// e cada atualização registrada na linha do tempo dele — cada um com sua própria
+// ID. Atribui ID a atualizações antigas que ainda não tinham (compatibilidade),
+// persistindo a mudança.
+function _todosItensLinkaveis(ativoId){
+  const itens=[];
+  let mudou=false;
+  (DB.registros[ativoId]||[]).forEach(r=>{
+    itens.push({id:r.id,ref:r,data:r.data,label:'#'+_dispId(r.id)+' — '+_tituloRegistroResumo(r)+' ('+fmtData(r.data)+')'});
+    if((r.tipo==='defeito'||r.tipo==='ext-defeito')&&r.campos?.defeitos){
+      r.campos.defeitos.forEach((d,i)=>{
+        (d.atualizacoes||[]).forEach(u=>{
+          if(!u.id){u.id=newId();mudou=true;}
+          itens.push({id:u.id,ref:u,data:u.data,label:'#'+_dispId(u.id)+' — '+_tituloAtualizacao(r,'Defeito'+(i>0?' #'+(i+1):''))+' ('+fmtData(u.data)+')'});
+        });
+      });
+    } else if(r.campos?.atualizacoes){
+      r.campos.atualizacoes.forEach(u=>{
+        if(!u.id){u.id=newId();mudou=true;}
+        itens.push({id:u.id,ref:u,data:u.data,label:'#'+_dispId(u.id)+' — '+_tituloAtualizacao(r)+' ('+fmtData(u.data)+')'});
+      });
+    }
+  });
+  if(mudou){marcarMudanca();autoBackup();}
+  return itens;
+}
+
+// Todos os itens (registro ou atualização) cujo .vinculos aponta para a ID informada
+function _itensQueApontamPara(ativoId,id){
+  return _todosItensLinkaveis(ativoId).filter(it=>(it.ref.vinculos||[]).includes(id)&&it.id!==id);
+}
+
+// Lista para o seletor de vínculo (exclui o próprio item sendo editado, se informado)
+function _listaRegistrosLinkaveis(ativoId,excluirId){
+  return _todosItensLinkaveis(ativoId)
+    .filter(it=>it.id!==excluirId)
+    .map(it=>({id:it.id,label:it.label}))
+    .sort((a,b)=>_idNum(b.id)-_idNum(a.id));
+}
+
+function buildVinculoField(ns,ativoId,excluirId,selecionados){
+  window['_vincSel_'+ns]=new Set(selecionados||[]);
+  window['_vincOpcoes_'+ns]=_listaRegistrosLinkaveis(ativoId,excluirId);
+  return`<div class="form-grupo">
+    <label><i class="ti ti-link" style="vertical-align:-2px;"></i> Relacionado a outro relato <span class="lbl-hint">(opcional — pode vincular a um relato inteiro ou a uma atualização específica)</span></label>
+    <div id="vinc-chips-${ns}" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;"></div>
+    <input type="text" id="vinc-busca-${ns}" placeholder="Buscar relato ou atualização para vincular (ex: rolo, #12)..." oninput="_renderVinculoLista('${ns}',this.value)" onfocus="_renderVinculoLista('${ns}',this.value)" style="width:100%;font-size:13px;padding:8px 10px;border:1px solid #D1D5DB;border-radius:8px;margin-bottom:6px;">
+    <div id="vinc-lista-${ns}" style="max-height:170px;overflow-y:auto;border-radius:8px;"></div>
+  </div>`;
+}
+
+function _renderVinculoChips(ns){
+  const wrap=document.getElementById('vinc-chips-'+ns);
+  if(!wrap)return;
+  const sel=window['_vincSel_'+ns]||new Set();
+  const opcoes=window['_vincOpcoes_'+ns]||[];
+  if(!sel.size){wrap.innerHTML='';return;}
+  wrap.innerHTML=[...sel].map(id=>{
+    const op=opcoes.find(o=>o.id===id);
+    const lbl=op?op.label:('#'+_dispId(id));
+    return`<span class="pill pill-blue" style="display:inline-flex;align-items:center;gap:4px;">${lbl}<i class="ti ti-x" style="cursor:pointer;font-size:11px;" onclick="_toggleVinculo('${ns}','${id}')"></i></span>`;
+  }).join('');
+}
+
+function _renderVinculoLista(ns,filtro){
+  const cont=document.getElementById('vinc-lista-'+ns);
+  if(!cont)return;
+  const opcoes=window['_vincOpcoes_'+ns]||[];
+  const f=(filtro||'').trim().toLowerCase();
+  const sel=window['_vincSel_'+ns]||new Set();
+  if(!f){cont.innerHTML='';cont.style.border='none';return;}
+  const lista=opcoes.filter(o=>o.label.toLowerCase().includes(f));
+  cont.style.border='1px solid #E5E8ED';
+  if(!lista.length){cont.innerHTML='<div style="padding:8px 10px;font-size:12px;color:#9CA3AF;">Nenhum relato encontrado</div>';return;}
+  cont.innerHTML=lista.slice(0,25).map(o=>`<div onclick="_toggleVinculo('${ns}','${o.id}')" style="padding:8px 10px;font-size:12px;border-bottom:1px solid #F0F2F5;cursor:pointer;display:flex;align-items:center;gap:6px;background:${sel.has(o.id)?'#EBF3FF':'#fff'};">
+    <i class="ti ti-${sel.has(o.id)?'square-rounded-check-filled':'square-rounded'}" style="color:${sel.has(o.id)?'#1F3864':'#C4C9D4'};flex-shrink:0;"></i>${o.label}
+  </div>`).join('');
+}
+
+function _toggleVinculo(ns,id){
+  const sel=window['_vincSel_'+ns]||(window['_vincSel_'+ns]=new Set());
+  if(sel.has(id))sel.delete(id);else sel.add(id);
+  _renderVinculoChips(ns);
+  const busca=document.getElementById('vinc-busca-'+ns);
+  _renderVinculoLista(ns,busca?busca.value:'');
+}
+
+function _getVinculos(ns){
+  return[...(window['_vincSel_'+ns]||new Set())];
+}
+
+// Escoa até o card (ou item da linha do tempo) vinculado e destaca por um instante
+function irParaRegistro(id){
+  const el=document.getElementById('card-'+id)||document.getElementById('upd-item-'+id);
+  if(!el){mostrarToast('Relato não encontrado nesta tela (pode estar no histórico)','#E65100');return;}
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+  el.classList.add('reg-card-destaque');
+  setTimeout(()=>el.classList.remove('reg-card-destaque'),1600);
+}
+
+// Monta o bloco de vínculos (saída + reversa) para um item (registro OU atualização)
+function buildVinculosBlock(id,vinculosSaida,ativoId,compact){
+  const opcoes=_listaRegistrosLinkaveis(ativoId,null);
+  const saida=(vinculosSaida||[]).map(vid=>opcoes.find(o=>o.id===vid)).filter(Boolean);
+  const entrada=_itensQueApontamPara(ativoId,id);
+  if(!saida.length&&!entrada.length)return'';
+  const fs=compact?'10px':'11px';
+  let h=`<div style="margin-top:${compact?'6px':'8px'};display:flex;flex-direction:column;gap:4px;">`;
+  if(saida.length){
+    h+=`<div style="font-size:${fs};color:#6B7280;display:flex;flex-wrap:wrap;gap:5px;align-items:center;font-weight:700;text-transform:uppercase;letter-spacing:.02em;">🔗 Vinculado com:
+      ${saida.map(o=>`<span class="pill pill-blue" style="cursor:pointer;text-transform:none;font-weight:600;font-size:${fs};" onclick="irParaRegistro('${o.id}')">#${_dispId(o.id)}</span>`).join('')}
+    </div>`;
+  }
+  if(entrada.length){
+    h+=`<div style="font-size:${fs};color:#6B7280;display:flex;flex-wrap:wrap;gap:5px;align-items:center;">↳ Gerou:
+      ${entrada.map(it=>`<span class="pill pill-neu" style="cursor:pointer;font-size:${fs};" onclick="irParaRegistro('${it.id}')">#${_dispId(it.id)}</span>`).join('')}
+    </div>`;
+  }
+  h+='</div>';
+  return h;
 }
 
 function _buildImportAtivoHtml(){
@@ -1770,6 +2050,8 @@ function buildAnotacoesGeraisHtml(){
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;">
           <span class="anotacao-ativo-badge">${an.ativo||'—'}</span>
           <div style="display:flex;gap:5px;">
+            <button class="btn-sm btn-sm-sec" onclick="baixarAnotacaoGeral(${idxGlobal})" title="Baixar esta anotação (PDF)"><i class="ti ti-download"></i></button>
+            <button class="btn-sm btn-sm-sec" onclick="compartilharAnotacaoGeral(${idxGlobal})" title="Compartilhar esta anotação (PDF)"><i class="ti ti-share"></i></button>
             <button class="btn-sm btn-sm-sec" onclick="abrirEdicaoAnotacao(${idxGlobal})"><i class="ti ti-edit"></i></button>
             <button class="btn-sm btn-sm-danger" onclick="excluirAnotacaoGeral(${idxGlobal})"><i class="ti ti-trash"></i></button>
           </div>
@@ -1847,13 +2129,14 @@ function mudaPagAnotacoes(p){
 // ════════════════════════════════
 // MENU DO ATIVO
 // ════════════════════════════════
-function selAtivo(id){if(!_garantirAtivoSelecionado(id))return;ativoSel=id;renderMenu();}
+function selAtivo(id){_initAtivo(id);ativoSel=id;renderMenu();}
 function renderMenu(){
   _formSujo=false;
   passo='menu';
-  const a=ATIVOS.find(x=>x.id===ativoSel);
+  const aReg=ATIVOS.find(x=>x.id===ativoSel);
+  const tipo=aReg?aReg.tipo:_guessTipoAtivo(ativoSel);
   const{cls,txt}=pillUltima(ativoSel);
-  setTopbar(ativoSel,a.tipo,true,false);
+  setTopbar(ativoSel,tipo,true,false);
   setStepBar(true,2);
 
   // seções em ordem alfabética — 3 por linha exceto rasp que destaca
@@ -1882,11 +2165,11 @@ function renderMenu(){
 
   document.getElementById('content').innerHTML=`
     <div class="ativo-banner">
-      <span style="display:flex;align-items:center;justify-content:center;">${svgAtivo(a.tipo)}</span>
-      <div><div class="ab-id">${a.id}</div><div class="ab-nome">${a.tipo}</div></div>
+      <span style="display:flex;align-items:center;justify-content:center;">${svgAtivo(tipo)}</span>
+      <div><div class="ab-id">${ativoSel}</div><div class="ab-nome">${tipo}</div></div>
       <span class="pill ${cls}" style="margin-left:auto;">${txt}</span>
-      <button class="banner-icon-btn" title="Exportar este ativo" onclick="exportarBackupAtivo('${a.id}')"><i class="ti ti-file-export"></i></button>
-      <button class="banner-icon-btn" title="Importar ativo" onclick="abrirImportarAtivo('${a.id}')"><i class="ti ti-file-import"></i></button>
+      <button class="banner-icon-btn" title="Exportar este ativo" onclick="exportarBackupAtivo('${ativoSel}')"><i class="ti ti-file-export"></i></button>
+      <button class="banner-icon-btn" title="Importar ativo" onclick="abrirImportarAtivo('${ativoSel}')"><i class="ti ti-file-import"></i></button>
     </div>
     <div class="grid-2" style="margin-bottom:13px;gap:8px;">
       <div class="card-btn destaque" onclick="renderRelatorio()">
@@ -1942,6 +2225,11 @@ function renderForm(){
   if(!['defeito','rasp','anotacao','ext-defeito'].includes(secaoSel)){
     c+=buildGaleriaField(ns);
   }
+  // Vínculo com outro relato já existente do mesmo ativo (não se aplica a Anotações,
+  // que usam um armazenamento próprio separado dos registros)
+  if(secaoSel!=='anotacao'){
+    c+=buildVinculoField('form-vinc',ativoSel,null,[]);
+  }
   c+=`<button class="btn-prim" onclick="salvar()">Salvar registro</button>
       <button class="btn-sec" onclick="renderMenu()"><i class="ti ti-arrow-left"></i> Voltar ao menu</button>`;
 
@@ -1955,6 +2243,7 @@ function renderForm(){
   const grids=[ns];
   if(secaoSel==='anotacao') grids.push('gal-f-foto-an');
   initGals(...grids);
+  if(secaoSel!=='anotacao')setTimeout(()=>_renderVinculoChips('form-vinc'),0);
 }
 
 function buildFotoField(fotoId,inpId,prevId){
@@ -2106,6 +2395,8 @@ function buildAnotacaoHistoricoAtivo(ativoId){
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;">
           <span class="anotacao-data" style="margin:0;"><i class="ti ti-calendar" style="vertical-align:-2px;"></i> ${fmtData(an.data)}</span>
           <div style="display:flex;gap:5px;">
+            <button class="btn-sm btn-sm-sec" onclick="baixarAnotacaoGeral(${idx})" title="Baixar esta anotação (PDF)"><i class="ti ti-download"></i></button>
+            <button class="btn-sm btn-sm-sec" onclick="compartilharAnotacaoGeral(${idx})" title="Compartilhar esta anotação (PDF)"><i class="ti ti-share"></i></button>
             <button class="btn-sm btn-sm-sec" onclick="abrirEdicaoAnotacao(${idx})"><i class="ti ti-edit"></i></button>
             <button class="btn-sm btn-sm-danger" onclick="excluirAnotacaoGeral(${idx})"><i class="ti ti-trash"></i></button>
           </div>
@@ -2742,7 +3033,7 @@ function salvar(){
       const idxAtivo=regs.findIndex(r=>r.tipo==='rasp-'+k&&!r._hist&&!r._encerrado);
       if(idxAtivo>=0) regs[idxAtivo]._hist=true;
       // Cria novo registro individual por componente
-      const reg={id:newId(),tipo:'rasp-'+k,data,desc:desc||'Sem relato',fotos,campos:{pct,crit},_hist:false};
+      const reg={id:newId(),tipo:'rasp-'+k,data,desc:desc||'Sem relato',fotos,campos:{pct,crit},_hist:false,vinculos:_getVinculos('form-vinc')};
       DB.registros[ativoSel].unshift(reg);
     });
     renderSucesso({id:newId(),tipo:'rasp',data,desc:'Inspeção de raspadores',fotos:[],campos:{}});return;
@@ -2779,7 +3070,7 @@ function salvar(){
         desc, fotos
       });
     });
-    const reg={id:newId(),tipo:secaoSel,data,desc:SECAO_LABELS[secaoSel]||'Defeitos/Reparos',fotos:[],campos:{defeitos}};
+    const reg={id:newId(),tipo:secaoSel,data,desc:SECAO_LABELS[secaoSel]||'Defeitos/Reparos',fotos:[],campos:{defeitos},vinculos:_getVinculos('form-vinc')};
     DB.registros[ativoSel].unshift(reg);
     renderSucesso(reg);return;
   }
@@ -2787,7 +3078,7 @@ function salvar(){
   const desc=(document.getElementById('f-desc')?.value||'').trim();
   if(!desc){alert('Preencha a descrição ou use "Sem relato".');return;}
   const fotos=getGalFotos(galNs(secaoSel));
-  const reg={id:newId(),tipo:secaoSel,data,desc,fotos,campos:{}};
+  const reg={id:newId(),tipo:secaoSel,data,desc,fotos,campos:{},vinculos:_getVinculos('form-vinc')};
 
   // Extrator mapeia para mesmos handlers mas com tipo diferente
   const _tipoBase=secaoSel.replace('ext-','');
@@ -3304,9 +3595,9 @@ function buildRegCard(r,isHist){
         atualizacoes.forEach((u,ui)=>{
           const stDot={em:'dot-em',ac:'dot-ac',co:'dot-co'}[u.status]||'dot-new';
           const stLabel=stMap[u.status]||'Atualização';
-          timelineH+=`<div class="def-tl-item">
+          timelineH+=`<div class="def-tl-item" id="upd-item-${u.id||''}">
             <div class="def-tl-dot ${stDot}"></div>
-            <div class="def-tl-meta"><i class="ti ti-calendar" style="font-size:10px;"></i>${fmtData(u.data)} — <span style="color:${stCls[u.status]?'inherit':'#6B7280'};font-weight:600;">${stLabel}</span>${u._origem==='Mesclado'?'<span style="background:#EDE7F6;color:#4527A0;font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:4px;">MESCLADO</span>':''}</div>
+            <div class="def-tl-meta">${u.id?`<span class="pill pill-neu" style="font-size:9px;font-weight:700;margin-right:4px;">#${_dispId(u.id)}</span>`:''}<i class="ti ti-calendar" style="font-size:10px;"></i>${fmtData(u.data)} — <span style="color:${stCls[u.status]?'inherit':'#6B7280'};font-weight:600;">${stLabel}</span>${u._origem==='Mesclado'?'<span style="background:#EDE7F6;color:#4527A0;font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:4px;">MESCLADO</span>':''}</div>
             <div class="def-tl-body">
               <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">
                 <div style="flex:1;">
@@ -3316,6 +3607,7 @@ function buildRegCard(r,isHist){
                   </div>
                   ${u.desc&&u.desc!=='Sem relato'?`<div>${u.desc}</div>`:'<span style="color:#9CA3AF;font-style:italic;font-size:11px;">Sem relato</span>'}
                   ${u.fotos&&u.fotos.length?buildGaleriaDisplay(u.fotos,'atu-'+r.id+'-'+i+'-'+ui):''}
+                  ${u.id?buildVinculosBlock(u.id,u.vinculos,ativoSel,true):''}
                 </div>
                 ${!isHist?`<div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0;">
                   ${u._origem==='Mesclado'?`<button class="btn-sm" style="font-size:9px;padding:3px 5px;background:#EDE7F6;color:#4527A0;border:none;border-radius:5px;cursor:pointer;white-space:nowrap;" onclick="separarMesclado('${r.id}',${i},${ui})" title="Separar este defeito mesclado em um registro independente"><i class="ti ti-git-branch" style="font-size:10px;"></i> Separar</button>`:''}
@@ -3370,15 +3662,19 @@ function buildRegCard(r,isHist){
 
   return `<div class="reg-card" id="card-${r.id}">
     <div class="reg-card-header">
+      <span class="pill pill-neu" style="font-size:9px;font-weight:700;">#${_dispId(r.id)}</span>
       ${titulo?`<span style="font-size:11px;font-weight:700;color:#1F3864;">${titulo}</span>`:''}
       <span class="rc-data" style="${titulo?'':''}"><i class="ti ti-calendar" style="vertical-align:-2px;"></i> ${dataHeaderLbl}${fmtData(dataHeaderVal)}</span>
       <span style="flex:1;"></span>
       <input type="checkbox" class="item-print-chk no-print" checked title="Incluir na impressão" onclick="event.stopPropagation()">
+      <button class="btn-sm btn-sm-sec no-print" onclick="baixarRelatoUnico('${r.id}')" title="Baixar este relato em PDF"><i class="ti ti-download"></i></button>
+      <button class="btn-sm btn-sm-sec no-print" onclick="compartilharRelatoUnico('${r.id}')" title="Compartilhar este relato (PDF)"><i class="ti ti-share"></i></button>
       <button class="btn-sm btn-sm-sec no-print" onclick="abrirEdicao('${r.id}')"><i class="ti ti-edit"></i> Editar</button>
       ${isHist?`<button class="btn-sm no-print" style="background:#FFEBEE;color:#C62828;padding:4px 7px;" onclick="excluirRegistroHist('${r.id}')" title="Excluir permanentemente"><i class="ti ti-trash"></i></button>`:''}
     </div>
     ${desc?`<div class="reg-card-body">${desc}</div>`:''}
     ${extras}
+    ${buildVinculosBlock(r.id,r.vinculos,ativoSel)}
     ${!isRaspK&&r.tipo!=='interf'&&r.tipo!=='ext-interf'&&r.tipo!=='desal'&&r.tipo!=='ext-desal'&&r.fotos&&r.fotos.length?buildGaleriaDisplay(r.fotos,'rg-'+r.id):(!isRaspK&&r.tipo!=='interf'&&r.tipo!=='ext-interf'&&r.tipo!=='desal'&&r.tipo!=='ext-desal'&&r.foto?`<img src="${r.foto}" style="width:100%;border-radius:6px;margin-top:8px;">`:'')}</div>`;
 }
 
@@ -3634,6 +3930,7 @@ function abrirEdicao(regId){
     });
   }
 
+  c+=buildVinculoField('edit-vinc-'+regId,ativoSel,regId,r.vinculos||[]);
   c+=`<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
     <button class="btn-prim" onclick="salvarEdicao()"><i class="ti ti-device-floppy"></i> Salvar alterações</button>
     <button class="btn-sec" onclick="fecharModal()"><i class="ti ti-x"></i> Cancelar</button>
@@ -3649,6 +3946,7 @@ function abrirEdicao(regId){
     if(r.tipo==='rasp') Object.keys(r.campos).forEach(k=>renderGaleriaGrid(ns+'-'+k));
     else if(r.tipo==='defeito') (r.campos.defeitos||[]).forEach((_,i)=>renderGaleriaGrid(ns+'-d'+i));
     else renderGaleriaGrid(ns);
+    _renderVinculoChips('edit-vinc-'+regId);
   },0);
   // Para rasp-K: iniciar barra se já tem % salvo
   if(isRaspK) setTimeout(()=>editAtualizarBarra(),50);
@@ -3758,11 +4056,12 @@ function abrirAtualizarDefeito(regId,defIdx){
       <textarea id="upd-desc" rows="3" style="width:100%;font-size:13px;padding:8px;border:1px solid #D1D5DB;border-radius:8px;resize:vertical;margin-top:4px;" placeholder="O que mudou? Ou copie a descrição anterior"></textarea>
     </div>
     ${buildGaleriaField(ns)}
+    ${buildVinculoField('upd-vinc-'+ns,ativoSel,null,[])}
     <button class="btn-prim" onclick="salvarAtualizacaoDefeito()" style="margin-top:4px;"><i class="ti ti-device-floppy"></i> Salvar atualização</button>
     <button class="btn-sec" onclick="fecharModalUpd()" style="margin-top:8px;">Cancelar</button>
   </div>`;
   document.body.appendChild(modal);
-  setTimeout(()=>renderGaleriaGrid(ns),50);
+  setTimeout(()=>{renderGaleriaGrid(ns);_renderVinculoChips('upd-vinc-'+ns);},50);
 }
 
 function excluirAtualizacao(regId,defIdx,updIdx){
@@ -3875,7 +4174,7 @@ function salvarAtualizacaoDefeito(){
   const desc=(document.getElementById('upd-desc')?.value||'').trim()||'Sem relato';
   const fotos=getGalFotos(ns);
   if(!d.atualizacoes)d.atualizacoes=[];
-  d.atualizacoes.push({data,status,crit,loc,desc,fotos});
+  d.atualizacoes.push({id:newId(),data,status,crit,loc,desc,fotos,vinculos:_getVinculos('upd-vinc-'+ns)});
   // Atualiza o status atual do defeito
   d.status=status;
   marcarMudanca(); autoBackup();
@@ -3921,9 +4220,9 @@ function buildTimelineRegistro(atualizacoes,regId,isHist,grp,original){
   (atualizacoes||[]).forEach((u,ui)=>{
     const stDot=grp==='rasp'?'dot-new':({em:'dot-em',ac:'dot-ac',co:'dot-co'}[u.status]||'dot-new');
     const stLabel=grp==='rasp'?'':(stMap[u.status]||'');
-    h+=`<div class="def-tl-item">
+    h+=`<div class="def-tl-item" id="upd-item-${u.id||''}">
       <div class="def-tl-dot ${stDot}"></div>
-      <div class="def-tl-meta"><i class="ti ti-calendar" style="font-size:10px;"></i>${fmtData(u.data)}${stLabel?' — <span style="font-weight:600;">'+stLabel+'</span>':''}</div>
+      <div class="def-tl-meta">${u.id?`<span class="pill pill-neu" style="font-size:9px;font-weight:700;margin-right:4px;">#${_dispId(u.id)}</span>`:''}<i class="ti ti-calendar" style="font-size:10px;"></i>${fmtData(u.data)}${stLabel?' — <span style="font-weight:600;">'+stLabel+'</span>':''}</div>
       <div class="def-tl-body">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;">
           <div style="flex:1;">
@@ -3933,6 +4232,7 @@ function buildTimelineRegistro(atualizacoes,regId,isHist,grp,original){
             </div>
             ${u.desc&&u.desc!=='Sem relato'?`<div>${u.desc}</div>`:'<span style="color:#9CA3AF;font-style:italic;font-size:11px;">Sem relato</span>'}
             ${u.fotos&&u.fotos.length?buildGaleriaDisplay(u.fotos,'atureg-'+regId+'-'+ui):''}
+            ${u.id?buildVinculosBlock(u.id,u.vinculos,ativoSel,true):''}
           </div>
           ${!isHist?`<div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0;">
             <button class="btn-sm btn-sm-sec" style="font-size:10px;padding:3px 6px;" onclick="editarAtualizacaoRegistro('${regId}',${ui})"><i class="ti ti-edit" style="font-size:10px;"></i></button>
@@ -3950,7 +4250,7 @@ function escHtml(s){
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function _htmlModalAtualizacaoRegistro(grp,ns,onSalvar,titulo,dataVal,prefill,relatoAnterior){
+function _htmlModalAtualizacaoRegistro(grp,ns,onSalvar,titulo,dataVal,prefill,relatoAnterior,vincInfo){
   prefill=prefill||{};
   const ds=prefill.status||'ac';
   const dc=prefill.crit||'';
@@ -4017,6 +4317,7 @@ function _htmlModalAtualizacaoRegistro(grp,ns,onSalvar,titulo,dataVal,prefill,re
       <textarea id="upd2-desc" rows="3" style="width:100%;font-size:13px;padding:8px;border:1px solid #D1D5DB;border-radius:8px;resize:vertical;margin-top:4px;" placeholder="O que mudou? Ou copie a descrição anterior">${escHtml(dd)}</textarea>
     </div>
     ${buildGaleriaField(ns)}
+    ${vincInfo?buildVinculoField('upd-vinc-'+ns,vincInfo.ativoId,vincInfo.excluirId,vincInfo.selecionados||[]):''}
     <button class="btn-prim" onclick="${onSalvar}" style="margin-top:4px;"><i class="ti ti-device-floppy"></i> Salvar atualização</button>
     <button class="btn-sec" onclick="fecharModalUpd()" style="margin-top:8px;">Cancelar</button>
   </div>`;
@@ -4046,9 +4347,9 @@ function abrirAtualizarRegistro(regId){
   const modal=document.createElement('div');
   modal.id='modal-upd';
   modal.className='upd-modal';
-  modal.innerHTML=_htmlModalAtualizacaoRegistro(grp,ns,'salvarAtualizacaoRegistro()','Registrar Atualização','',prefillAtual,relatoAnterior);
+  modal.innerHTML=_htmlModalAtualizacaoRegistro(grp,ns,'salvarAtualizacaoRegistro()','Registrar Atualização','',prefillAtual,relatoAnterior,{ativoId:ativoSel,excluirId:null,selecionados:[]});
   document.body.appendChild(modal);
-  setTimeout(()=>renderGaleriaGrid(ns),50);
+  setTimeout(()=>{renderGaleriaGrid(ns);_renderVinculoChips('upd-vinc-'+ns);},50);
 }
 
 function salvarAtualizacaoRegistro(){
@@ -4062,7 +4363,7 @@ function salvarAtualizacaoRegistro(){
   const crit=document.getElementById('upd2-crit')?.value||'';
   const desc=(document.getElementById('upd2-desc')?.value||'').trim()||'Sem relato';
   const fotos=getGalFotos(ns);
-  const entry={data,desc,fotos,crit};
+  const entry={id:newId(),data,desc,fotos,crit};
   if(!r.campos)r.campos={};
   if(grp==='rasp'){
     const pct=document.getElementById('upd2-pct')?.value||'';
@@ -4073,6 +4374,7 @@ function salvarAtualizacaoRegistro(){
     r.campos.status=status;
     if(crit)r.campos.crit=crit;
   }
+  entry.vinculos=_getVinculos('upd-vinc-'+ns);
   if(!r.campos.atualizacoes)r.campos.atualizacoes=[];
   r.campos.atualizacoes.push(entry);
   marcarMudanca();autoBackup();
@@ -4410,6 +4712,8 @@ function salvarEdicao(){
     });
   }
 
+  r.vinculos=_getVinculos('edit-vinc-'+r.id);
+
   DB.registros[ativoSel].sort((a,b)=>b.data.localeCompare(a.data));
   marcarMudanca(); autoBackup();
   fecharModal();renderRelatorio();
@@ -4417,9 +4721,9 @@ function salvarEdicao(){
 // ════════════════════════════════════════════════════════════════
 // SISTEMA DE NOVIDADES
 // ════════════════════════════════════════════════════════════════
-const APP_VERSION='v2.3';
+const APP_VERSION='v3.2';
 // Só a novidade mais recente desta versão
-const APP_CHANGELOG=['Novo: botão "Limpar todos os favoritos" na tela Favoritos, para remover de uma vez favoritos antigos que ficaram marcados sem querer (nenhum dado do ativo é apagado, só a marcação de favorito).','Corrigido: Favoritar um ativo na tela "Ativos" não insere mais ele automaticamente na tela inicial — favoritos e "tela inicial" agora são independentes.'];
+const APP_CHANGELOG=['Ajustado: baixar um relato agora gera o PDF sozinho primeiro (sem colocar dentro de zip nenhum — era isso que saía em branco). Se o relato tiver fotos, alguns segundos depois baixa um segundo arquivo, um .zip só com as fotos organizadas em pastas por ID.'];
 // Cores do badge alternando a cada versão
 // Paleta de cores que repete infinitamente
 const _CORES_PALETA=[
@@ -5193,6 +5497,443 @@ function imprimirRelatorio(){
   },150);
 }
 
+// Imprime SÓ UM relato (mesmo mecanismo do imprimirRelatorio — que já funciona bem —
+// só que escondendo tudo, exceto o card escolhido, antes de chamar o print nativo)
+function imprimirRelatoUnico(regId){
+  const cardEl=document.getElementById('card-'+regId);
+  if(!cardEl){mostrarToast('Abra o relatório para imprimir este relato','#E65100');return;}
+  const ocultos=[];
+  document.querySelectorAll('.rel-sec-wrap').forEach(sec=>{
+    if(!sec.contains(cardEl)){sec.classList.add('print-item-oculto');ocultos.push(sec);}
+  });
+  document.querySelectorAll('.reg-card').forEach(card=>{
+    if(card!==cardEl){card.classList.add('print-item-oculto');ocultos.push(card);}
+  });
+  setTimeout(()=>{
+    window.print();
+    setTimeout(()=>ocultos.forEach(el=>el.classList.remove('print-item-oculto')),800);
+  },150);
+}
+
+// ════════════════════════════════
+// BAIXAR RELATO EM PDF (desenhado direto, sem html2canvas)
+// Em vez de "tirar print" da tela (que vinha travando em alguns relatos),
+// o PDF é montado escrevendo texto e colando as fotos direto com o jsPDF —
+// mecanismo bem mais simples e estável, sem depender de renderizar HTML/CSS.
+// ════════════════════════════════
+function _carregarJsPDF(){
+  if(window.jspdf&&window.jspdf.jsPDF)return Promise.resolve();
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload=res;s.onerror=rej;
+    document.head.appendChild(s);
+  });
+}
+
+function _dimsImagem(b64){
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>res({w:img.naturalWidth||1,h:img.naturalHeight||1});
+    img.onerror=()=>res({w:1,h:1});
+    img.src=b64;
+  });
+}
+
+// Extrai uma lista plana de "blocos" (relato principal + cada atualização) de
+// qualquer tipo de registro, num formato único.
+function _extrairBlocosParaPdf(r){
+  const blocos=[];
+  if((r.tipo==='defeito'||r.tipo==='ext-defeito')&&r.campos?.defeitos){
+    const tlLbl={emenda:'Emenda',fora_emenda:'Fora de emenda',ambos:'Ambos'};
+    r.campos.defeitos.forEach((d,i)=>{
+      const tags=[];
+      if(d.tipo)tags.push(tlLbl[d.tipo]||d.tipo);
+      if(d.loc)tags.push(d.loc);
+      if(d.crit)tags.push(d.crit);
+      blocos.push({id:r.id,titulo:'Defeito'+(i>0?' #'+(i+1):''),data:d.dataEmenda||r.data,tags,desc:d.desc,fotos:d.fotos||(d.foto?[d.foto]:[])});
+      (d.atualizacoes||[]).forEach(u=>{
+        const utags=[];
+        if(u.crit)utags.push(u.crit);
+        if(u.loc)utags.push(u.loc);
+        if(u.status)utags.push(stMap[u.status]||'');
+        blocos.push({id:u.id||r.id,titulo:'Atualização',data:u.data,tags:utags,desc:u.desc,fotos:u.fotos||[]});
+      });
+    });
+  } else if(r.tipo&&r.tipo.startsWith('rasp-')){
+    const v=r.campos||{};
+    const tags=[];
+    if(v.pct)tags.push(v.pct+'% desgaste');
+    if(v.crit)tags.push(v.crit);
+    blocos.push({id:r.id,titulo:SECAO_LABELS[r.tipo]||r.tipo,data:r.data,tags,desc:r.desc,fotos:r.fotos||[]});
+    (v.atualizacoes||[]).forEach(u=>{
+      const utags=[];
+      if(u.pct)utags.push(u.pct+'% desgaste');
+      if(u.crit)utags.push(u.crit);
+      blocos.push({id:u.id||r.id,titulo:'Atualização',data:u.data,tags:utags,desc:u.desc,fotos:u.fotos||[]});
+    });
+  } else {
+    const v=r.campos||{};
+    const tags=[];
+    if(v.tipo)tags.push(v.tipo);
+    if(v.crit)tags.push(v.crit);
+    if(v.bal)tags.push('Baliza '+v.bal);
+    if(v.local)tags.push('Local '+v.local);
+    if(v.pos)tags.push('Posição: '+v.pos);
+    if(v.status)tags.push(stMap[v.status]||'');
+    blocos.push({id:r.id,titulo:SECAO_LABELS[r.tipo]||r.tipo||'Registro',data:r.data,tags,desc:r.desc,fotos:r.fotos||(r.foto?[r.foto]:[])});
+    (v.atualizacoes||[]).forEach(u=>{
+      const utags=[];
+      if(u.crit)utags.push(u.crit);
+      if(u.status)utags.push(stMap[u.status]||'');
+      blocos.push({id:u.id||r.id,titulo:'Atualização',data:u.data,tags:utags,desc:u.desc,fotos:u.fotos||[]});
+    });
+  }
+  return blocos;
+}
+
+async function _gerarPdfRelatoBlob(r){
+  await _carregarJsPDF();
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'});
+  const pageW=210,pageH=297,margin=12,maxW=pageW-margin*2;
+  let y=margin;
+  function novaPagSeNecessario(altura){
+    if(y+altura>pageH-margin){doc.addPage();y=margin;}
+  }
+  // Cabeçalho: nome do ativo
+  doc.setFillColor(31,56,100);
+  doc.roundedRect(margin,y,doc.getTextWidth(ativoSel)+12,8,2,2,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(11);
+  doc.setFont(undefined,'bold');
+  doc.text(String(ativoSel),margin+6,y+5.5);
+  y+=14;
+
+  const blocos=_extrairBlocosParaPdf(r);
+  for(const b of blocos){
+    novaPagSeNecessario(14);
+    doc.setFontSize(9);
+    doc.setFont(undefined,'bold');
+    doc.setTextColor(55,65,81);
+    doc.text(`#${_dispId(b.id)}`,margin,y+4);
+    doc.setTextColor(31,56,100);
+    doc.text(String(b.titulo||''),margin+16,y+4);
+    doc.setFont(undefined,'normal');
+    doc.setTextColor(150,150,150);
+    doc.setFontSize(8);
+    doc.text(fmtData(b.data),pageW-margin-doc.getTextWidth(fmtData(b.data)),y+4);
+    y+=7;
+
+    if(b.tags&&b.tags.length){
+      doc.setFontSize(8);
+      let tx=margin;
+      b.tags.filter(Boolean).forEach(t=>{
+        const tw=doc.getTextWidth(t)+5;
+        if(tx+tw>pageW-margin){tx=margin;y+=5.5;}
+        doc.setFillColor(255,235,238);
+        doc.setTextColor(198,40,40);
+        doc.roundedRect(tx,y-3.3,tw,4.8,1.2,1.2,'F');
+        doc.text(t,tx+2.5,y);
+        tx+=tw+2;
+      });
+      y+=6;
+    }
+
+    doc.setFontSize(9);
+    doc.setTextColor(55,65,81);
+    doc.setFont(undefined,'normal');
+    const descTxt=(b.desc&&b.desc!=='Sem relato')?b.desc:'Sem relato';
+    const linhas=doc.splitTextToSize(descTxt,maxW);
+    novaPagSeNecessario(linhas.length*4.3);
+    doc.text(linhas,margin,y);
+    y+=linhas.length*4.3+3;
+
+    const fotos=(b.fotos||[]).filter(Boolean);
+    if(fotos.length){
+      const altFoto=32;
+      novaPagSeNecessario(altFoto+4);
+      let fx=margin;
+      for(const foto of fotos){
+        const dims=await _dimsImagem(foto);
+        const largFoto=Math.min(altFoto*(dims.w/dims.h),48);
+        if(fx+largFoto>pageW-margin){fx=margin;y+=altFoto+3;novaPagSeNecessario(altFoto+4);}
+        try{
+          const tipoImg=foto.indexOf('image/png')>=0?'PNG':'JPEG';
+          doc.addImage(foto,tipoImg,fx,y,largFoto,altFoto);
+        }catch(e){}
+        fx+=largFoto+3;
+      }
+      y+=altFoto+6;
+    } else {
+      y+=2;
+    }
+    doc.setDrawColor(225,225,225);
+    doc.line(margin,y-2,pageW-margin,y-2);
+    y+=3;
+  }
+  return doc.output('blob');
+}
+
+// ── PDF de UMA anotação (ativo + data + descrição + fotos) ──
+async function _gerarPdfAnotacaoBlob(an){
+  await _carregarJsPDF();
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'});
+  const pageW=210,pageH=297,margin=12,maxW=pageW-margin*2;
+  let y=margin;
+  function novaPagSeNecessario(altura){
+    if(y+altura>pageH-margin){doc.addPage();y=margin;}
+  }
+  const nomeAtivo=an.ativo||'—';
+  doc.setFillColor(31,56,100);
+  doc.roundedRect(margin,y,doc.getTextWidth(nomeAtivo)+12,8,2,2,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(11);
+  doc.setFont(undefined,'bold');
+  doc.text(String(nomeAtivo),margin+6,y+5.5);
+  y+=14;
+
+  doc.setFontSize(9);
+  doc.setFont(undefined,'bold');
+  doc.setTextColor(31,56,100);
+  doc.text('Anotação',margin,y+4);
+  doc.setFont(undefined,'normal');
+  doc.setTextColor(150,150,150);
+  doc.setFontSize(8);
+  const dataTxt=fmtData(an.data);
+  doc.text(dataTxt,pageW-margin-doc.getTextWidth(dataTxt),y+4);
+  y+=9;
+
+  doc.setFontSize(9);
+  doc.setTextColor(55,65,81);
+  doc.setFont(undefined,'normal');
+  const descTxt=an.desc||'Sem descrição';
+  const linhas=doc.splitTextToSize(descTxt,maxW);
+  novaPagSeNecessario(linhas.length*4.3);
+  doc.text(linhas,margin,y);
+  y+=linhas.length*4.3+3;
+
+  const fotos=(an.fotos||[]).filter(Boolean);
+  if(fotos.length){
+    const altFoto=32;
+    novaPagSeNecessario(altFoto+4);
+    let fx=margin;
+    for(const foto of fotos){
+      const dims=await _dimsImagem(foto);
+      const largFoto=Math.min(altFoto*(dims.w/dims.h),48);
+      if(fx+largFoto>pageW-margin){fx=margin;y+=altFoto+3;novaPagSeNecessario(altFoto+4);}
+      try{
+        const tipoImg=foto.indexOf('image/png')>=0?'PNG':'JPEG';
+        doc.addImage(foto,tipoImg,fx,y,largFoto,altFoto);
+      }catch(e){}
+      fx+=largFoto+3;
+    }
+    y+=altFoto+6;
+  }
+  return doc.output('blob');
+}
+
+// Monta o(s) arquivo(s) de uma anotação: PDF sozinho, ou .zip com PDF+fotos
+// juntos quando há fotos — mesma lógica usada nos relatos.
+async function _montarArquivoAnotacao(idx){
+  const an=DB.anotacoesGerais[idx];
+  if(!an)return null;
+  const d=new Date();
+  const dataStr=String(d.getDate()).padStart(2,'0')+String(d.getMonth()+1).padStart(2,'0')+d.getFullYear();
+  const nomeArquivo=`${an.ativo||'anotacao'}-anotacao_${dataStr}`;
+  const pdfBlob=await _gerarPdfAnotacaoBlob(an);
+  const fotos=(an.fotos||[]).filter(Boolean);
+  if(!fotos.length){
+    return {blob:pdfBlob,nome:`${nomeArquivo}.pdf`,tipo:'application/pdf'};
+  }
+  try{
+    await _carregarJSZip();
+    const zip=new JSZip();
+    zip.file(`${nomeArquivo}.pdf`,pdfBlob);
+    _adicionarFotosZip(zip,'fotos',fotos);
+    const zipBlob=await zip.generateAsync({type:'blob'});
+    return {blob:zipBlob,nome:`${nomeArquivo}.zip`,tipo:'application/zip'};
+  }catch(e){
+    return {blob:pdfBlob,nome:`${nomeArquivo}.pdf`,tipo:'application/pdf'};
+  }
+}
+
+async function baixarAnotacaoGeral(idx){
+  const an=DB.anotacoesGerais[idx];
+  if(!an){mostrarToast('Anotação não encontrada','#C62828');return;}
+  mostrarToast('Gerando PDF...','#1565C0');
+  try{
+    const arq=await _montarArquivoAnotacao(idx);
+    _downloadBlob(arq.blob,arq.nome);
+    mostrarToast(arq.nome.endsWith('.zip')?'✓ PDF + fotos baixados em .zip!':'✓ PDF baixado!','#2E7D32');
+  }catch(e){
+    mostrarToast('Erro ao gerar o PDF — verifique a conexão','#C62828');
+  }
+}
+
+async function compartilharAnotacaoGeral(idx){
+  const an=DB.anotacoesGerais[idx];
+  if(!an){mostrarToast('Anotação não encontrada','#C62828');return;}
+  mostrarToast('Gerando PDF...','#1565C0');
+  let arq=null;
+  try{
+    arq=await _montarArquivoAnotacao(idx);
+  }catch(e){
+    mostrarToast('Erro ao gerar o PDF — verifique a conexão','#C62828');
+    return;
+  }
+  const arquivo=new File([arq.blob],arq.nome,{type:arq.tipo});
+  if(navigator.canShare&&navigator.canShare({files:[arquivo]})){
+    try{
+      await navigator.share({title:`Anotação ${an.ativo||''}`,files:[arquivo]});
+      mostrarToast('✓ Anotação compartilhada!','#2E7D32');
+    }catch(e){
+      if(e.name!=='AbortError'){
+        _downloadBlob(arq.blob,arq.nome);
+        mostrarToast('Compartilhamento indisponível — arquivo baixado','#1565C0');
+      }
+    }
+  } else {
+    _downloadBlob(arq.blob,arq.nome);
+    mostrarToast(arq.nome.endsWith('.zip')?'✓ PDF + fotos baixados em .zip!':'✓ PDF baixado!','#2E7D32');
+  }
+}
+
+// ── Compartilhar UM relato (mesma lógica de baixarRelatoUnico: PDF + fotos
+// juntos num único .zip quando há fotos) — usa a Web Share API do celular;
+// se o compartilhamento não for suportado, cai para baixar normalmente. ──
+async function compartilharRelatoUnico(regId){
+  const r=DB.registros[ativoSel]?.find(x=>x.id===regId);
+  if(!r){mostrarToast('Relato não encontrado','#C62828');return;}
+  mostrarToast('Gerando PDF...','#1565C0');
+  const dIdSuf=_dispId(regId);
+  const d=new Date();
+  const dataStr=String(d.getDate()).padStart(2,'0')+String(d.getMonth()+1).padStart(2,'0')+d.getFullYear();
+  let pdfBlob=null;
+  try{
+    pdfBlob=await _gerarPdfRelatoBlob(r);
+  }catch(e){
+    mostrarToast('Erro ao gerar o PDF — verifique a conexão','#C62828');
+    return;
+  }
+  const nomeArquivo=`${ativoSel}-relato_${dIdSuf}_${dataStr}`;
+  let temFoto=false;
+  let zip=null;
+  try{
+    await _carregarJSZip();
+    zip=new JSZip();
+    const addFotos=(fotos,pastaId)=>{
+      const validas=(fotos||[]).filter(Boolean);
+      if(!validas.length)return;
+      temFoto=true;
+      _adicionarFotosZip(zip,pastaId,validas);
+    };
+    addFotos(r.fotos||(r.foto?[r.foto]:[]),dIdSuf);
+    if((r.tipo==='defeito'||r.tipo==='ext-defeito')&&r.campos?.defeitos){
+      r.campos.defeitos.forEach(dft=>{
+        addFotos(dft.fotos||(dft.foto?[dft.foto]:[]),dIdSuf);
+        (dft.atualizacoes||[]).forEach(u=>addFotos(u.fotos||[],_dispId(u.id||regId)));
+      });
+    } else if(r.campos?.atualizacoes){
+      r.campos.atualizacoes.forEach(u=>addFotos(u.fotos||[],_dispId(u.id||regId)));
+    }
+  }catch(e){
+    temFoto=false;
+  }
+  // Monta o(s) arquivo(s) final(is): PDF sozinho, ou .zip com PDF+fotos juntos
+  let arquivoFinal=null, nomeFinal='', tipoFinal='';
+  if(temFoto){
+    try{
+      zip.file(`${nomeArquivo}.pdf`,pdfBlob);
+      mostrarToast('Gerando arquivo compactado...','#1565C0');
+      arquivoFinal=await zip.generateAsync({type:'blob'});
+      nomeFinal=`${nomeArquivo}.zip`;
+      tipoFinal='application/zip';
+    }catch(e){
+      arquivoFinal=pdfBlob; nomeFinal=`${nomeArquivo}.pdf`; tipoFinal='application/pdf';
+    }
+  } else {
+    arquivoFinal=pdfBlob; nomeFinal=`${nomeArquivo}.pdf`; tipoFinal='application/pdf';
+  }
+  const arquivo=new File([arquivoFinal],nomeFinal,{type:tipoFinal});
+  if(navigator.canShare&&navigator.canShare({files:[arquivo]})){
+    try{
+      await navigator.share({title:`Relato ${_dispId(regId)}`,files:[arquivo]});
+      mostrarToast('✓ Relato compartilhado!','#2E7D32');
+    }catch(e){
+      if(e.name!=='AbortError'){
+        _downloadBlob(arquivoFinal,nomeFinal);
+        mostrarToast('Compartilhamento indisponível — arquivo baixado','#1565C0');
+      }
+    }
+  } else {
+    _downloadBlob(arquivoFinal,nomeFinal);
+    mostrarToast(temFoto?'✓ PDF + fotos baixados em .zip!':'✓ PDF baixado!','#2E7D32');
+  }
+}
+
+async function baixarRelatoUnico(regId){
+  const r=DB.registros[ativoSel]?.find(x=>x.id===regId);
+  if(!r){mostrarToast('Relato não encontrado','#C62828');return;}
+  mostrarToast('Gerando PDF...','#1565C0');
+  const dIdSuf=_dispId(regId);
+  const d=new Date();
+  const dataStr=String(d.getDate()).padStart(2,'0')+String(d.getMonth()+1).padStart(2,'0')+d.getFullYear();
+  // 1) Gera o PDF
+  let pdfBlob=null;
+  try{
+    pdfBlob=await _gerarPdfRelatoBlob(r);
+  }catch(e){
+    mostrarToast('Erro ao gerar o PDF — verifique a conexão','#C62828');
+    return;
+  }
+  const nomeArquivo=`${ativoSel}-relato_${dIdSuf}_${dataStr}`;
+  // 2) Reúne as fotos do relato (principal + defeitos + atualizações)
+  let temFoto=false;
+  let zip=null;
+  try{
+    await _carregarJSZip();
+    zip=new JSZip();
+    const addFotos=(fotos,pastaId)=>{
+      const validas=(fotos||[]).filter(Boolean);
+      if(!validas.length)return;
+      temFoto=true;
+      _adicionarFotosZip(zip,pastaId,validas);
+    };
+    addFotos(r.fotos||(r.foto?[r.foto]:[]),dIdSuf);
+    if((r.tipo==='defeito'||r.tipo==='ext-defeito')&&r.campos?.defeitos){
+      r.campos.defeitos.forEach(dft=>{
+        addFotos(dft.fotos||(dft.foto?[dft.foto]:[]),dIdSuf);
+        (dft.atualizacoes||[]).forEach(u=>addFotos(u.fotos||[],_dispId(u.id||regId)));
+      });
+    } else if(r.campos?.atualizacoes){
+      r.campos.atualizacoes.forEach(u=>addFotos(u.fotos||[],_dispId(u.id||regId)));
+    }
+  }catch(e){
+    temFoto=false;
+  }
+  if(!temFoto){
+    // Sem fotos — não há motivo para zip, baixa só o PDF
+    _downloadBlob(pdfBlob,`${nomeArquivo}.pdf`);
+    mostrarToast('✓ PDF baixado!','#2E7D32');
+    return;
+  }
+  // 3) Coloca o PDF dentro do MESMO .zip que as fotos e baixa um único arquivo
+  try{
+    zip.file(`${nomeArquivo}.pdf`,pdfBlob);
+    mostrarToast('Gerando arquivo compactado...','#1565C0');
+    const zipBlob=await zip.generateAsync({type:'blob'});
+    _downloadBlob(zipBlob,`${nomeArquivo}.zip`);
+    mostrarToast('✓ PDF + fotos baixados em .zip!','#2E7D32');
+  }catch(e){
+    // Se o zip falhar por algum motivo, garante ao menos o PDF
+    _downloadBlob(pdfBlob,`${nomeArquivo}.pdf`);
+    mostrarToast('PDF baixado, mas o .zip com as fotos falhou','#E65100');
+  }
+}
+
+
 // ════════════════════════════════
 // EXPORTAR / IMPORTAR BACKUP
 // ════════════════════════════════
@@ -5465,7 +6206,7 @@ function _fallbackDownload(json){
 // ════════════════════════════════
 function voltar(){
   if(passo==='import-ativo-previa'){cancelarImportarAtivo();return;}
-  if(passo==='export-ativos'||passo==='import-lote-previa'){renderCatalogoAtivos();return;}
+  if(passo==='export-ativos'||passo==='import-lote-previa'||passo==='print-ativos'){renderCatalogoAtivos();return;}
   if(passo==='menu'||passo==='anotacoes-gerais'||passo==='favoritos'||passo==='catalogo')renderLista();
   else renderMenu();
 }
@@ -5818,7 +6559,7 @@ function _emTelaDeEdicao(){
 }
 
 // Ações de navegação/visualização que NÃO devem contar como "digitou algo"
-const _ACOES_SEGURAS=/^(renderMenu|renderLista|selAtivo|renderRelatorio|selSecao|fecharModalAnotacao|fecharLightbox|navLightbox|lbOpenSaved|abrirLightbox|toggleChkSecao|imprimirRelatorio|salvar\(|salvarAnotacaoGeral\(|salvarFicha\(|salvarEdicao\(|salvarEdicaoAnotacao\(|mudaPagAnotacoes|renderAnotacoesGerais)/;
+const _ACOES_SEGURAS=/^(renderMenu|renderLista|selAtivo|renderRelatorio|selSecao|fecharModalAnotacao|fecharLightbox|navLightbox|lbOpenSaved|abrirLightbox|toggleChkSecao|imprimirRelatorio|salvar\(|salvarAnotacaoGeral\(|salvarFicha\(|salvarEdicao\(|salvarEdicaoAnotacao\(|mudaPagAnotacoes|renderAnotacoesGerais|baixarAnotacaoGeral\(|compartilharAnotacaoGeral\(|baixarRelatoUnico\(|compartilharRelatoUnico\()/;
 
 function marcarFormSujo(){
   _formSujo=true;
