@@ -5776,28 +5776,30 @@ async function compartilharAnotacaoGeral(idx){
   const an=DB.anotacoesGerais[idx];
   if(!an){mostrarToast('Anotação não encontrada','#C62828');return;}
   mostrarToast('Gerando PDF...','#1565C0');
-  let arq=null;
+  const d=new Date();
+  const dataStr=String(d.getDate()).padStart(2,'0')+String(d.getMonth()+1).padStart(2,'0')+d.getFullYear();
+  const nomeArquivo=`${an.ativo||'anotacao'}-anotacao_${dataStr}`;
+  let pdfBlob=null;
   try{
-    arq=await _montarArquivoAnotacao(idx);
+    pdfBlob=await _gerarPdfAnotacaoBlob(an);
   }catch(e){
     mostrarToast('Erro ao gerar o PDF — verifique a conexão','#C62828');
     return;
   }
-  const arquivo=new File([arq.blob],arq.nome,{type:arq.tipo});
-  if(navigator.canShare&&navigator.canShare({files:[arquivo]})){
-    try{
-      await navigator.share({title:`Anotação ${an.ativo||''}`,files:[arquivo]});
-      mostrarToast('✓ Anotação compartilhada!','#2E7D32');
-    }catch(e){
-      if(e.name!=='AbortError'){
-        _downloadBlob(arq.blob,arq.nome);
-        mostrarToast('Compartilhamento indisponível — arquivo baixado','#1565C0');
-      }
+  const pdfFile=new File([pdfBlob],`${nomeArquivo}.pdf`,{type:'application/pdf'});
+  const fotos=(an.fotos||[]).filter(Boolean);
+  const fotoArquivos=fotos.map((b64,i)=>_dataURLParaArquivo(b64,`foto${i+1}.${_extImagem(b64)}`)).filter(Boolean);
+  await _compartilharOuBaixar({
+    pdfFile,fotoArquivos,nomeArquivo,
+    tituloShare:`Anotação ${an.ativo||''}`,
+    montarZipFallback:async()=>{
+      await _carregarJSZip();
+      const zip=new JSZip();
+      zip.file(`${nomeArquivo}.pdf`,pdfBlob);
+      _adicionarFotosZip(zip,'fotos',fotos);
+      return await zip.generateAsync({type:'blob'});
     }
-  } else {
-    _downloadBlob(arq.blob,arq.nome);
-    mostrarToast(arq.nome.endsWith('.zip')?'✓ PDF + fotos baixados em .zip!':'✓ PDF baixado!','#2E7D32');
-  }
+  });
 }
 
 // ── Compartilhar UM relato (mesma lógica de baixarRelatoUnico: PDF + fotos
@@ -5818,59 +5820,41 @@ async function compartilharRelatoUnico(regId){
     return;
   }
   const nomeArquivo=`${ativoSel}-relato_${dIdSuf}_${dataStr}`;
-  let temFoto=false;
-  let zip=null;
-  try{
-    await _carregarJSZip();
-    zip=new JSZip();
-    const addFotos=(fotos,pastaId)=>{
-      const validas=(fotos||[]).filter(Boolean);
-      if(!validas.length)return;
-      temFoto=true;
-      _adicionarFotosZip(zip,pastaId,validas);
-    };
-    addFotos(r.fotos||(r.foto?[r.foto]:[]),dIdSuf);
-    if((r.tipo==='defeito'||r.tipo==='ext-defeito')&&r.campos?.defeitos){
-      r.campos.defeitos.forEach(dft=>{
-        addFotos(dft.fotos||(dft.foto?[dft.foto]:[]),dIdSuf);
-        (dft.atualizacoes||[]).forEach(u=>addFotos(u.fotos||[],_dispId(u.id||regId)));
-      });
-    } else if(r.campos?.atualizacoes){
-      r.campos.atualizacoes.forEach(u=>addFotos(u.fotos||[],_dispId(u.id||regId)));
-    }
-  }catch(e){
-    temFoto=false;
+  const pdfFile=new File([pdfBlob],`${nomeArquivo}.pdf`,{type:'application/pdf'});
+  // Reúne as fotos do relato (principal + defeitos + atualizações), mantendo
+  // o id da pasta de origem de cada uma (usado no nome do arquivo e no zip de fallback)
+  const fotosColetadas=[];
+  const addFotos=(fotos,pastaId)=>{
+    (fotos||[]).filter(Boolean).forEach(b64=>fotosColetadas.push({pastaId,b64}));
+  };
+  addFotos(r.fotos||(r.foto?[r.foto]:[]),dIdSuf);
+  if((r.tipo==='defeito'||r.tipo==='ext-defeito')&&r.campos?.defeitos){
+    r.campos.defeitos.forEach(dft=>{
+      addFotos(dft.fotos||(dft.foto?[dft.foto]:[]),dIdSuf);
+      (dft.atualizacoes||[]).forEach(u=>addFotos(u.fotos||[],_dispId(u.id||regId)));
+    });
+  } else if(r.campos?.atualizacoes){
+    r.campos.atualizacoes.forEach(u=>addFotos(u.fotos||[],_dispId(u.id||regId)));
   }
-  // Monta o(s) arquivo(s) final(is): PDF sozinho, ou .zip com PDF+fotos juntos
-  let arquivoFinal=null, nomeFinal='', tipoFinal='';
-  if(temFoto){
-    try{
+  const contagemPorPasta={};
+  const fotoArquivos=fotosColetadas.map(({pastaId,b64})=>{
+    contagemPorPasta[pastaId]=(contagemPorPasta[pastaId]||0)+1;
+    return _dataURLParaArquivo(b64,`${pastaId}-foto${contagemPorPasta[pastaId]}.${_extImagem(b64)}`);
+  }).filter(Boolean);
+
+  await _compartilharOuBaixar({
+    pdfFile,fotoArquivos,nomeArquivo,
+    tituloShare:`Relato ${_dispId(regId)}`,
+    montarZipFallback:async()=>{
+      await _carregarJSZip();
+      const zip=new JSZip();
       zip.file(`${nomeArquivo}.pdf`,pdfBlob);
-      mostrarToast('Gerando arquivo compactado...','#1565C0');
-      arquivoFinal=await zip.generateAsync({type:'blob'});
-      nomeFinal=`${nomeArquivo}.zip`;
-      tipoFinal='application/zip';
-    }catch(e){
-      arquivoFinal=pdfBlob; nomeFinal=`${nomeArquivo}.pdf`; tipoFinal='application/pdf';
+      const porPasta={};
+      fotosColetadas.forEach(({pastaId,b64})=>{(porPasta[pastaId]=porPasta[pastaId]||[]).push(b64);});
+      Object.keys(porPasta).forEach(pastaId=>_adicionarFotosZip(zip,pastaId,porPasta[pastaId]));
+      return await zip.generateAsync({type:'blob'});
     }
-  } else {
-    arquivoFinal=pdfBlob; nomeFinal=`${nomeArquivo}.pdf`; tipoFinal='application/pdf';
-  }
-  const arquivo=new File([arquivoFinal],nomeFinal,{type:tipoFinal});
-  if(navigator.canShare&&navigator.canShare({files:[arquivo]})){
-    try{
-      await navigator.share({title:`Relato ${_dispId(regId)}`,files:[arquivo]});
-      mostrarToast('✓ Relato compartilhado!','#2E7D32');
-    }catch(e){
-      if(e.name!=='AbortError'){
-        _downloadBlob(arquivoFinal,nomeFinal);
-        mostrarToast('Compartilhamento indisponível — arquivo baixado','#1565C0');
-      }
-    }
-  } else {
-    _downloadBlob(arquivoFinal,nomeFinal);
-    mostrarToast(temFoto?'✓ PDF + fotos baixados em .zip!':'✓ PDF baixado!','#2E7D32');
-  }
+  });
 }
 
 async function baixarRelatoUnico(regId){
@@ -6153,6 +6137,65 @@ function _downloadBlob(blob,nome){
   const a=document.createElement('a');
   a.href=url; a.download=nome; a.click();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+// ── Helpers de compartilhamento (PDF + fotos SEM zip) ──
+// O Android/Chrome não aceita compartilhar arquivos .zip pela Web Share API
+// (só áudio, imagem, PDF, vídeo e texto) — por isso, ao compartilhar, cada
+// foto vira um arquivo de imagem separado em vez de ir dentro de um .zip.
+// O .zip continua sendo usado normalmente para BAIXAR (isso não usa Web Share).
+function _extImagem(dataUrl){
+  const m=/^data:image\/(\w+);base64,/.exec(dataUrl||'');
+  if(!m)return 'jpg';
+  return m[1]==='jpeg'?'jpg':m[1];
+}
+
+function _dataURLParaArquivo(dataUrl,nome){
+  const m=/^data:([^;]+);base64,(.+)$/.exec(dataUrl||'');
+  if(!m)return null;
+  try{
+    const bin=atob(m[2]);
+    const arr=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
+    return new File([arr],nome,{type:m[1]});
+  }catch(e){return null;}
+}
+
+// Tenta compartilhar PDF + fotos juntos como arquivos separados; se o
+// dispositivo não aceitar o conjunto todo, tenta só o PDF; se não houver
+// suporte a Web Share (ex.: desktop), cai para baixar (.zip com fotos, ou
+// só o PDF quando não há fotos) — igual ao comportamento de antes.
+async function _compartilharOuBaixar({pdfFile,fotoArquivos,nomeArquivo,tituloShare,montarZipFallback}){
+  fotoArquivos=fotoArquivos||[];
+  const todosArquivos=[pdfFile,...fotoArquivos];
+  if(navigator.canShare&&navigator.canShare({files:todosArquivos})){
+    try{
+      await navigator.share({title:tituloShare,files:todosArquivos});
+      mostrarToast('✓ Compartilhado!','#2E7D32');
+      return;
+    }catch(e){
+      if(e.name==='AbortError')return;
+    }
+  }
+  if(fotoArquivos.length&&navigator.canShare&&navigator.canShare({files:[pdfFile]})){
+    try{
+      await navigator.share({title:tituloShare,files:[pdfFile]});
+      mostrarToast('✓ PDF compartilhado (fotos ficaram de fora — envie-as separado pela galeria)','#1565C0');
+      return;
+    }catch(e){
+      if(e.name==='AbortError')return;
+    }
+  }
+  if(fotoArquivos.length){
+    try{
+      const zipBlob=await montarZipFallback();
+      _downloadBlob(zipBlob,`${nomeArquivo}.zip`);
+      mostrarToast('✓ PDF + fotos baixados em .zip!','#2E7D32');
+      return;
+    }catch(e){/* segue e baixa só o pdf abaixo */}
+  }
+  _downloadBlob(pdfFile,pdfFile.name);
+  mostrarToast('✓ PDF baixado!','#2E7D32');
 }
 
 // ════════════════════════════════
