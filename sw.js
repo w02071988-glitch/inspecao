@@ -3,7 +3,7 @@
 // Versão: 0.7
 // ══════════════════════════════════════════════════
 
-const CACHE_NAME = 'inspecao-v3.21'; // atualizado para forçar refresh (v3.21 — sincronizado com APP_VERSION do index.html)
+const CACHE_NAME = 'inspecao-v3.3'; // atualizado para forçar refresh (v3.3 — sincronizado com APP_VERSION do index.html: botão de baixar por seção do relatório)
 
 // Arquivos que ficam disponíveis offline
 const ARQUIVOS_CACHE = [

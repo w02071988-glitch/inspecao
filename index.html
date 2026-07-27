@@ -3266,7 +3266,7 @@ function renderRelatorio(){
       raspBody+=`<div style="font-size:12px;color:#9CA3AF;padding:8px 0;">${label} — sem registro</div>`;
     }
   });
-  const raspHtml=temRasp?buildSecaoRel('rasp','ti-tool','RASPADORES',raspBody,false,''):'';
+  const raspHtml=temRasp?buildSecaoRel('rasp','ti-tool','RASPADORES',raspBody,false,'',true):'';
 
   // ── OUTRAS SEÇÕES ──
   let regsHtml='';
@@ -3274,7 +3274,7 @@ function renderRelatorio(){
     if(!ativos[tipo].length)return;
     let body='';
     ativos[tipo].forEach(r=>{body+=buildRegCard(r,false);});
-    regsHtml+=buildSecaoRel('reg-'+tipo,SECAO_ICONS[tipo],SECAO_LABELS[tipo].toUpperCase(),body,false,'');
+    regsHtml+=buildSecaoRel('reg-'+tipo,SECAO_ICONS[tipo],SECAO_LABELS[tipo].toUpperCase(),body,false,'',true);
   });
 
   // ── EXTRATOR DE SUCATAS ──────────────────────────────────────────────────
@@ -3422,15 +3422,18 @@ function renderRelatorio(){
 }
 
 // Constrói uma seção recolhível com checkbox de impressão
-function buildSecaoRel(uid,icon,titulo,body,isHist,extraHdrClass){
+function buildSecaoRel(uid,icon,titulo,body,isHist,extraHdrClass,permitirDownloadSecao){
   const bodyId='sec-body-'+uid;
   const chkId='sec-chk-'+uid;
   const filtroBtnHtml=isHist?`<button class="rel-sec-toggle no-print" id="sec-filtro-${uid}" onclick="event.stopPropagation();toggleFiltroGeralPainel('${uid}')" title="Filtrar por data" style="background:rgba(255,255,255,.15);margin-right:2px;"><i class="ti ti-filter" style="font-size:12px;"></i></button>`:'';
+  const tituloEsc=String(titulo||'').replace(/'/g,"\\'");
+  const downloadBtnHtml=permitirDownloadSecao?`<button class="rel-sec-toggle no-print" onclick="event.stopPropagation();baixarSecaoZip('${uid}','${tituloEsc}')" title="Baixar itens selecionados desta seção (PDF + fotos por pasta, .zip)" style="background:rgba(255,255,255,.15);margin-right:2px;"><i class="ti ti-download" style="font-size:12px;"></i></button>`:'';
   return `<div class="rel-sec-wrap" id="sec-wrap-${uid}">
     <div class="rel-sec-hdr ${extraHdrClass||''}" onclick="toggleSecao('${bodyId}','${uid}')">
       <i class="ti ${icon} rsh-icon"></i>
       <span class="rsh-label">${titulo}</span>
       ${filtroBtnHtml}
+      ${downloadBtnHtml}
       <input type="checkbox" class="rel-sec-chk no-print" id="${chkId}" checked onclick="event.stopPropagation();toggleChkSecao('${uid}')" title="Incluir na impressão">
       <button class="rel-sec-toggle no-print" id="sec-btn-${uid}">−</button>
     </div>
@@ -4722,9 +4725,9 @@ function salvarEdicao(){
 // ════════════════════════════════════════════════════════════════
 // SISTEMA DE NOVIDADES
 // ════════════════════════════════════════════════════════════════
-const APP_VERSION='v3.2';
+const APP_VERSION='v3.3';
 // Só a novidade mais recente desta versão
-const APP_CHANGELOG=['Ajustado: baixar um relato agora gera o PDF sozinho primeiro (sem colocar dentro de zip nenhum — era isso que saía em branco). Se o relato tiver fotos, alguns segundos depois baixa um segundo arquivo, um .zip só com as fotos organizadas em pastas por ID.'];
+const APP_CHANGELOG=['Novo: botão de baixar no título de cada seção do relatório (Raspadores, Interferências, Desalinhamentos, Defeitos/Reparos, Contrapesos, Anotações). Baixa um .zip com uma pasta por item selecionado (ID + nome), contendo o PDF daquele item junto com suas fotos.'];
 // Cores do badge alternando a cada versão
 // Paleta de cores que repete infinitamente
 const _CORES_PALETA=[
@@ -5918,6 +5921,74 @@ async function baixarRelatoUnico(regId){
   }
 }
 
+
+// ── Baixar TODOS os itens SELECIONADOS de uma seção do relatório ──
+// (ex.: RASPADORES, INTERFERÊNCIAS...) — 1 pasta por item (ID + nome do item)
+// contendo o PDF daquele item + suas fotos, tudo dentro de um único .zip.
+// Reaproveita o MESMO modelo de geração usado no "baixar" de cada item
+// individual (_gerarPdfRelatoBlob) — não usa o modelo de compartilhamento.
+async function baixarSecaoZip(uid,titulo){
+  const bodyEl=document.getElementById('sec-body-'+uid);
+  if(!bodyEl){mostrarToast('Seção não encontrada','#C62828');return;}
+  const cards=[...bodyEl.querySelectorAll('.reg-card')];
+  if(!cards.length){mostrarToast('Nenhum item nesta seção','#E65100');return;}
+  const idsSelecionados=cards.filter(c=>{
+    const chk=c.querySelector('.item-print-chk');
+    return !chk||chk.checked;
+  }).map(c=>c.id.replace(/^card-/,''));
+  if(!idsSelecionados.length){mostrarToast('Nenhum item selecionado nesta seção','#E65100');return;}
+  const registros=idsSelecionados.map(id=>(DB.registros[ativoSel]||[]).find(x=>x.id===id)).filter(Boolean);
+  if(!registros.length){mostrarToast('Itens não encontrados','#C62828');return;}
+  try{
+    mostrarToast(`Gerando PDFs (0/${registros.length})...`,'#1565C0');
+    await _carregarJSZip();
+    const zip=new JSZip();
+    let algumOk=false;
+    for(let i=0;i<registros.length;i++){
+      const r=registros[i];
+      mostrarToast(`Gerando PDF ${i+1}/${registros.length}...`,'#1565C0');
+      let pdfBlob=null;
+      try{ pdfBlob=await _gerarPdfRelatoBlob(r); }catch(e){ continue; }
+      const dIdSuf=_dispId(r.id);
+      const nomeItem=(SECAO_LABELS[r.tipo]||r.tipo||'Item').replace(/[\\/:*?"<>|]/g,'').trim();
+      const pasta=zip.folder(`${dIdSuf}-${nomeItem}`);
+      pasta.file(`relato_${dIdSuf}.pdf`,pdfBlob);
+      // Fotos do item (principal + defeitos + atualizações) — todas dentro da MESMA pasta do PDF
+      let fotoContador=0;
+      const addFotosNaPasta=(fotos)=>{
+        (fotos||[]).filter(Boolean).forEach(b64=>{
+          const m=/^data:image\/(\w+);base64,(.+)$/.exec(b64);
+          if(!m)return;
+          fotoContador++;
+          const ext=m[1]==='jpeg'?'jpg':m[1];
+          pasta.file(`foto${fotoContador}.${ext}`,m[2],{base64:true});
+        });
+      };
+      addFotosNaPasta(r.fotos||(r.foto?[r.foto]:[]));
+      if((r.tipo==='defeito'||r.tipo==='ext-defeito')&&r.campos?.defeitos){
+        r.campos.defeitos.forEach(dft=>{
+          addFotosNaPasta(dft.fotos||(dft.foto?[dft.foto]:[]));
+          (dft.atualizacoes||[]).forEach(u=>addFotosNaPasta(u.fotos||[]));
+        });
+      } else if(r.campos?.atualizacoes){
+        r.campos.atualizacoes.forEach(u=>addFotosNaPasta(u.fotos||[]));
+      }
+      algumOk=true;
+    }
+    if(!algumOk){mostrarToast('Erro ao gerar os PDFs — verifique a conexão','#C62828');return;}
+    mostrarToast('Compactando arquivo...','#1565C0');
+    const zipBlob=await zip.generateAsync({type:'blob'});
+    const d=new Date();
+    const dataStr=String(d.getDate()).padStart(2,'0')+String(d.getMonth()+1).padStart(2,'0')+d.getFullYear();
+    const horaStr=String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0')+String(d.getSeconds()).padStart(2,'0');
+    const tituloArq=String(titulo||'SECAO').trim().replace(/\s+/g,'_');
+    const nomeArquivo=`${ativoSel}_${tituloArq}-ID${dataStr}${horaStr}`;
+    _downloadBlob(zipBlob,`${nomeArquivo}.zip`);
+    mostrarToast(`✓ ${registros.length} item(ns) baixado(s) em .zip!`,'#2E7D32');
+  }catch(e){
+    mostrarToast('Erro ao gerar o arquivo — verifique a conexão','#C62828');
+  }
+}
 
 // ════════════════════════════════
 // EXPORTAR / IMPORTAR BACKUP
