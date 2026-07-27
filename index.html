@@ -3172,6 +3172,7 @@ function renderRelatorio(){
   passo='relatorio';
   setTopbar('Relatório',ativoSel,true,true);
   setStepBar(false);
+  _precarregarHtml2pdf(); // carrega a lib em segundo plano p/ o botão compartilhar ser mais rápido
   const ficha=DB.fichas[ativoSel];
   const TIPOS_BASE=['anotacao','contra','defeito','desal','interf'];
   const RASP_K_TIPOS=RASP_CHAVES.map(k=>'rasp-'+k);
@@ -6124,11 +6125,18 @@ async function compartilharPDF(){
   try{
     const pdfBlob=await html2pdf().set(opt).from(wrapper).outputPdf('blob');
     restaurar();
-    const pdfFile=new File([pdfBlob],`relatorio_${nomeAtivo}.pdf`,{type:'application/pdf'});
+    const nomeArquivo=`relatorio_${nomeAtivo}.pdf`;
+    const pdfFile=new File([pdfBlob],nomeArquivo,{type:'application/pdf'});
     if(navigator.canShare&&navigator.canShare({files:[pdfFile]})){
       try{await navigator.share({title:`Relatório ${nomeAtivo}`,files:[pdfFile]});mostrarToast('✓ PDF compartilhado!','#2E7D32');}
-      catch(e){if(e.name!=='AbortError'){_downloadBlob(pdfBlob,`relatorio_${nomeAtivo}.pdf`);mostrarToast('PDF salvo!','#1565C0');}}
-    } else {_downloadBlob(pdfBlob,`relatorio_${nomeAtivo}.pdf`);mostrarToast('✓ PDF baixado!','#2E7D32');}
+      catch(e){
+        if(e.name!=='AbortError'){
+          // Provável perda da permissão de compartilhar por demora na geração —
+          // o PDF já está pronto, então oferece um novo toque para tentar de novo.
+          _mostrarAcaoCompartilhar([pdfFile],`Relatório ${nomeAtivo}`,()=>_downloadBlob(pdfBlob,nomeArquivo));
+        }
+      }
+    } else {_downloadBlob(pdfBlob,nomeArquivo);mostrarToast('✓ PDF baixado!','#2E7D32');}
   }catch(e){restaurar();mostrarToast('Erro PDF — use Imprimir','#C62828');setTimeout(()=>window.print(),300);}
 }
 
@@ -6137,6 +6145,51 @@ function _downloadBlob(blob,nome){
   const a=document.createElement('a');
   a.href=url; a.download=nome; a.click();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+// Carrega a lib html2pdf em segundo plano (sem travar nada) assim que o
+// relatório é aberto, para que o botão "Compartilhar" não perca tempo com
+// isso depois — ver explicação em _mostrarAcaoCompartilhar.
+function _precarregarHtml2pdf(){
+  if(window.html2pdf||window._html2pdfCarregando)return;
+  window._html2pdfCarregando=true;
+  const s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+  s.onerror=()=>{window._html2pdfCarregando=false;};
+  document.head.appendChild(s);
+}
+
+// ── Banner "tentar compartilhar de novo" ──
+// O navigator.share() do celular só funciona por ~5s depois do toque no
+// botão ("ativação transitória"). Gerar o PDF do relatório inteiro (que usa
+// html2canvas para desenhar a tela) pode demorar mais que isso, e aí o
+// compartilhamento falha silenciosamente e cai pra baixar. Quando isso
+// acontece, em vez de só baixar, mostramos este botão: o PDF já está pronto
+// (em memória), então um novo toque aqui é rápido o bastante pro
+// compartilhamento funcionar.
+function _mostrarAcaoCompartilhar(arquivos,titulo,aoBaixar){
+  const antigo=document.getElementById('banner-compartilhar');
+  if(antigo)antigo.remove();
+  const el=document.createElement('div');
+  el.id='banner-compartilhar';
+  el.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1F3864;color:#fff;padding:10px 10px 10px 16px;border-radius:12px;z-index:1000;display:flex;gap:10px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.35);font-size:13px;font-weight:600;max-width:92vw;';
+  el.innerHTML=`<span>PDF pronto —</span>
+    <button id="banner-compartilhar-btn" style="background:#2E7D32;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-weight:700;white-space:nowrap;">Compartilhar</button>
+    <button id="banner-compartilhar-baixar" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);padding:8px 10px;border-radius:8px;white-space:nowrap;">Baixar</button>
+    <button id="banner-compartilhar-fechar" style="background:transparent;color:#fff;border:none;font-size:16px;padding:0 4px;">✕</button>`;
+  document.body.appendChild(el);
+  const fechar=()=>{if(document.body.contains(el))el.remove();};
+  document.getElementById('banner-compartilhar-fechar').onclick=fechar;
+  document.getElementById('banner-compartilhar-baixar').onclick=()=>{aoBaixar();fechar();};
+  document.getElementById('banner-compartilhar-btn').onclick=async()=>{
+    try{
+      await navigator.share({title:titulo,files:arquivos});
+      mostrarToast('✓ Compartilhado!','#2E7D32');
+    }catch(e){
+      if(e.name!=='AbortError'){aoBaixar();mostrarToast('Compartilhamento indisponível — baixado','#1565C0');}
+    }
+    fechar();
+  };
 }
 
 // ── Helpers de compartilhamento (PDF + fotos SEM zip) ──
@@ -6168,6 +6221,18 @@ function _dataURLParaArquivo(dataUrl,nome){
 async function _compartilharOuBaixar({pdfFile,fotoArquivos,nomeArquivo,tituloShare,montarZipFallback}){
   fotoArquivos=fotoArquivos||[];
   const todosArquivos=[pdfFile,...fotoArquivos];
+  const aoBaixarFallback=async()=>{
+    if(fotoArquivos.length){
+      try{
+        const zipBlob=await montarZipFallback();
+        _downloadBlob(zipBlob,`${nomeArquivo}.zip`);
+        mostrarToast('✓ PDF + fotos baixados em .zip!','#2E7D32');
+        return;
+      }catch(e){/* segue e baixa só o pdf abaixo */}
+    }
+    _downloadBlob(pdfFile,pdfFile.name);
+    mostrarToast('✓ PDF baixado!','#2E7D32');
+  };
   if(navigator.canShare&&navigator.canShare({files:todosArquivos})){
     try{
       await navigator.share({title:tituloShare,files:todosArquivos});
@@ -6175,6 +6240,9 @@ async function _compartilharOuBaixar({pdfFile,fotoArquivos,nomeArquivo,tituloSha
       return;
     }catch(e){
       if(e.name==='AbortError')return;
+      // Já temos tudo pronto — oferece um novo toque em vez de baixar direto
+      _mostrarAcaoCompartilhar(todosArquivos,tituloShare,aoBaixarFallback);
+      return;
     }
   }
   if(fotoArquivos.length&&navigator.canShare&&navigator.canShare({files:[pdfFile]})){
@@ -6186,16 +6254,7 @@ async function _compartilharOuBaixar({pdfFile,fotoArquivos,nomeArquivo,tituloSha
       if(e.name==='AbortError')return;
     }
   }
-  if(fotoArquivos.length){
-    try{
-      const zipBlob=await montarZipFallback();
-      _downloadBlob(zipBlob,`${nomeArquivo}.zip`);
-      mostrarToast('✓ PDF + fotos baixados em .zip!','#2E7D32');
-      return;
-    }catch(e){/* segue e baixa só o pdf abaixo */}
-  }
-  _downloadBlob(pdfFile,pdfFile.name);
-  mostrarToast('✓ PDF baixado!','#2E7D32');
+  await aoBaixarFallback();
 }
 
 // ════════════════════════════════

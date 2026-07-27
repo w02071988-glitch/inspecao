@@ -3,7 +3,7 @@
 // Versão: 0.7
 // ══════════════════════════════════════════════════
 
-const CACHE_NAME = 'inspecao-v10'; // atualizado para forçar refresh (v0.8 — compartilhamento de relatos/anotações com fotos agora envia PDF+fotos como arquivos separados em vez de .zip, pois o Android não aceita compartilhar .zip pela Web Share API)
+const CACHE_NAME = 'inspecao-v3.21'; // atualizado para forçar refresh (v3.21 — sincronizado com APP_VERSION do index.html)
 
 // Arquivos que ficam disponíveis offline
 const ARQUIVOS_CACHE = [
