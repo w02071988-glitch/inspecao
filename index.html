@@ -379,6 +379,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .rel-sec-body.recolhido{display:none;}
 .item-print-row{display:flex;align-items:flex-start;gap:6px;}
 .item-print-chk{width:15px;height:15px;accent-color:#1F3864;cursor:pointer;flex-shrink:0;margin-top:2px;}
+.uss-print-chk{width:16px;height:16px;accent-color:#BDD9F8;cursor:pointer;flex-shrink:0;}
+.uss-trecho-chk{width:15px;height:15px;accent-color:#1F3864;cursor:pointer;flex-shrink:0;}
 @media print{
   .rel-sec-toggle,.rel-sec-chk,.item-print-chk,.no-print{display:none!important;}
   .print-item-oculto{display:none!important;}
@@ -685,7 +687,7 @@ function dataMaisRecenteRegistro(r){
   const datas=_datasRegistro(r);
   return datas.length?datas.sort().reverse()[0]:r.data;
 }
-function ultimaAlteracao(id){const r=DB.registros[id];if(!r.length)return null;let datas=[];r.forEach(reg=>datas.push(..._datasRegistro(reg)));return datas.length?datas.sort().reverse()[0]:null;}
+function ultimaAlteracao(id){const r=DB.registros[id];if(!r||!r.length)return null;let datas=[];r.forEach(reg=>datas.push(..._datasRegistro(reg)));return datas.length?datas.sort().reverse()[0]:null;}
 function pillUltima(id){
   const ult=ultimaAlteracao(id);
   if(!ult)return{cls:'pill-neu',txt:'—'};
@@ -1457,15 +1459,14 @@ async function _gerarPdfBlobAtivo(id){
   ativoSel=id;
   renderRelatorio();
   await new Promise(r=>setTimeout(r,30));
-  // Expande seções recolhidas e ultrassom para sair completo no PDF
+  // Expande seções recolhidas; Ultrassom só entra se a caixa mestre estiver marcada
   document.querySelectorAll('.rel-sec-body.recolhido').forEach(el=>el.classList.remove('recolhido'));
-  document.querySelectorAll('[id^="uss-rel-"]').forEach(el=>{if(el.style.display==='none')el.style.display='block';});
+  _aplicarSelecaoUssParaImpressao();
   let cssText='';document.querySelectorAll('style').forEach(s=>{cssText+=s.textContent;});
   const content=document.getElementById('content');
   const clone=content.cloneNode(true);
   clone.querySelectorAll('.no-print,.rel-sec-toggle,.rel-sec-chk,.item-print-chk,.btn-prim,.btn-sec,.btn-sm,.galeria-add-btn').forEach(el=>el.remove());
   clone.querySelectorAll('.rel-sec-body.recolhido').forEach(el=>el.classList.remove('recolhido'));
-  clone.querySelectorAll('[style*="display:none"]').forEach(el=>{if(el.id&&el.id.startsWith('uss-rel-'))el.style.display='block';});
   const wrapper=document.createElement('div');
   wrapper.innerHTML=`<style>${cssText}.no-print,.rel-sec-toggle,.rel-sec-chk,.item-print-chk,.btn-prim,.btn-sec,.btn-sm,.galeria-add-btn{display:none!important;}.rel-sec-body.recolhido{display:block!important;}.rel-sec-wrap{border:1px solid #ccc;border-radius:4px;margin-bottom:8px;page-break-inside:avoid;}.rel-sec-hdr{background:#1F3864!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}</style>`;
   wrapper.appendChild(clone);
@@ -3192,24 +3193,31 @@ function renderRelatorio(){
 
   // ── FICHA TÉCNICA ──
   if(!ficha.trechos[0]?.uss){ficha.trechos.forEach(t=>{t.uss=Array(21).fill('');t.fab=t.fab||t.med||'';t.spec=t.spec||'';t.unica=t.unica||false;});}
-  const temUss=ficha.trechos.some(t=>(t.uss||[]).some(v=>v));
+  const temUss=ficha.trechos.some(t=>(t.uss_hist||t.uss||[]).some(v=>v));
   const temFicha=ficha.comprimento_total||ficha.cod||ficha.largura||ficha.material||temUss||ficha.trechos.some(t=>t.comp||t.de||t.fab||t.spec);
   let fichaBody='';
   if(!temFicha){fichaBody=`<div class="empty-state"><i class="ti ti-table"></i>Não preenchida</div>`;}
   else{
     if(ficha.comprimento_total||ficha.cod)fichaBody+=`<div class="rel-ficha-row"><div class="rel-ficha-label">Comprimento</div><div class="rel-ficha-val">${ficha.comprimento_total||'—'} m</div><div class="rel-ficha-label">COD</div><div class="rel-ficha-val">${ficha.cod||'—'}</div></div>`;
-    const tC=ficha.trechos.filter(t=>t.de||t.comp||t.fab||t.spec||(t.uss||[]).some(v=>v));
+    const tC=ficha.trechos.filter(t=>t.de||t.comp||t.fab||t.spec||(t.uss_hist||t.uss||[]).some(v=>v));
     if(tC.length){
       fichaBody+=`<div style="overflow-x:auto;"><table class="ficha-table"><tr><th>Trecho</th><th>De</th><th>Até</th><th>Comp.(m)</th><th>Fabricante</th><th>OP</th><th>Especificação</th><th>Única</th></tr>`;
       tC.forEach(t=>{fichaBody+=`<tr><td class="lbl trecho-header">${t.l}</td><td>${t.de||'—'}</td><td>${t.ate||'—'}</td><td>${t.comp||'—'}</td><td>${t.fab||t.med||'—'}</td><td>${t.op||'—'}</td><td>${t.spec||'—'}</td><td>${t.unica?'✓':''}</td></tr>`;});
       fichaBody+=`</table></div>`;
     }
-    // USS — único bloco recolhido dentro da ficha
-    const temUssData=ficha.trechos.some(t=>(t.uss||[]).some(v=>v));
+    const tipoLona=ficha.tipo_lona||'lona';
+    if(ficha.largura||ficha.cob_sup)fichaBody+=`<div class="rel-ficha-row"><div class="rel-ficha-label">Largura</div><div class="rel-ficha-val">${ficha.largura||'—'} mm</div><div class="rel-ficha-label">Tipo</div><div class="rel-ficha-val">${tipoLona==='cabo'?'Cabo de aço'+(ficha.cabo_breaker?' + Breaker':''):'Lona'}</div></div>`;
+    if(ficha.cob_sup||ficha.cob_inf)fichaBody+=`<div class="rel-ficha-row"><div class="rel-ficha-label">Cob. Superior</div><div class="rel-ficha-val">${ficha.cob_sup||'—'}</div><div class="rel-ficha-label">Cob. Inferior</div><div class="rel-ficha-val">${ficha.cob_inf||'—'}</div></div>`;
+    // USS — único bloco recolhido dentro da ficha, logo após Cob. Superior/Inferior.
+    // Fica fechado e SEM seleção por padrão: só entra na impressão/PDF se a
+    // caixa "Incluir na impressão" do cabeçalho for marcada. Cada trecho
+    // também tem sua própria caixa, para escolher quais trechos saem quando
+    // o bloco estiver marcado.
+    const temUssData=ficha.trechos.some(t=>(t.uss_hist||t.uss||[]).some(v=>v));
     if(temUssData){
       let ussInner='';
       ficha.trechos.forEach((t,idx)=>{
-        const ussV=t.uss||Array(21).fill('');
+        const ussV=t.uss_hist||t.uss||Array(21).fill('');
         if(!ussV.some(v=>v))return;
         const l=t.l||LETRAS[idx]||String(idx+1);
         const uid='uss-tr-'+idx;
@@ -3220,25 +3228,28 @@ function renderRelatorio(){
             +'<div style="font-size:12px;padding:6px 2px;border:1px solid #E5E8ED;border-radius:5px;text-align:center;background:#F8F9FB;">'+(ussV[j]||'—')+'</div></div>';
         }
         grid+='</div>';
-        ussInner+=`<div style="border-top:1px solid #F0F2F5;margin-top:2px;">
+        ussInner+=`<div style="border-top:1px solid #F0F2F5;margin-top:2px;" id="${uid}-wrap">
           <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;cursor:pointer;" onclick="toggleUssSubTrecho('${uid}')">
             <span style="font-size:11px;font-weight:600;color:#374151;">Trecho ${l}</span>
-            <button class="rel-sec-toggle no-print" id="${uid}-btn" style="background:#EEF0F3;color:#374151;width:20px;height:20px;font-size:12px;">+</button>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="checkbox" class="uss-trecho-chk no-print" id="${uid}-chk" checked onclick="event.stopPropagation();" title="Incluir este trecho na impressão">
+              <button class="rel-sec-toggle no-print" id="${uid}-btn" style="background:#EEF0F3;color:#374151;width:20px;height:20px;font-size:12px;">+</button>
+            </div>
           </div>
           <div id="${uid}" style="display:none;">${grid}</div>
         </div>`;
       });
-      fichaBody+=`<div style="border-top:1px solid #E5E8ED;margin-top:8px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;cursor:pointer;" onclick="toggleUssRelFicha()">
-          <span style="font-size:11px;font-weight:700;color:#1F3864;display:flex;align-items:center;gap:6px;"><i class="ti ti-wave-sine"></i> MEDIDAS DE ULTRASSOM</span>
-          <button class="rel-sec-toggle no-print" id="uss-ficha-btn" style="background:#EEF0F3;color:#374151;">+</button>
+      fichaBody+=`<div style="margin-top:10px;border-radius:6px;overflow:hidden;border:1px solid #E5E8ED;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 8px;cursor:pointer;background:#1F3864;" onclick="toggleUssRelFicha()">
+          <span style="font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;"><i class="ti ti-wave-sine"></i> MEDIDAS DE ULTRASSOM (ESP.)</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" class="uss-print-chk no-print" id="uss-ficha-chk" onclick="event.stopPropagation();toggleChkUss()" title="Incluir Medidas de Ultrassom na impressão">
+            <button class="rel-sec-toggle no-print" id="uss-ficha-btn" style="background:rgba(255,255,255,.2);color:#fff;">+</button>
+          </div>
         </div>
-        <div id="uss-ficha-body" style="display:none;padding:0 4px;">${ussInner}</div>
+        <div id="uss-ficha-body" style="display:none;padding:6px 8px;">${ussInner}</div>
       </div>`;
     }
-    const tipoLona=ficha.tipo_lona||'lona';
-    if(ficha.largura||ficha.cob_sup)fichaBody+=`<div class="rel-ficha-row"><div class="rel-ficha-label">Largura</div><div class="rel-ficha-val">${ficha.largura||'—'} mm</div><div class="rel-ficha-label">Tipo</div><div class="rel-ficha-val">${tipoLona==='cabo'?'Cabo de aço'+(ficha.cabo_breaker?' + Breaker':''):'Lona'}</div></div>`;
-    if(ficha.cob_sup||ficha.cob_inf)fichaBody+=`<div class="rel-ficha-row"><div class="rel-ficha-label">Cob. Superior</div><div class="rel-ficha-val">${ficha.cob_sup||'—'}</div><div class="rel-ficha-label">Cob. Inferior</div><div class="rel-ficha-val">${ficha.cob_inf||'—'}</div></div>`;
     if(ficha.material)fichaBody+=`<div class="rel-ficha-row"><div class="rel-ficha-label">Material</div><div class="rel-ficha-val">${ficha.material}</div></div>`;
     if(ficha.obs)fichaBody+=`<div class="rel-ficha-row"><div class="rel-ficha-label">Obs.</div><div class="rel-ficha-val" style="white-space:pre-line;">${ficha.obs}</div></div>`;
     fichaBody+=`<div style="padding:8px;"><button class="btn-sec no-print" onclick="renderFicha()"><i class="ti ti-edit"></i> Editar ficha</button></div>`;
@@ -3461,6 +3472,13 @@ function toggleFiltroGeralPainel(uid){
   }
 }
 
+function toggleChkUss(){
+  // quando marca/desmarca o bloco de Ultrassom, propaga para todos os trechos
+  const chk=document.getElementById('uss-ficha-chk');
+  if(!chk)return;
+  document.querySelectorAll('.uss-trecho-chk').forEach(c=>c.checked=chk.checked);
+}
+
 function toggleUssRelFicha(){
   const body=document.getElementById('uss-ficha-body');
   const btn=document.getElementById('uss-ficha-btn');
@@ -3672,7 +3690,7 @@ function buildRegCard(r,isHist){
       <span style="flex:1;"></span>
       <input type="checkbox" class="item-print-chk no-print" checked title="Incluir na impressão" onclick="event.stopPropagation()">
       <button class="btn-sm btn-sm-sec no-print" onclick="baixarRelatoUnico('${r.id}')" title="Baixar este relato em PDF"><i class="ti ti-download"></i></button>
-      <button class="btn-sm btn-sm-sec no-print" onclick="compartilharRelatoUnico('${r.id}')" title="Compartilhar este relato (PDF)"><i class="ti ti-share"></i></button>
+      <button class="btn-sm btn-sm-sec no-print" onclick="compartilharRelatoUnico('${r.id}')" title="Compartilhar este relato (Fotos, PDF ou ZIP)"><i class="ti ti-share"></i></button>
       <button class="btn-sm btn-sm-sec no-print" onclick="abrirEdicao('${r.id}')"><i class="ti ti-edit"></i> Editar</button>
       ${isHist?`<button class="btn-sm no-print" style="background:#FFEBEE;color:#C62828;padding:4px 7px;" onclick="excluirRegistroHist('${r.id}')" title="Excluir permanentemente"><i class="ti ti-trash"></i></button>`:''}
     </div>
@@ -4725,9 +4743,9 @@ function salvarEdicao(){
 // ════════════════════════════════════════════════════════════════
 // SISTEMA DE NOVIDADES
 // ════════════════════════════════════════════════════════════════
-const APP_VERSION='v3.3';
+const APP_VERSION='v3.4';
 // Só a novidade mais recente desta versão
-const APP_CHANGELOG=['Novo: botão de baixar no título de cada seção do relatório (Raspadores, Interferências, Desalinhamentos, Defeitos/Reparos, Contrapesos, Anotações). Baixa um .zip com uma pasta por item selecionado (ID + nome), contendo o PDF daquele item junto com suas fotos.'];
+const APP_CHANGELOG=['Correção: última medida de ultrassom voltou a aparecer no relatório. Novo: caixa de seleção para incluir Medidas de Ultrassom (e cada trecho) na impressão/PDF, desmarcada por padrão — bloco reposicionado na ficha, com título em barra azul. Correção: Favoritos não abre mais a tela inicial por engano. Compartilhar de cada item agora pergunta o formato — Fotos, PDF ou ZIP. PDF individual de cada item ficou mais parecido com o relatório principal.'];
 // Cores do badge alternando a cada versão
 // Paleta de cores que repete infinitamente
 const _CORES_PALETA=[
@@ -5477,6 +5495,32 @@ function salvarEdicaoAnotacao(idx){
 // ════════════════════════════════
 // IMPRIMIR PDF
 // ════════════════════════════════
+// ── Aplica no DOM ao vivo a seleção do bloco "Medidas de Ultrassom" antes de
+// imprimir/gerar PDF: só entra se a caixa mestre estiver marcada, e dentro
+// dele só os trechos com a caixa própria marcada. Sem seleção = não sai.
+function _aplicarSelecaoUssParaImpressao(){
+  const alterados=[];
+  const ussChk=document.getElementById('uss-ficha-chk');
+  const ussBody=document.getElementById('uss-ficha-body');
+  if(!ussBody)return alterados;
+  const incluir=!!(ussChk&&ussChk.checked);
+  alterados.push({el:ussBody,display:ussBody.style.display});
+  ussBody.style.display=incluir?'block':'none';
+  if(incluir){
+    ussBody.querySelectorAll('.uss-trecho-chk').forEach(chk=>{
+      const uid=chk.id.replace('-chk','');
+      const bloco=document.getElementById(uid);
+      const wrap=document.getElementById(uid+'-wrap');
+      if(bloco){alterados.push({el:bloco,display:bloco.style.display});bloco.style.display='block';}
+      if(wrap){alterados.push({el:wrap,display:wrap.style.display});wrap.style.display=chk.checked?'':'none';}
+    });
+  }
+  return alterados;
+}
+function _restaurarSelecaoUss(alterados){
+  (alterados||[]).forEach(({el,display})=>{el.style.display=display;});
+}
+
 function imprimirRelatorio(){
   // Usa os checkboxes já presentes no relatório (rel-sec-chk e item-print-chk)
   const ocultos=[];
@@ -5495,9 +5539,13 @@ function imprimirRelatorio(){
       });
     }
   });
+  const ussAlterados=_aplicarSelecaoUssParaImpressao();
   setTimeout(()=>{
     window.print();
-    setTimeout(()=>ocultos.forEach(el=>el.classList.remove('print-item-oculto')),800);
+    setTimeout(()=>{
+      ocultos.forEach(el=>el.classList.remove('print-item-oculto'));
+      _restaurarSelecaoUss(ussAlterados);
+    },800);
   },150);
 }
 
@@ -5605,76 +5653,123 @@ async function _gerarPdfRelatoBlob(r){
   function novaPagSeNecessario(altura){
     if(y+altura>pageH-margin){doc.addPage();y=margin;}
   }
-  // Cabeçalho: nome do ativo
+
+  // Barra de categoria cheia (mesmo azul #1F3864 do cabeçalho de seção do
+  // relatório principal — ex.: "RASPADORES") em vez do rótulo pequeno de antes.
+  const catLabel=(r.tipo&&r.tipo.startsWith('rasp-'))?'RASPADORES':(SECAO_LABELS[r.tipo]||'REGISTRO').toUpperCase();
   doc.setFillColor(31,56,100);
-  doc.roundedRect(margin,y,doc.getTextWidth(ativoSel)+12,8,2,2,'F');
+  doc.rect(margin,y,maxW,9,'F');
   doc.setTextColor(255,255,255);
   doc.setFontSize(11);
   doc.setFont(undefined,'bold');
-  doc.text(String(ativoSel),margin+6,y+5.5);
-  y+=14;
+  doc.text(catLabel,margin+4,y+6);
+  y+=15;
+
+  // Nome do ativo como subtítulo, abaixo da barra
+  doc.setFontSize(13);
+  doc.setFont(undefined,'bold');
+  doc.setTextColor(31,56,100);
+  doc.text(String(ativoSel),margin,y);
+  y+=9;
+
+  // Cada item vira um "cartão" com fundo claro e borda (mesmo visual do
+  // .reg-card na tela) em vez de só uma linha separadora fina.
+  const padX=4,padY=4,altFoto=32;
+  const innerW=maxW-padX*2;
 
   const blocos=_extrairBlocosParaPdf(r);
   for(const b of blocos){
-    novaPagSeNecessario(14);
+    const descTxt=(b.desc&&b.desc!=='Sem relato')?b.desc:'Sem relato';
     doc.setFontSize(9);
-    doc.setFont(undefined,'bold');
-    doc.setTextColor(55,65,81);
-    doc.text(`#${_dispId(b.id)}`,margin,y+4);
-    doc.setTextColor(31,56,100);
-    doc.text(String(b.titulo||''),margin+16,y+4);
     doc.setFont(undefined,'normal');
-    doc.setTextColor(150,150,150);
-    doc.setFontSize(8);
-    doc.text(fmtData(b.data),pageW-margin-doc.getTextWidth(fmtData(b.data)),y+4);
-    y+=7;
+    const linhasDesc=doc.splitTextToSize(descTxt,innerW);
 
-    if(b.tags&&b.tags.length){
+    const tagsValidas=(b.tags||[]).filter(Boolean);
+    let alturaTags=0;
+    if(tagsValidas.length){
       doc.setFontSize(8);
-      let tx=margin;
-      b.tags.filter(Boolean).forEach(t=>{
+      let tx=0,linhasTags=1;
+      tagsValidas.forEach(t=>{
         const tw=doc.getTextWidth(t)+5;
-        if(tx+tw>pageW-margin){tx=margin;y+=5.5;}
-        doc.setFillColor(255,235,238);
-        doc.setTextColor(198,40,40);
-        doc.roundedRect(tx,y-3.3,tw,4.8,1.2,1.2,'F');
-        doc.text(t,tx+2.5,y);
+        if(tx+tw>innerW){tx=0;linhasTags++;}
         tx+=tw+2;
       });
-      y+=6;
+      alturaTags=(linhasTags-1)*5.5+6;
     }
 
-    doc.setFontSize(9);
-    doc.setTextColor(55,65,81);
-    doc.setFont(undefined,'normal');
-    const descTxt=(b.desc&&b.desc!=='Sem relato')?b.desc:'Sem relato';
-    const linhas=doc.splitTextToSize(descTxt,maxW);
-    novaPagSeNecessario(linhas.length*4.3);
-    doc.text(linhas,margin,y);
-    y+=linhas.length*4.3+3;
-
     const fotos=(b.fotos||[]).filter(Boolean);
+    let alturaFotos=2;
+    let linhasFotoInfo=[];
     if(fotos.length){
-      const altFoto=32;
-      novaPagSeNecessario(altFoto+4);
-      let fx=margin;
+      let fx=0,linhasFoto=1;
       for(const foto of fotos){
         const dims=await _dimsImagem(foto);
         const largFoto=Math.min(altFoto*(dims.w/dims.h),48);
-        if(fx+largFoto>pageW-margin){fx=margin;y+=altFoto+3;novaPagSeNecessario(altFoto+4);}
+        if(fx+largFoto>innerW){fx=0;linhasFoto++;}
+        fx+=largFoto+3;
+        linhasFotoInfo.push({foto,largFoto});
+      }
+      alturaFotos=(linhasFoto-1)*(altFoto+3)+altFoto+6;
+    }
+
+    const alturaCard=padY+7+alturaTags+(linhasDesc.length*4.3+3)+alturaFotos+padY;
+    novaPagSeNecessario(alturaCard+5);
+
+    const cardY=y;
+    doc.setFillColor(248,249,251);
+    doc.setDrawColor(229,232,237);
+    doc.roundedRect(margin,cardY,maxW,alturaCard,2,2,'FD');
+
+    const cx=margin+padX;
+    let cy=cardY+padY+3;
+
+    doc.setFontSize(9);
+    doc.setFont(undefined,'bold');
+    doc.setTextColor(55,65,81);
+    doc.text(`#${_dispId(b.id)}`,cx,cy);
+    doc.setTextColor(31,56,100);
+    doc.text(String(b.titulo||''),cx+16,cy);
+    doc.setFont(undefined,'normal');
+    doc.setTextColor(150,150,150);
+    doc.setFontSize(8);
+    const dataTxt=fmtData(b.data);
+    doc.text(dataTxt,margin+maxW-padX-doc.getTextWidth(dataTxt),cy);
+    cy+=7;
+
+    if(tagsValidas.length){
+      doc.setFontSize(8);
+      let tx=cx;
+      tagsValidas.forEach(t=>{
+        const tw=doc.getTextWidth(t)+5;
+        if(tx+tw>margin+maxW-padX){tx=cx;cy+=5.5;}
+        doc.setFillColor(255,235,238);
+        doc.setTextColor(198,40,40);
+        doc.roundedRect(tx,cy-3.3,tw,4.8,1.2,1.2,'F');
+        doc.text(t,tx+2.5,cy);
+        tx+=tw+2;
+      });
+      cy+=6;
+    }
+
+    doc.setFontSize(9);
+    doc.setTextColor(55,65,81);
+    doc.setFont(undefined,'normal');
+    doc.text(linhasDesc,cx,cy);
+    cy+=linhasDesc.length*4.3+3;
+
+    if(fotos.length){
+      let fx=cx;
+      for(const {foto,largFoto} of linhasFotoInfo){
+        if(fx+largFoto>margin+maxW-padX){fx=cx;cy+=altFoto+3;}
         try{
           const tipoImg=foto.indexOf('image/png')>=0?'PNG':'JPEG';
-          doc.addImage(foto,tipoImg,fx,y,largFoto,altFoto);
+          doc.addImage(foto,tipoImg,fx,cy,largFoto,altFoto);
         }catch(e){}
         fx+=largFoto+3;
       }
-      y+=altFoto+6;
-    } else {
-      y+=2;
     }
-    doc.setDrawColor(225,225,225);
-    doc.line(margin,y-2,pageW-margin,y-2);
-    y+=3;
+
+    y=cardY+alturaCard+5;
   }
   return doc.output('blob');
 }
@@ -5806,10 +5901,55 @@ async function compartilharAnotacaoGeral(idx){
   });
 }
 
-// ── Compartilhar UM relato (mesma lógica de baixarRelatoUnico: PDF + fotos
-// juntos num único .zip quando há fotos) — usa a Web Share API do celular;
-// se o compartilhamento não for suportado, cai para baixar normalmente. ──
+// ── Compartilhar UM relato — pergunta o formato antes: Fotos, PDF, ou ZIP
+// (Fotos + PDF). O download (botão de baixar) continua com PDF + fotos
+// normalmente e não foi alterado (função baixarRelatoUnico, abaixo). ──
 async function compartilharRelatoUnico(regId){
+  const r=DB.registros[ativoSel]?.find(x=>x.id===regId);
+  if(!r){mostrarToast('Relato não encontrado','#C62828');return;}
+  _perguntarTipoCompartilhamento(tipo=>{
+    if(tipo==='fotos')_compartilharItemFotos(regId);
+    else if(tipo==='pdf')_compartilharItemPDF(regId);
+    else if(tipo==='zip')_compartilharItemZip(regId);
+  });
+}
+
+// Reúne as fotos de um relato (principal + defeitos + atualizações),
+// mantendo o id da pasta de origem de cada uma (usado no nome do arquivo)
+function _coletarFotosRelato(r,regId){
+  const dIdSuf=_dispId(regId);
+  const fotosColetadas=[];
+  const addFotos=(fotos,pastaId)=>{
+    (fotos||[]).filter(Boolean).forEach(b64=>fotosColetadas.push({pastaId,b64}));
+  };
+  addFotos(r.fotos||(r.foto?[r.foto]:[]),dIdSuf);
+  if((r.tipo==='defeito'||r.tipo==='ext-defeito')&&r.campos?.defeitos){
+    r.campos.defeitos.forEach(dft=>{
+      addFotos(dft.fotos||(dft.foto?[dft.foto]:[]),dIdSuf);
+      (dft.atualizacoes||[]).forEach(u=>addFotos(u.fotos||[],_dispId(u.id||regId)));
+    });
+  } else if(r.campos?.atualizacoes){
+    r.campos.atualizacoes.forEach(u=>addFotos(u.fotos||[],_dispId(u.id||regId)));
+  }
+  return fotosColetadas;
+}
+
+async function _compartilharItemFotos(regId){
+  const r=DB.registros[ativoSel]?.find(x=>x.id===regId);
+  if(!r){mostrarToast('Relato não encontrado','#C62828');return;}
+  const dIdSuf=_dispId(regId);
+  const fotosColetadas=_coletarFotosRelato(r,regId);
+  const contagemPorPasta={};
+  const fotoArquivos=fotosColetadas.map(({pastaId,b64})=>{
+    contagemPorPasta[pastaId]=(contagemPorPasta[pastaId]||0)+1;
+    return _dataURLParaArquivo(b64,`${pastaId}-foto${contagemPorPasta[pastaId]}.${_extImagem(b64)}`);
+  }).filter(Boolean);
+  const d=new Date();
+  const dataStr=String(d.getDate()).padStart(2,'0')+String(d.getMonth()+1).padStart(2,'0')+d.getFullYear();
+  await _compartilharFotos(fotoArquivos,`Fotos ${_dispId(regId)}`,`${ativoSel}-relato_${dIdSuf}_${dataStr}`);
+}
+
+async function _compartilharItemPDF(regId){
   const r=DB.registros[ativoSel]?.find(x=>x.id===regId);
   if(!r){mostrarToast('Relato não encontrado','#C62828');return;}
   mostrarToast('Gerando PDF...','#1565C0');
@@ -5825,40 +5965,64 @@ async function compartilharRelatoUnico(regId){
   }
   const nomeArquivo=`${ativoSel}-relato_${dIdSuf}_${dataStr}`;
   const pdfFile=new File([pdfBlob],`${nomeArquivo}.pdf`,{type:'application/pdf'});
-  // Reúne as fotos do relato (principal + defeitos + atualizações), mantendo
-  // o id da pasta de origem de cada uma (usado no nome do arquivo e no zip de fallback)
-  const fotosColetadas=[];
-  const addFotos=(fotos,pastaId)=>{
-    (fotos||[]).filter(Boolean).forEach(b64=>fotosColetadas.push({pastaId,b64}));
+  const aoBaixarFallback=async()=>{
+    _downloadBlob(pdfFile,pdfFile.name);
+    mostrarToast('✓ PDF baixado!','#2E7D32');
   };
-  addFotos(r.fotos||(r.foto?[r.foto]:[]),dIdSuf);
-  if((r.tipo==='defeito'||r.tipo==='ext-defeito')&&r.campos?.defeitos){
-    r.campos.defeitos.forEach(dft=>{
-      addFotos(dft.fotos||(dft.foto?[dft.foto]:[]),dIdSuf);
-      (dft.atualizacoes||[]).forEach(u=>addFotos(u.fotos||[],_dispId(u.id||regId)));
-    });
-  } else if(r.campos?.atualizacoes){
-    r.campos.atualizacoes.forEach(u=>addFotos(u.fotos||[],_dispId(u.id||regId)));
-  }
-  const contagemPorPasta={};
-  const fotoArquivos=fotosColetadas.map(({pastaId,b64})=>{
-    contagemPorPasta[pastaId]=(contagemPorPasta[pastaId]||0)+1;
-    return _dataURLParaArquivo(b64,`${pastaId}-foto${contagemPorPasta[pastaId]}.${_extImagem(b64)}`);
-  }).filter(Boolean);
-
-  await _compartilharOuBaixar({
-    pdfFile,fotoArquivos,nomeArquivo,
-    tituloShare:`Relato ${_dispId(regId)}`,
-    montarZipFallback:async()=>{
-      await _carregarJSZip();
-      const zip=new JSZip();
-      zip.file(`${nomeArquivo}.pdf`,pdfBlob);
-      const porPasta={};
-      fotosColetadas.forEach(({pastaId,b64})=>{(porPasta[pastaId]=porPasta[pastaId]||[]).push(b64);});
-      Object.keys(porPasta).forEach(pastaId=>_adicionarFotosZip(zip,pastaId,porPasta[pastaId]));
-      return await zip.generateAsync({type:'blob'});
+  if(navigator.canShare&&navigator.canShare({files:[pdfFile]})){
+    try{
+      await navigator.share({title:`Relato ${_dispId(regId)}`,files:[pdfFile]});
+      mostrarToast('✓ PDF compartilhado!','#2E7D32');
+      return;
+    }catch(e){
+      if(e.name==='AbortError')return;
+      _mostrarAcaoCompartilhar([pdfFile],`Relato ${_dispId(regId)}`,aoBaixarFallback,'PDF pronto');
+      return;
     }
-  });
+  }
+  await aoBaixarFallback();
+}
+
+async function _compartilharItemZip(regId){
+  const r=DB.registros[ativoSel]?.find(x=>x.id===regId);
+  if(!r){mostrarToast('Relato não encontrado','#C62828');return;}
+  mostrarToast('Gerando PDF...','#1565C0');
+  const dIdSuf=_dispId(regId);
+  const d=new Date();
+  const dataStr=String(d.getDate()).padStart(2,'0')+String(d.getMonth()+1).padStart(2,'0')+d.getFullYear();
+  let pdfBlob=null;
+  try{
+    pdfBlob=await _gerarPdfRelatoBlob(r);
+  }catch(e){
+    mostrarToast('Erro ao gerar o PDF — verifique a conexão','#C62828');
+    return;
+  }
+  const nomeArquivo=`${ativoSel}-relato_${dIdSuf}_${dataStr}`;
+  const fotosColetadas=_coletarFotosRelato(r,regId);
+  await _carregarJSZip();
+  const zip=new JSZip();
+  zip.file(`${nomeArquivo}.pdf`,pdfBlob);
+  const porPasta={};
+  fotosColetadas.forEach(({pastaId,b64})=>{(porPasta[pastaId]=porPasta[pastaId]||[]).push(b64);});
+  Object.keys(porPasta).forEach(pastaId=>_adicionarFotosZip(zip,pastaId,porPasta[pastaId]));
+  const zipBlob=await zip.generateAsync({type:'blob'});
+  const zipFile=new File([zipBlob],`${nomeArquivo}.zip`,{type:'application/zip'});
+  const aoBaixarFallback=async()=>{
+    _downloadBlob(zipBlob,`${nomeArquivo}.zip`);
+    mostrarToast('✓ PDF + fotos baixados em .zip!','#2E7D32');
+  };
+  // A maioria dos apps (WhatsApp incluso) não aceita .zip pela Web Share API —
+  // tenta mesmo assim; se o dispositivo recusar, baixa direto.
+  if(navigator.canShare&&navigator.canShare({files:[zipFile]})){
+    try{
+      await navigator.share({title:`Relato ${_dispId(regId)}`,files:[zipFile]});
+      mostrarToast('✓ Compartilhado!','#2E7D32');
+      return;
+    }catch(e){
+      if(e.name==='AbortError')return;
+    }
+  }
+  await aoBaixarFallback();
 }
 
 async function baixarRelatoUnico(regId){
@@ -6161,9 +6325,8 @@ async function compartilharPDF(){
   // Expande seções recolhidas
   const eraRecolhido=[];
   document.querySelectorAll('.rel-sec-body.recolhido').forEach(el=>{el.classList.remove('recolhido');eraRecolhido.push(el);const uid=el.id.replace('sec-body-','');const btn=document.getElementById('sec-btn-'+uid);if(btn)btn.textContent='−';});
-  // Expande ultrassom
-  const ussAbertos=[];
-  document.querySelectorAll('[id^="uss-rel-"]').forEach(el=>{if(el.style.display==='none'){el.style.display='block';ussAbertos.push(el);}});
+  // Ultrassom: só entra se a caixa "Incluir na impressão" estiver marcada
+  const ussAlterados=_aplicarSelecaoUssParaImpressao();
   // Checkboxes
   const ocultos=[];
   document.querySelectorAll('.rel-sec-wrap').forEach(wrap=>{
@@ -6179,7 +6342,6 @@ async function compartilharPDF(){
   clone.querySelectorAll('.no-print,.rel-sec-toggle,.rel-sec-chk,.item-print-chk,.btn-prim,.btn-sec,.btn-sm,.galeria-add-btn').forEach(el=>el.remove());
   clone.querySelectorAll('.print-item-oculto').forEach(el=>el.remove());
   clone.querySelectorAll('.rel-sec-body.recolhido').forEach(el=>el.classList.remove('recolhido'));
-  clone.querySelectorAll('[style*="display:none"]').forEach(el=>{if(el.id&&el.id.startsWith('uss-rel-'))el.style.display='block';});
   const wrapper=document.createElement('div');
   wrapper.innerHTML=`<style>${cssText}.no-print,.rel-sec-toggle,.rel-sec-chk,.item-print-chk,.btn-prim,.btn-sec,.btn-sm,.galeria-add-btn{display:none!important;}.rel-sec-body.recolhido{display:block!important;}.rel-sec-wrap{border:1px solid #ccc;border-radius:4px;margin-bottom:8px;page-break-inside:avoid;}.rel-sec-hdr{background:#1F3864!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}</style>`;
   wrapper.appendChild(clone);
@@ -6191,7 +6353,7 @@ async function compartilharPDF(){
     if(document.body.contains(wrapper))document.body.removeChild(wrapper);
     ocultos.forEach(el=>el.classList.remove('print-item-oculto'));
     eraRecolhido.forEach(el=>{el.classList.add('recolhido');const uid=el.id.replace('sec-body-','');const btn=document.getElementById('sec-btn-'+uid);if(btn)btn.textContent='+';});
-    ussAbertos.forEach(el=>{el.style.display='none';});
+    _restaurarSelecaoUss(ussAlterados);
   };
   try{
     const pdfBlob=await html2pdf().set(opt).from(wrapper).outputPdf('blob');
@@ -6238,13 +6400,39 @@ function _precarregarHtml2pdf(){
 // acontece, em vez de só baixar, mostramos este botão: o PDF já está pronto
 // (em memória), então um novo toque aqui é rápido o bastante pro
 // compartilhamento funcionar.
-function _mostrarAcaoCompartilhar(arquivos,titulo,aoBaixar){
+// Pergunta em que formato compartilhar (Fotos, PDF, ou ZIP com os dois)
+// antes de gerar/enviar qualquer coisa. onEscolher recebe 'fotos'|'pdf'|'zip'.
+function _perguntarTipoCompartilhamento(onEscolher){
+  const antigo=document.getElementById('sheet-compartilhar-tipo');
+  if(antigo)antigo.remove();
+  const overlay=document.createElement('div');
+  overlay.id='sheet-compartilhar-tipo';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:400;display:flex;align-items:flex-end;';
+  overlay.innerHTML=`<div style="background:#fff;border-radius:16px 16px 0 0;padding:18px 16px 26px;width:100%;max-height:80vh;overflow-y:auto;">
+    <div style="font-size:15px;font-weight:700;color:#1F2937;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">
+      <span><i class="ti ti-share" style="margin-right:6px;color:#2E75B6;"></i>Compartilhar como…</span>
+      <button id="sheet-compartilhar-fechar" style="background:none;border:none;font-size:20px;color:#6B7280;cursor:pointer;line-height:1;"><i class="ti ti-x"></i></button>
+    </div>
+    <button class="btn-sec" id="opt-share-fotos" style="display:flex;align-items:center;gap:10px;text-align:left;margin-top:0;"><i class="ti ti-photo" style="font-size:17px;color:#2E75B6;"></i> Fotos</button>
+    <button class="btn-sec" id="opt-share-pdf" style="display:flex;align-items:center;gap:10px;text-align:left;"><i class="ti ti-file-type-pdf" style="font-size:17px;color:#2E75B6;"></i> PDF</button>
+    <button class="btn-sec" id="opt-share-zip" style="display:flex;align-items:center;gap:10px;text-align:left;"><i class="ti ti-file-zip" style="font-size:17px;color:#2E75B6;"></i> ZIP (Fotos + PDF)</button>
+  </div>`;
+  document.body.appendChild(overlay);
+  const fechar=()=>{if(document.body.contains(overlay))overlay.remove();};
+  overlay.addEventListener('click',e=>{if(e.target===overlay)fechar();});
+  document.getElementById('sheet-compartilhar-fechar').onclick=fechar;
+  document.getElementById('opt-share-fotos').onclick=()=>{fechar();onEscolher('fotos');};
+  document.getElementById('opt-share-pdf').onclick=()=>{fechar();onEscolher('pdf');};
+  document.getElementById('opt-share-zip').onclick=()=>{fechar();onEscolher('zip');};
+}
+
+function _mostrarAcaoCompartilhar(arquivos,titulo,aoBaixar,rotulo){
   const antigo=document.getElementById('banner-compartilhar');
   if(antigo)antigo.remove();
   const el=document.createElement('div');
   el.id='banner-compartilhar';
   el.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1F3864;color:#fff;padding:10px 10px 10px 16px;border-radius:12px;z-index:1000;display:flex;gap:10px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.35);font-size:13px;font-weight:600;max-width:92vw;';
-  el.innerHTML=`<span>PDF pronto —</span>
+  el.innerHTML=`<span>${rotulo||'PDF pronto'} —</span>
     <button id="banner-compartilhar-btn" style="background:#2E7D32;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-weight:700;white-space:nowrap;">Compartilhar</button>
     <button id="banner-compartilhar-baixar" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);padding:8px 10px;border-radius:8px;white-space:nowrap;">Baixar</button>
     <button id="banner-compartilhar-fechar" style="background:transparent;color:#fff;border:none;font-size:16px;padding:0 4px;">✕</button>`;
@@ -6289,6 +6477,39 @@ function _dataURLParaArquivo(dataUrl,nome){
 // dispositivo não aceitar o conjunto todo, tenta só o PDF; se não houver
 // suporte a Web Share (ex.: desktop), cai para baixar (.zip com fotos, ou
 // só o PDF quando não há fotos) — igual ao comportamento de antes.
+// Compartilha SOMENTE as fotos (sem PDF junto) — usado no botão de
+// compartilhar de cada item. Misturar PDF + fotos no mesmo compartilhamento
+// falha em alguns apps (ex.: WhatsApp acusa "mensagem vazia"), então aqui
+// vai só imagem.
+async function _compartilharFotos(fotoArquivos,tituloShare,nomeArquivoBase){
+  if(!fotoArquivos||!fotoArquivos.length){mostrarToast('Este registro não tem fotos para compartilhar','#E65100');return;}
+  const aoBaixarFallback=async()=>{
+    if(fotoArquivos.length===1){
+      _downloadBlob(fotoArquivos[0],fotoArquivos[0].name);
+      mostrarToast('✓ Foto baixada!','#2E7D32');
+      return;
+    }
+    await _carregarJSZip();
+    const zip=new JSZip();
+    fotoArquivos.forEach(f=>zip.file(f.name,f));
+    const zipBlob=await zip.generateAsync({type:'blob'});
+    _downloadBlob(zipBlob,`${nomeArquivoBase}-fotos.zip`);
+    mostrarToast('✓ Fotos baixadas em .zip!','#2E7D32');
+  };
+  if(navigator.canShare&&navigator.canShare({files:fotoArquivos})){
+    try{
+      await navigator.share({title:tituloShare,files:fotoArquivos});
+      mostrarToast('✓ Fotos compartilhadas!','#2E7D32');
+      return;
+    }catch(e){
+      if(e.name==='AbortError')return;
+      _mostrarAcaoCompartilhar(fotoArquivos,tituloShare,aoBaixarFallback,'Fotos prontas');
+      return;
+    }
+  }
+  await aoBaixarFallback();
+}
+
 async function _compartilharOuBaixar({pdfFile,fotoArquivos,nomeArquivo,tituloShare,montarZipFallback}){
   fotoArquivos=fotoArquivos||[];
   const todosArquivos=[pdfFile,...fotoArquivos];
@@ -6803,7 +7024,11 @@ if('serviceWorker' in navigator){
   renderLista(); // mostra tela inicial imediatamente (sem dados)
   const ok = await carregarLS();
   if(ok){
-    renderLista(); // re-renderiza com os dados carregados
+    // Só re-renderiza a lista se o usuário ainda não tiver navegado para
+    // outra tela enquanto os dados carregavam (evita "chutar" o usuário
+    // de volta pra tela inicial ao tocar em Favoritos/Ativos/etc. logo
+    // após abrir o app, antes do IndexedDB terminar de carregar).
+    if(passo==='lista') renderLista(); // re-renderiza com os dados carregados
     mostrarToast('✓ Dados carregados!','#2E7D32');
   }
   marcarSalvo();
