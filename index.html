@@ -4743,9 +4743,9 @@ function salvarEdicao(){
 // ════════════════════════════════════════════════════════════════
 // SISTEMA DE NOVIDADES
 // ════════════════════════════════════════════════════════════════
-const APP_VERSION='v3.5';
+const APP_VERSION='v3.6';
 // Só a novidade mais recente desta versão
-const APP_CHANGELOG=['IMPORTANTE — correção de perda de dados: o app agora salva imediatamente ao ir para segundo plano (trocar de app, bloquear a tela, fechar pela lista de recentes), além de avisar na tela se algum salvamento falhar. Antes, em alguns casos no Android, uma inspeção podia ser perdida se o aparelho fosse trocado de app logo após salvar.'];
+const APP_CHANGELOG=['IMPORTANTE — mais uma correção de perda de dados: gravações que aconteciam muito rápido uma atrás da outra (ex.: registrar uma inspeção e sair correndo pra próxima) agora esperam a gravação anterior terminar antes de começar outra, e o app trava a saída da página se uma gravação ainda estiver rolando na hora de sair/atualizar.'];
 // Cores do badge alternando a cada versão
 // Paleta de cores que repete infinitamente
 const _CORES_PALETA=[
@@ -6252,10 +6252,12 @@ function atualizarIndicadorMudanca(){
   if(ind) ind.style.display = _mudancasPendentes ? 'flex' : 'none';
 }
 
-// Intercepta fechamento da aba
+// Intercepta fechamento da aba — bloqueia tanto se há mudança não confirmada
+// como gravada quanto se uma gravação está rodando neste exato momento
+// (dar tempo dela terminar em vez de deixar o navegador cortar no meio).
 window.addEventListener('beforeunload', e => {
   marcarMudanca();
-  if(_mudancasPendentes){
+  if(_mudancasPendentes || _salvandoAgora){
     e.preventDefault();
     e.returnValue = 'Há alterações não salvas. Deseja sair mesmo assim?';
     return e.returnValue;
@@ -6655,7 +6657,34 @@ function abrirIDB(){
   });
 }
 
+// ── Estado de salvamento em andamento. Toda mudança no app chama autoBackup()
+// -> salvarLS(), que grava o BANCO INTEIRO (todos os 140 ativos, com fotos)
+// de uma vez. Em uma base grande isso pode levar um tempo perceptível — e se
+// duas ações rápidas disparassem duas gravações ao mesmo tempo, elas
+// ficavam brigando pelo mesmo registro no IndexedDB. Agora só roda UMA
+// gravação por vez; se pedirem outra enquanto a atual ainda está rodando,
+// ela é enfileirada (no máximo uma) e roda assim que a atual terminar,
+// já com os dados mais recentes. ──
+let _salvandoAgora = false;
+let _salvarNovamenteAoTerminar = false;
+
 async function salvarLS(){
+  if(_salvandoAgora){
+    // já tem uma gravação rodando — pede pra rodar de novo (uma vez só) ao terminar
+    _salvarNovamenteAoTerminar = true;
+    return true;
+  }
+  _salvandoAgora = true;
+  let ok = await _salvarLSAgora();
+  _salvandoAgora = false;
+  if(_salvarNovamenteAoTerminar){
+    _salvarNovamenteAoTerminar = false;
+    ok = await salvarLS();
+  }
+  return ok;
+}
+
+async function _salvarLSAgora(){
   const payload = {
     ativos: ATIVOS,
     registros: DB.registros,
@@ -6701,6 +6730,7 @@ async function salvarLS(){
     }
   }
 }
+
 
 async function carregarLS(){
   // 1. Tenta carregar do IndexedDB

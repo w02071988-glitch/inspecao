@@ -3,7 +3,7 @@
 // Versão: 0.7
 // ══════════════════════════════════════════════════
 
-const CACHE_NAME = 'inspecao-v3.50'; // CRÍTICO: correção de perda de dados (visibilitychange/pagehide + storage.persist()) — sincronizado com APP_VERSION v3.5
+const CACHE_NAME = 'inspecao-v3.60'; // CRÍTICO: salvar ao minimizar/fechar + coalescing de gravações + bloqueio de saída durante salvamento — sincronizado com APP_VERSION v3.6
 
 // Arquivos que ficam disponíveis offline
 const ARQUIVOS_CACHE = [
