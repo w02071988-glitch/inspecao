@@ -4743,9 +4743,9 @@ function salvarEdicao(){
 // ════════════════════════════════════════════════════════════════
 // SISTEMA DE NOVIDADES
 // ════════════════════════════════════════════════════════════════
-const APP_VERSION='v3.4';
+const APP_VERSION='v3.5';
 // Só a novidade mais recente desta versão
-const APP_CHANGELOG=['Correção: última medida de ultrassom voltou a aparecer no relatório. Novo: caixa de seleção para incluir Medidas de Ultrassom (e cada trecho) na impressão/PDF, desmarcada por padrão — bloco reposicionado na ficha, com título em barra azul. Correção: Favoritos não abre mais a tela inicial por engano. Compartilhar de cada item agora pergunta o formato — Fotos, PDF ou ZIP. PDF individual de cada item ficou mais parecido com o relatório principal.'];
+const APP_CHANGELOG=['IMPORTANTE — correção de perda de dados: o app agora salva imediatamente ao ir para segundo plano (trocar de app, bloquear a tela, fechar pela lista de recentes), além de avisar na tela se algum salvamento falhar. Antes, em alguns casos no Android, uma inspeção podia ser perdida se o aparelho fosse trocado de app logo após salvar.'];
 // Cores do badge alternando a cada versão
 // Paleta de cores que repete infinitamente
 const _CORES_PALETA=[
@@ -6262,6 +6262,25 @@ window.addEventListener('beforeunload', e => {
   }
 });
 
+// ── beforeunload é DE CONFIANÇA em desktop, mas no Android quase nunca
+// dispara quando o PWA vai pra segundo plano (troca de app, bloqueia a tela,
+// fecha pela lista de recentes) — foi exatamente aí que os dados estavam se
+// perdendo: a inspeção era feita e salva na hora (autoBackup), mas se o
+// Android suspendesse/matasse o processo um instante depois, a gravação no
+// IndexedDB podia não ter terminado ainda. visibilitychange + pagehide são
+// os únicos sinais em que se pode confiar em mobile para isso. ──
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'hidden') salvarLS().catch(()=>{});
+});
+window.addEventListener('pagehide', () => { salvarLS().catch(()=>{}); });
+
+// Pede armazenamento "persistente" ao navegador: sem isso, o Android pode
+// apagar o banco de dados (IndexedDB) sozinho quando o aparelho fica com
+// pouco espaço — mesmo que tudo tenha sido salvo certinho antes.
+if(navigator.storage && navigator.storage.persist){
+  navigator.storage.persist().catch(()=>{});
+}
+
 // Patch: chamar marcarMudanca após qualquer operação que altera dados
 const _origUnshift = Array.prototype.unshift;
 // Wrapper das funções de salvar para marcar mudança
@@ -6656,9 +6675,30 @@ async function salvarLS(){
       tx.oncomplete = resolve;
       tx.onerror    = () => reject(tx.error);
     });
+    marcarSalvo(); // só marca como salvo quando a gravação no IndexedDB realmente terminou
+    return true;
   }catch(e){
-    // IndexedDB falhou silenciosamente — não tenta localStorage
+    // Antes isso falhava em silêncio (só console.warn) — Washington ficava sem
+    // saber que os dados NÃO foram gravados até reabrir o app e ver tudo sumido.
+    // Agora avisa na hora e tenta de novo uma vez.
     console.warn('IndexedDB save failed:', e?.message||e);
+    mostrarToast('⚠️ Falha ao salvar! Não feche o app agora.','#C62828');
+    try{
+      const db = await abrirIDB();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(IDB_STORE, 'readwrite');
+        tx.objectStore(IDB_STORE).put(payload, IDB_KEY);
+        tx.oncomplete = resolve;
+        tx.onerror    = () => reject(tx.error);
+      });
+      marcarSalvo();
+      mostrarToast('✓ Consegui salvar na segunda tentativa','#2E7D32');
+      return true;
+    }catch(e2){
+      console.warn('IndexedDB save failed (retry):', e2?.message||e2);
+      mostrarToast('⚠️ Não foi possível salvar os dados neste aparelho!','#C62828');
+      return false;
+    }
   }
 }
 

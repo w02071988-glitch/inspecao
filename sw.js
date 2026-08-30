@@ -3,7 +3,7 @@
 // Versão: 0.7
 // ══════════════════════════════════════════════════
 
-const CACHE_NAME = 'inspecao-v3.40'; // atualizado para forçar refresh (v3.40 — sincronizado com APP_VERSION v3.4 do index.html: favoritos, ultrassom com seleção p/ impressão, compartilhar por formato, PDF individual redesenhado)
+const CACHE_NAME = 'inspecao-v3.50'; // CRÍTICO: correção de perda de dados (visibilitychange/pagehide + storage.persist()) — sincronizado com APP_VERSION v3.5
 
 // Arquivos que ficam disponíveis offline
 const ARQUIVOS_CACHE = [
