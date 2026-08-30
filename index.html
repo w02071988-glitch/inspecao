@@ -4743,9 +4743,9 @@ function salvarEdicao(){
 // ════════════════════════════════════════════════════════════════
 // SISTEMA DE NOVIDADES
 // ════════════════════════════════════════════════════════════════
-const APP_VERSION='v3.6';
+const APP_VERSION='v3.7';
 // Só a novidade mais recente desta versão
-const APP_CHANGELOG=['IMPORTANTE — mais uma correção de perda de dados: gravações que aconteciam muito rápido uma atrás da outra (ex.: registrar uma inspeção e sair correndo pra próxima) agora esperam a gravação anterior terminar antes de começar outra, e o app trava a saída da página se uma gravação ainda estiver rolando na hora de sair/atualizar.'];
+const APP_CHANGELOG=['CORREÇÃO CRÍTICA — causa real da perda de inspeções: ao recarregar o app ou importar um backup, os dados só eram restaurados para ativos que já estavam na lista principal. Um ativo inspecionado pela tela "Ativos" (catálogo) sem fazer parte da lista principal tinha os dados salvos certinho, mas eram descartados na hora de ler de volta — por isso sumiam depois de sair e voltar, mesmo com o backup correto. Agora restaura os dados de QUALQUER ativo salvo, esteja ele na lista principal ou não.'];
 // Cores do badge alternando a cada versão
 // Paleta de cores que repete infinitamente
 const _CORES_PALETA=[
@@ -6181,12 +6181,20 @@ function importarBackup(input){
         ATIVOS.length=0;
         payload.DB_ativos.forEach(a=>ATIVOS.push(a));
       }
-      // Restaura dados de cada ativo
-      ATIVOS.forEach(a=>{
-        if(payload.DB_registros[a.id]) DB.registros[a.id]=payload.DB_registros[a.id];
-        if(payload.DB_fichas?.[a.id])    DB.fichas[a.id]=payload.DB_fichas[a.id];
-        if(payload.DB_raspAtivos?.[a.id])DB.raspAtivos[a.id]=payload.DB_raspAtivos[a.id];
-        _initAtivo(a.id);
+      // Restaura dados de TODOS os ativos presentes no backup, não só os que
+      // estão na lista principal (ATIVOS) — um ativo inspecionado pela tela
+      // "Ativos" (catálogo) sem fazer parte da lista principal também tinha
+      // dados válidos no backup, mas ficava de fora aqui antes.
+      const idsComDadosImport = new Set([
+        ...Object.keys(payload.DB_registros||{}),
+        ...Object.keys(payload.DB_fichas||{}),
+        ...Object.keys(payload.DB_raspAtivos||{})
+      ]);
+      idsComDadosImport.forEach(id=>{
+        if(payload.DB_registros[id]) DB.registros[id]=payload.DB_registros[id];
+        if(payload.DB_fichas?.[id])    DB.fichas[id]=payload.DB_fichas[id];
+        if(payload.DB_raspAtivos?.[id])DB.raspAtivos[id]=payload.DB_raspAtivos[id];
+        _initAtivo(id);
       });
       if(Array.isArray(payload.DB_anotacoesGerais)) DB.anotacoesGerais=payload.DB_anotacoesGerais;
       if(Array.isArray(payload.DB_favoritos)) DB.favoritos=new Set(payload.DB_favoritos);
@@ -6767,10 +6775,21 @@ function _aplicarDados(d){
       ATIVOS.length = 0;
       d.ativos.forEach(a=>{ ATIVOS.push(a); _initAtivo(a.id); });
     }
-    ATIVOS.forEach(a=>{
-      if(d.registros?.[a.id])  DB.registros[a.id]  = d.registros[a.id];
-      if(d.fichas?.[a.id])     DB.fichas[a.id]      = d.fichas[a.id];
-      if(d.raspAtivos?.[a.id]) DB.raspAtivos[a.id]  = d.raspAtivos[a.id];
+    // Restaura registros/fichas/raspAtivos de TODOS os ativos salvos, não só
+    // os que estão na lista principal (ATIVOS). Um ativo inspecionado pela
+    // tela "Ativos" (catálogo) sem fazer parte da lista principal também tem
+    // dados válidos aqui — restringir ao ATIVOS.forEach fazia esses dados
+    // sumirem toda vez que o app recarregava, mesmo estando salvos certinho.
+    const idsComDados = new Set([
+      ...Object.keys(d.registros||{}),
+      ...Object.keys(d.fichas||{}),
+      ...Object.keys(d.raspAtivos||{})
+    ]);
+    idsComDados.forEach(id=>{
+      if(d.registros?.[id])  DB.registros[id]  = d.registros[id];
+      if(d.fichas?.[id])     DB.fichas[id]      = d.fichas[id];
+      if(d.raspAtivos?.[id]) DB.raspAtivos[id]  = d.raspAtivos[id];
+      _initAtivo(id); // garante estruturas padrão mesmo pra ativo fora da lista principal
     });
     if(Array.isArray(d.anotacoesGerais)) DB.anotacoesGerais = d.anotacoesGerais;
     if(Array.isArray(d.favoritos))       DB.favoritos = new Set(d.favoritos);

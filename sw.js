@@ -3,7 +3,7 @@
 // Versão: 0.7
 // ══════════════════════════════════════════════════
 
-const CACHE_NAME = 'inspecao-v3.60'; // CRÍTICO: salvar ao minimizar/fechar + coalescing de gravações + bloqueio de saída durante salvamento — sincronizado com APP_VERSION v3.6
+const CACHE_NAME = 'inspecao-v3.70'; // CORREÇÃO CRÍTICA: restaura dados de QUALQUER ativo salvo (não só os da lista principal) — sincronizado com APP_VERSION v3.7
 
 // Arquivos que ficam disponíveis offline
 const ARQUIVOS_CACHE = [
